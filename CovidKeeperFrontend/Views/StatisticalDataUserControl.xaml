@@ -1,0 +1,122 @@
+﻿<UserControl x:Class="CovidKeeperFrontend.Views.StatisticalDataUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CovidKeeperFrontend.Views"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+             xmlns:MetroChart="clr-namespace:De.TorstenMandelkow.MetroChart;assembly=De.TorstenMandelkow.MetroChart"             
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    
+    <Grid>
+        <Grid Height="450">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="310"/>
+                <RowDefinition Height="60"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Row="0" Grid.ColumnSpan="3" >
+                <ItemsControl x:Name="StatisticButtonList">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10 0"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Uid="1" Width="180" Content="{Binding ButtonContent}" 
+                                        Height="50" Background="{x:Null}" BorderBrush="{x:Null}" 
+                                    Foreground="#FF2196F3" Click="Button_Click"/>                            
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Grid x:Name="GridCursor" Width="180" Height="5" Background="#FF2196F3" HorizontalAlignment="Left" Margin="10 0"/>
+
+            </Grid>
+            <Grid Grid.Row="1" Grid.ColumnSpan="3">
+                <StackPanel>
+                    <ScrollViewer x:Name="ScrollOfAmountEventPerWeekTable" Width="620" Height="300" >
+                        <DataGrid x:Name="AmountEventPerWeekTable" ItemsSource="{Binding Path=VM_AmountEventsByWorkerTableProperty, Mode=OneWay}" 
+                              Width="600" VerticalAlignment="Top" AutoGenerateColumns="False" 
+                                  SelectionChanged="AmountEventPerWeekTable_SelectionChanged" RowHeight="40">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Id_worker}" Header="Id worker" Width="150" IsReadOnly="True"/>
+                                <DataGridTextColumn Binding="{Binding FullName}" Header="Full name" Width="150" IsReadOnly="True"/>
+                                <DataGridTextColumn Binding="{Binding Count}" Header="Count events" Width="150" IsReadOnly="True"/>
+                                <DataGridTextColumn Binding="{Binding LineSeriesGraph}" Visibility="Hidden" Header="LineSeriesGraph" Width="150" IsReadOnly="True"/>
+                                <DataGridTextColumn Binding="{Binding LabelsGraph}" Visibility="Hidden" Header="LabelsGraph" Width="150" IsReadOnly="True"/>
+                                <DataGridTextColumn Binding="{Binding TitleGraph}" Visibility="Hidden" Header="TitleGraph" Width="150" IsReadOnly="True"/>
+                            </DataGrid.Columns>
+                            <DataGrid.ItemContainerStyle>
+                                <Style TargetType="DataGridRow">
+                                    <EventSetter Event="PreviewMouseLeftButtonDown" Handler="OnMouseDown"/>
+                                </Style>
+                            </DataGrid.ItemContainerStyle>
+                            <DataGrid.RowDetailsTemplate>
+                                <DataTemplate>
+                                    <DockPanel Height="200">
+                                        <lvc:CartesianChart Series="{Binding Path=LineSeriesGraph}" LegendLocation="Bottom">
+                                            <lvc:CartesianChart.AxisX>
+                                                <lvc:Axis Title="{Binding Path=TitleGraph}" 
+                                                              Labels="{Binding Path=LabelsGraph}"/>
+                                            </lvc:CartesianChart.AxisX>
+                                            <lvc:CartesianChart.AxisY>
+                                                <lvc:Axis Title="Total Events" />
+                                            </lvc:CartesianChart.AxisY>
+                                        </lvc:CartesianChart>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </DataGrid.RowDetailsTemplate>
+                        </DataGrid>
+                    </ScrollViewer>
+                </StackPanel>
+
+                <MetroChart:PieChart x:Name="PieGraph" Background="{x:Null}" ChartTitle="Average Per Weekday"
+                                                 ChartSubTitle="Each slice represent one weekday">
+                    <MetroChart:PieChart.Series>
+                        <MetroChart:ChartSeries SeriesTitle="Average Per Weekday" ItemsSource="{Binding Path=VM_ColumnGraphProperty}" DisplayMember="WorkWeek" ValueMember="AvgValue" />
+                    </MetroChart:PieChart.Series>
+                </MetroChart:PieChart>
+
+                <MetroChart:ClusteredColumnChart x:Name="ColumnGraph" Background="{x:Null}" ChartTitle="{Binding Path=VM_ColumnChartTitleProperty, Mode=OneWay}"
+                                                 ChartSubTitle="{Binding Path=VM_ColumnChartSubTitleProperty, Mode=OneWay}" >
+                    <MetroChart:ClusteredColumnChart.Series>
+                        <MetroChart:ChartSeries SeriesTitle="{Binding Path=VM_ColumnChartTitleProperty, Mode=OneWay}" 
+                                                ItemsSource="{Binding Path=VM_ColumnGraphProperty}" DisplayMember="WorkWeek" ValueMember="AvgValue" />
+                    </MetroChart:ClusteredColumnChart.Series>
+                </MetroChart:ClusteredColumnChart>
+            </Grid>
+            <Grid Grid.Row="2" Grid.Column="0">
+                <DatePicker x:Name="StartDatePicker" DisplayDate="{x:Static sys:DateTime.Now}" 
+                            DisplayDateStart="{Binding Path=VM_StartDateInDatePickerProperty, Mode=OneWay}" 
+                            DisplayDateEnd="{x:Static sys:DateTime.Now}"
+                            FirstDayOfWeek="Sunday" IsTodayHighlighted="True" VerticalAlignment="Center" 
+                            HorizontalAlignment="Center" Width="200"
+                            SelectedDate="{Binding Path=VM_SelectedDateStartInDatePickerProperty, Mode=OneWayToSource}"/>
+            </Grid>
+            <Grid Grid.Row="2" Grid.Column="1">
+                <DatePicker x:Name="EndDatePicker" DisplayDate="{x:Static sys:DateTime.Now}" 
+                            DisplayDateStart="{Binding Path=VM_StartDateInDatePickerProperty, Mode=OneWay}" 
+                            DisplayDateEnd="{x:Static sys:DateTime.Now}"
+                            FirstDayOfWeek="Sunday" IsTodayHighlighted="True" VerticalAlignment="Center" 
+                            HorizontalAlignment="Center" Width="200"
+                            SelectedDate="{Binding Path=VM_SelectedDateEndInDatePickerProperty, Mode=OneWayToSource}"/>
+            </Grid>
+            <Grid Grid.Row="2" Grid.Column="2">
+                <Grid.Effect>
+                    <DropShadowEffect BlurRadius="20" Color="#FFDEDEDE" ShadowDepth="1"/>
+                </Grid.Effect>
+                <Button x:Name="ShowGraphInThisRange" Content="Show" VerticalAlignment="Center" 
+                        HorizontalAlignment="Center" Width="70"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

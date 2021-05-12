@@ -1,0 +1,61 @@
+﻿<UserControl x:Class="CovidKeeperFrontend.Views.SearchWorkersUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CovidKeeperFrontend.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"  
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <materialDesign:TransitioningContent x:Name="TransitioningContentSlide" OpeningEffect="{materialDesign:TransitionEffect SlideInFromLeft, Duration=0:0:0.8}"/>
+        <Grid Height="450">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="288.8"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0" Grid.Row="0" >
+                <Grid HorizontalAlignment="Center" VerticalAlignment="Top" >
+                    <Label Content="ID:" Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30" Margin="0 0 0 100"/>
+                    <Label Content="FULL NAME:" Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30" Margin="0 0 0 50"/>
+                    <Label Content="EMAIL ADDRESS:" Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30" Margin="0 0 0 -10"/>
+                </Grid>
+            </Grid>
+            <Grid Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Width="208"  >
+                    <TextBox x:Name="IdWorker" materialDesign:HintAssist.Hint="ID" Text="" Foreground="Gray" FontFamily="Champagne &amp; Limousines" Height="30" FontSize="18" Margin="0,0,0,100" Width="200" HorizontalAlignment="Right"/>
+                    <TextBox x:Name="FullName" materialDesign:HintAssist.Hint="FULL NAME" Text=""  Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30" Margin="0,0,0,50" Width="200" HorizontalAlignment="Right"/>
+                    <TextBox x:Name="EmailAddress" materialDesign:HintAssist.Hint="EMAIL ADDRESS" Text=""  Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30" Margin="0,0,0,-10" Width="200" HorizontalAlignment="Right"/>
+                </Grid>
+            </Grid>
+            <Grid Grid.Row="0" Grid.Column="2">
+                <Image x:Name="ImageWorker" Stretch="Fill" VerticalAlignment="Top" HorizontalAlignment="Left" Width="150" Height="150" Margin="20,0,0,0"/>
+            </Grid>
+            <Grid Grid.Row="1" Grid.ColumnSpan="2">
+                <ScrollViewer>
+                    <DataGrid x:Name="WorkerDetailsTable" ItemsSource="{Binding Path=VM_SearchWorkerDetailsTableProperty, Mode=OneWay}" HorizontalAlignment="Left" Width="600" AutoGenerateColumns="False" Grid.Row="1" Grid.ColumnSpan="2" SelectionChanged="WorkerDetailsTable_SelectionChanged">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Id}" Header="Id" Width="150" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding FullName}" Header="Full Name" Width="150" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding Email_address}" Header="Email address" Width="250" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding Image}" Visibility="Hidden" Header="Image" Width="150" IsReadOnly="True"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </ScrollViewer>
+            </Grid>
+            <Grid Grid.Column="2" Grid.Row="1" Width="150">
+                <Grid.Effect>
+                    <DropShadowEffect BlurRadius="20" Color="#FFDEDEDE" ShadowDepth="1"/>
+                </Grid.Effect>
+                <StackPanel Width="200" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Button x:Name="SearchButton" Content="Search" Margin="10" Width="110" Click="SearchButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>
