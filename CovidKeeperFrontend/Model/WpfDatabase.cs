@@ -486,7 +486,6 @@ namespace CovidKeeperFrontend.Model
             if (tbl1.Rows.Count != tbl2.Rows.Count || tbl1.Columns.Count != tbl2.Columns.Count)
                 return false;
 
-
             for (int i = 0; i < tbl1.Rows.Count; i++)
             {
                 for (int c = 0; c < tbl1.Columns.Count; c++)
@@ -562,14 +561,6 @@ namespace CovidKeeperFrontend.Model
         {
             using (var command = sqlConnection.CreateCommand())
             {
-                /*byte[] imageToByte = ImagePathToByteArray(imagePath);
-                string insertQuery = @"INSERT INTO [dbo].[Workers] VALUES (@Id, @Fullname, @Email_address, @Image);";
-                command.CommandText = insertQuery;
-                command.Parameters.AddWithValue("@Id", idWorker);
-                command.Parameters.AddWithValue("@Fullname", fullname);
-                command.Parameters.AddWithValue("@Email_address", emailAddress);
-                command.Parameters.AddWithValue("@Image", imageToByte);
-                command.ExecuteNonQuery();*/
                 byte[] imageToByte = ImagePathToByteArray(imagePath);
                 string insertQuery = @"INSERT INTO [dbo].[Workers] VALUES (@Id, @Fullname, @Email_address);";
                 command.CommandText = insertQuery;
@@ -577,21 +568,32 @@ namespace CovidKeeperFrontend.Model
                 command.Parameters.AddWithValue("@Fullname", fullname);
                 command.Parameters.AddWithValue("@Email_address", emailAddress);
                 command.ExecuteNonQuery();
-                var cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
-                var cloudBlobContainer = cloudBlobClient.GetContainerReference("pictures");
-                cloudBlobContainer.CreateIfNotExists();
-                cloudBlobContainer.SetPermissions(new BlobContainerPermissions() { PublicAccess = BlobContainerPublicAccessType.Blob });
-                
-                CloudBlockBlob blockBlob = cloudBlobContainer.GetBlockBlobReference(idWorker + ".jpg");
-                using (var stream = new MemoryStream(imageToByte, writable: false))
-                {
-                    blockBlob.UploadFromStream(stream);
-                }
+                UploadImageToStorage(idWorker, imageToByte);
                 DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
                 workerDetailsTableTemp.Rows.Add(idWorker, fullname, emailAddress, imageToByte);
                 WorkerDetailsTableProperty = workerDetailsTableTemp;
             }
         }
+
+        private CloudBlobContainer GetCloudBlobContainer()
+        {
+            var cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
+            var cloudBlobContainer = cloudBlobClient.GetContainerReference("pictures");
+            cloudBlobContainer.CreateIfNotExists();
+            cloudBlobContainer.SetPermissions(new BlobContainerPermissions() { PublicAccess = BlobContainerPublicAccessType.Blob });
+            return cloudBlobContainer;
+        }
+
+        private void UploadImageToStorage(string idWorker, byte[] imageToByte)
+        {
+            CloudBlobContainer cloudBlobContainer = GetCloudBlobContainer();
+            CloudBlockBlob blockBlob = cloudBlobContainer.GetBlockBlobReference(idWorker + ".jpg");
+            using (var stream = new MemoryStream(imageToByte, writable: false))
+            {
+                blockBlob.UploadFromStream(stream);
+            }
+        }
+        
         private byte[] ImagePathToByteArray(BitmapImage imagePath)
         {
             Image temp = BitmapImage2Bitmap(imagePath);
@@ -619,14 +621,13 @@ namespace CovidKeeperFrontend.Model
                 byte[] imageToByte = ImagePathToByteArray(imagePath);
                 DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
                 var rowToChange = workerDetailsTableTemp.Rows[indexOfSelectedRow];
-                string updateQuery = @"UPDATE [dbo].[Workers] SET Fullname = @Fullname, Email_address = @Email_address, Image = @Image Where Id = @Id;";
+                string updateQuery = @"UPDATE [dbo].[Workers] SET Fullname = @Fullname, Email_address = @Email_address Where Id = @Id;";
                 command.CommandText = updateQuery;
                 command.Parameters.AddWithValue("@Id", idWorker);
                 command.Parameters.AddWithValue("@Fullname", fullname);
                 command.Parameters.AddWithValue("@Email_address", emailAddress);
-                command.Parameters.AddWithValue("@Image", imageToByte);
-                command.ExecuteNonQuery();          
-                
+                command.ExecuteNonQuery();
+                UploadImageToStorage(idWorker, imageToByte);
                 rowToChange["Id"] = idWorker;
                 rowToChange["Fullname"] = fullname;
                 rowToChange["Email_address"] = emailAddress;
@@ -647,17 +648,6 @@ namespace CovidKeeperFrontend.Model
                 rowToChange.Delete();
                 WorkerDetailsTableProperty = workerDetailsTableTemp;
             }
-        }
-
-        public DataTable GetWorkersDetails()
-        {
-            SqlCommand command = new SqlCommand();
-            command.CommandText = "Select * From Workers";
-            command.Connection = sqlConnection;
-            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command);
-            DataTable dataTableImages = new DataTable("Workers");
-            sqlDataAdapter.Fill(dataTableImages);
-            return dataTableImages;
         }
         public void RefreshDataHome()
         {
@@ -781,6 +771,20 @@ namespace CovidKeeperFrontend.Model
         {
             GetWorkersDetailsTemp();
         }
+
+        private byte[] GetImageWorker(string idWorker, CloudBlobContainer cloudBlobContainer=default)
+        {
+            if (cloudBlobContainer == default)
+            {
+                cloudBlobContainer = GetCloudBlobContainer();
+            }
+            CloudBlockBlob blockBlob = cloudBlobContainer.GetBlockBlobReference(idWorker + ".jpg");
+            using (var memoryStream = new MemoryStream())
+            {
+                blockBlob.DownloadToStream(memoryStream);
+                return memoryStream.ToArray();
+            }
+        }
         public void GetWorkersDetailsTemp()
         {
             SqlCommand command = new SqlCommand();
@@ -791,21 +795,18 @@ namespace CovidKeeperFrontend.Model
             sqlDataAdapter.Fill(dataTableImages);
             dataTableImages.Columns.Add("Image", typeof(byte[]));
 
-            var cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
-            var cloudBlobContainer = cloudBlobClient.GetContainerReference("pictures");
-            cloudBlobContainer.CreateIfNotExists();
-            cloudBlobContainer.SetPermissions(new BlobContainerPermissions() { PublicAccess = BlobContainerPublicAccessType.Blob });
+            CloudBlobContainer cloudBlobContainer = GetCloudBlobContainer(); 
             foreach (DataRow row in dataTableImages.Rows)
             {
                 string idWorker = row[0].ToString();
-                CloudBlockBlob blockBlob = cloudBlobContainer.GetBlockBlobReference(idWorker + ".jpg");
+                row["Image"] = GetImageWorker(idWorker, cloudBlobContainer);
+                /*CloudBlockBlob blockBlob = cloudBlobContainer.GetBlockBlobReference(idWorker + ".jpg");
                 using (var memoryStream = new MemoryStream())
                 {
                     blockBlob.DownloadToStream(memoryStream);
                     row["Image"] = memoryStream.ToArray();
-                }
-            }
-            
+                }*/
+            }            
             WorkerDetailsTableProperty = dataTableImages;
         }
         public void PercentageWorkersWithoutMaskTodayPerYesterday()
@@ -828,9 +829,9 @@ namespace CovidKeeperFrontend.Model
                 }
             }
         }
-        public void SearchById(string idWorker)
+        private DataTable SearchTableByQuery(string query)
         {
-            DataRow[] results = WorkerDetailsTableProperty.Select("Id = '" + idWorker + "'");
+            DataRow[] results = WorkerDetailsTableProperty.Select(query);
             DataTable dataTable = new DataTable("Workers");
             dataTable.Columns.Add("Id", typeof(String));
             dataTable.Columns.Add("FullName", typeof(String));
@@ -840,11 +841,25 @@ namespace CovidKeeperFrontend.Model
             {
                 dataTable.ImportRow(row);
             }
-            SearchWorkerDetailsTableProperty = dataTable;
+            return dataTable;
+        }
+        public void SearchById(string idWorker)
+        {
+            /*DataRow[] results = WorkerDetailsTableProperty.Select("Id = '" + idWorker + "'");
+            DataTable dataTable = new DataTable("Workers");
+            dataTable.Columns.Add("Id", typeof(String));
+            dataTable.Columns.Add("FullName", typeof(String));
+            dataTable.Columns.Add("Email_address", typeof(String));
+            dataTable.Columns.Add("Image", typeof(byte[]));
+            foreach (DataRow row in results)
+            {
+                dataTable.ImportRow(row);
+            }*/
+            SearchWorkerDetailsTableProperty = SearchTableByQuery("Id = '" + idWorker + "'");
         }
         public void SearchByIdAndEmail(string idWorker, string emailAddress)
         {
-            DataRow[] results = WorkerDetailsTableProperty.Select("Id = '" + idWorker + "' AND Email_address = '" + emailAddress + "'");
+            /*DataRow[] results = WorkerDetailsTableProperty.Select("Id = '" + idWorker + "' AND Email_address = '" + emailAddress + "'");
             DataTable dataTable = new DataTable("Workers");
             dataTable.Columns.Add("Id", typeof(String));
             dataTable.Columns.Add("FullName", typeof(String));
@@ -853,12 +868,12 @@ namespace CovidKeeperFrontend.Model
             foreach (DataRow row in results)
             {
                 dataTable.ImportRow(row);
-            }
-            SearchWorkerDetailsTableProperty = dataTable;
+            }*/
+            SearchWorkerDetailsTableProperty = SearchTableByQuery("Id = '" + idWorker + "' AND Email_address = '" + emailAddress + "'");
         }
         public void SearchByIdAndFullName(string idWorker, string fullName)
         {
-            DataRow[] results = WorkerDetailsTableProperty.Select("Id = '" + idWorker + "' AND FullName = '" + fullName + "'");
+            /*DataRow[] results = WorkerDetailsTableProperty.Select("Id = '" + idWorker + "' AND FullName = '" + fullName + "'");
             DataTable dataTable = new DataTable("Workers");
             dataTable.Columns.Add("Id", typeof(String));
             dataTable.Columns.Add("FullName", typeof(String));
@@ -867,12 +882,12 @@ namespace CovidKeeperFrontend.Model
             foreach (DataRow row in results)
             {
                 dataTable.ImportRow(row);
-            }
-            SearchWorkerDetailsTableProperty = dataTable;
+            }*/
+            SearchWorkerDetailsTableProperty = SearchTableByQuery("Id = '" + idWorker + "' AND FullName = '" + fullName + "'");
         }
         public void SearchByFullName(string fullName)
         {
-            DataRow[] results = WorkerDetailsTableProperty.Select("FullName = '" + fullName + "'");
+            /*DataRow[] results = WorkerDetailsTableProperty.Select("FullName = '" + fullName + "'");
             DataTable dataTable = new DataTable("Workers");
             dataTable.Columns.Add("Id", typeof(String));
             dataTable.Columns.Add("FullName", typeof(String));
@@ -881,12 +896,12 @@ namespace CovidKeeperFrontend.Model
             foreach (DataRow row in results)
             {
                 dataTable.ImportRow(row);
-            }
-            SearchWorkerDetailsTableProperty = dataTable;
+            }*/
+            SearchWorkerDetailsTableProperty = SearchTableByQuery("FullName = '" + fullName + "'");
         }
         public void SearchByFullNameAndEmail(string fullName, string emailAddress)
         {
-            DataRow[] results = WorkerDetailsTableProperty.Select("FullName = '" + fullName + "' AND Email_address = '" + emailAddress + "'");
+            /*DataRow[] results = WorkerDetailsTableProperty.Select("FullName = '" + fullName + "' AND Email_address = '" + emailAddress + "'");
             DataTable dataTable = new DataTable("Workers");
             dataTable.Columns.Add("Id", typeof(String));
             dataTable.Columns.Add("FullName", typeof(String));
@@ -895,12 +910,12 @@ namespace CovidKeeperFrontend.Model
             foreach (DataRow row in results)
             {
                 dataTable.ImportRow(row);
-            }
-            SearchWorkerDetailsTableProperty = dataTable;
+            }*/
+            SearchWorkerDetailsTableProperty = SearchTableByQuery("FullName = '" + fullName + "' AND Email_address = '" + emailAddress + "'");
         }
         public void SearchByEmail(string emailAddress)
         {
-            DataRow[] results = WorkerDetailsTableProperty.Select("Email_address = '" + emailAddress + "'");
+            /*DataRow[] results = WorkerDetailsTableProperty.Select("Email_address = '" + emailAddress + "'");
             DataTable dataTable = new DataTable("Workers");
             dataTable.Columns.Add("Id", typeof(String));
             dataTable.Columns.Add("FullName", typeof(String));
@@ -909,12 +924,12 @@ namespace CovidKeeperFrontend.Model
             foreach (DataRow row in results)
             {
                 dataTable.ImportRow(row);
-            }
-            SearchWorkerDetailsTableProperty = dataTable;
+            }*/
+            SearchWorkerDetailsTableProperty = SearchTableByQuery("Email_address = '" + emailAddress + "'");
         }
         public void SearchByIdAndFullNameAndEmail(string idWorker, string fullName, string emailAddress)
         {
-            DataRow[] results = WorkerDetailsTableProperty.Select("Id = '" + idWorker + "' AND FullName = '" + fullName + "' AND Email_address = '" + emailAddress + "'");
+            /*DataRow[] results = WorkerDetailsTableProperty.Select("Id = '" + idWorker + "' AND FullName = '" + fullName + "' AND Email_address = '" + emailAddress + "'");
             DataTable dataTable = new DataTable("Workers");
             dataTable.Columns.Add("Id", typeof(String));
             dataTable.Columns.Add("FullName", typeof(String));
@@ -923,8 +938,8 @@ namespace CovidKeeperFrontend.Model
             foreach (DataRow row in results)
             {
                 dataTable.ImportRow(row);
-            }
-            SearchWorkerDetailsTableProperty = dataTable;
+            }*/
+            SearchWorkerDetailsTableProperty = SearchTableByQuery("Id = '" + idWorker + "' AND FullName = '" + fullName + "' AND Email_address = '" + emailAddress + "'");
         }
 
         public void StartOrCloseProgram()
