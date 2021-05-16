@@ -482,19 +482,6 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
-        private DateTime dateTimeForConfig;
-
-        public DateTime DateTimeForConfigProperty
-        {
-            get { return dateTimeForConfig; }
-            set
-            {
-                if (dateTimeForConfig != value && value != default)
-                {
-                    dateTimeForConfig = value;
-                }
-            }
-        }
         private int minutesBreakForMails;
 
         public int MinutesBreakForMailsProperty
@@ -513,19 +500,9 @@ namespace CovidKeeperFrontend.Model
         {
             using (var command = sqlConnection.CreateCommand())
             {
-                string updateQuery = @"UPDATE [dbo].[Manager_Config] SET Minutes_between_mails = @Minutes_between_mails";
+                string updateQuery = @"UPDATE [dbo].[Manager_Config] SET Minutes_between_mails = @Minutes_between_mails, Config_time = @Config_time";
                 command.CommandText = updateQuery;
                 command.Parameters.AddWithValue("@Minutes_between_mails", minutesBreakToChange);
-                command.ExecuteNonQuery();
-            }
-            UpdateConfigTime();
-        }
-        private void UpdateConfigTime()
-        {
-            using (var command = sqlConnection.CreateCommand())
-            {
-                string updateQuery = @"UPDATE [dbo].[Starter] SET Config_time = @Config_time";
-                command.CommandText = updateQuery;
                 command.Parameters.AddWithValue("@Config_time", DateTime.Now);
                 command.ExecuteNonQuery();
             }
