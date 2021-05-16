@@ -7,24 +7,54 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d" Height="600" Width="1024" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None">
     <Grid Background="#FFEEEEEE" MouseDown="Grid_MouseDown">
-        <StackPanel VerticalAlignment="Top">
-            <Grid Background="#FF0069C0" Height="10"/>
-            <Grid Margin="5">
-                
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10 0">
-                    <Button x:Name="RefreshButton" Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Foreground="Gray" Margin="0 0 10 0" Click="RefreshButton_Click">
-                        <materialDesign:PackIcon Kind="Refresh"/>
-                    </Button>
-                    <Button x:Name="ButtonFechar" Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Foreground="Gray" Click="ButtonFechar_Click">
-                        <materialDesign:PackIcon Kind="Power"/>
-                    </Button>
-                </StackPanel>
-            </Grid>
-        </StackPanel>
+        <materialDesign:DialogHost BorderBrush="{DynamicResource MaterialDesignDivider}">
+            <materialDesign:DialogHost.DialogContent>
+                <Grid Width="400" Height="150" HorizontalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Margin="15">
+                        <materialDesign:PackIcon Kind="Settings" Foreground="{StaticResource PrimaryHueMidBrush}" Width="50" Height="50"/>
+                        <TextBlock Foreground="Gray" Width="200" Margin="15 5" TextWrapping="Wrap">
+                            In case the same employee goes without a mask several times a day, how often do you want to send him an email (minutes)?
+                        </TextBlock>
+                        <TextBox x:Name="BreakTimeForSendMailText" materialDesign:HintAssist.Hint="TIME" Foreground="Gray" Margin="15 5 0 10"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="15">
+                        <Button x:Name="UpdateBreakTimeForSendMailButton" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" 
+                                    Style="{DynamicResource MaterialDesignFlatButton}" Margin="4" 
+                                    VerticalAlignment="Center" Click="UpdateBreakTimeForSendMailButton_Click">
+                            Update
+                        </Button>
+                        <Button x:Name="CancelBreakTimeForSendMailButton" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" 
+                                    Style="{DynamicResource MaterialDesignFlatButton}" Margin="4" 
+                                    VerticalAlignment="Center" Click="CancelBreakTimeForSendMailButton_Click">
+                            Cancel
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </materialDesign:DialogHost.DialogContent>
+            <StackPanel VerticalAlignment="Top">
+                    <Grid Background="#FF0069C0" Height="10"/>            
+                        <Grid Margin="5">
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10 0">
+                            <Button x:Name="SettingsButton" Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Foreground="Gray" Margin="0 0 10 0" Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}">
+                                <materialDesign:PackIcon Kind="Settings"/>
+                            </Button>
+                            <Button x:Name="RefreshButton" Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Foreground="Gray" Margin="0 0 10 0" Click="RefreshButton_Click">
+                               <materialDesign:PackIcon Kind="Refresh"/>
+                            </Button>
+                            <Button x:Name="ButtonFechar" Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Foreground="Gray" Click="ButtonFechar_Click" Margin="0 0 10 0">
+                                <materialDesign:PackIcon Kind="Power"/>
+                            </Button>
+
+                        </StackPanel>
+                    </Grid>            
+            </StackPanel>
+        </materialDesign:DialogHost>
 
         <Grid Margin="276 55 0 0">
             <Grid x:Name="GridPrincipal" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
+        
 
         <Grid Width="270" HorizontalAlignment="Left" Background="#FF222222">
             <materialDesign:TransitioningContent x:Name="TransitioningContentSlide" OpeningEffect="{materialDesign:TransitionEffect SlideInFromLeft, Duration=0:0:0.2}">

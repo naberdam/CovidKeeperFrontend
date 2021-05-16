@@ -89,5 +89,19 @@ namespace CovidKeeperFrontend
         {
 
         }
+
+        private void UpdateBreakTimeForSendMailButton_Click(object sender, RoutedEventArgs e)
+        {
+            var isNumeric = int.TryParse(BreakTimeForSendMailText.Text, out int minutes);
+            if (BreakTimeForSendMailText.Text != "" && isNumeric)
+            {
+                (Application.Current as App).MainMenuViewModel.VM_MinutesBreakForMailsProperty = minutes;
+            }
+        }
+
+        private void CancelBreakTimeForSendMailButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

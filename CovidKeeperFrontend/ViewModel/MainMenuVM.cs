@@ -19,6 +19,10 @@ namespace CovidKeeperFrontend.ViewModel
         {
             set { model.IndexOfMenuListProperty = value; }
         }
+        public int VM_MinutesBreakForMailsProperty
+        {
+            set { model.MinutesBreakForMailsProperty = value; }
+        }
 
     }
 }

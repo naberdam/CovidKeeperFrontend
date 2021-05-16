@@ -481,6 +481,57 @@ namespace CovidKeeperFrontend.Model
                 }                
             }
         }
+
+        private DateTime dateTimeForConfig;
+
+        public DateTime DateTimeForConfigProperty
+        {
+            get { return dateTimeForConfig; }
+            set
+            {
+                if (dateTimeForConfig != value && value != default)
+                {
+                    dateTimeForConfig = value;
+                }
+            }
+        }
+        private int minutesBreakForMails;
+
+        public int MinutesBreakForMailsProperty
+        {
+            get { return minutesBreakForMails; }
+            set 
+            {
+                if (minutesBreakForMails != value)
+                {
+                    minutesBreakForMails = value;
+                    UpdateTimeBreakForMails(minutesBreakForMails);
+                }
+            }
+        }
+        private void UpdateTimeBreakForMails(int minutesBreakToChange)
+        {
+            using (var command = sqlConnection.CreateCommand())
+            {
+                string updateQuery = @"UPDATE [dbo].[Manager_Config] SET Minutes_between_mails = @Minutes_between_mails";
+                command.CommandText = updateQuery;
+                command.Parameters.AddWithValue("@Minutes_between_mails", minutesBreakToChange);
+                command.ExecuteNonQuery();
+            }
+            UpdateConfigTime();
+        }
+        private void UpdateConfigTime()
+        {
+            using (var command = sqlConnection.CreateCommand())
+            {
+                string updateQuery = @"UPDATE [dbo].[Starter] SET Config_time = @Config_time";
+                command.CommandText = updateQuery;
+                command.Parameters.AddWithValue("@Config_time", DateTime.Now);
+                command.ExecuteNonQuery();
+            }
+        }
+
+
         public static bool AreTablesTheSame(DataTable tbl1, DataTable tbl2)
         {
             if (tbl1.Rows.Count != tbl2.Rows.Count || tbl1.Columns.Count != tbl2.Columns.Count)
@@ -845,100 +896,30 @@ namespace CovidKeeperFrontend.Model
         }
         public void SearchById(string idWorker)
         {
-            /*DataRow[] results = WorkerDetailsTableProperty.Select("Id = '" + idWorker + "'");
-            DataTable dataTable = new DataTable("Workers");
-            dataTable.Columns.Add("Id", typeof(String));
-            dataTable.Columns.Add("FullName", typeof(String));
-            dataTable.Columns.Add("Email_address", typeof(String));
-            dataTable.Columns.Add("Image", typeof(byte[]));
-            foreach (DataRow row in results)
-            {
-                dataTable.ImportRow(row);
-            }*/
             SearchWorkerDetailsTableProperty = SearchTableByQuery("Id = '" + idWorker + "'");
         }
         public void SearchByIdAndEmail(string idWorker, string emailAddress)
         {
-            /*DataRow[] results = WorkerDetailsTableProperty.Select("Id = '" + idWorker + "' AND Email_address = '" + emailAddress + "'");
-            DataTable dataTable = new DataTable("Workers");
-            dataTable.Columns.Add("Id", typeof(String));
-            dataTable.Columns.Add("FullName", typeof(String));
-            dataTable.Columns.Add("Email_address", typeof(String));
-            dataTable.Columns.Add("Image", typeof(byte[]));
-            foreach (DataRow row in results)
-            {
-                dataTable.ImportRow(row);
-            }*/
             SearchWorkerDetailsTableProperty = SearchTableByQuery("Id = '" + idWorker + "' AND Email_address = '" + emailAddress + "'");
         }
         public void SearchByIdAndFullName(string idWorker, string fullName)
         {
-            /*DataRow[] results = WorkerDetailsTableProperty.Select("Id = '" + idWorker + "' AND FullName = '" + fullName + "'");
-            DataTable dataTable = new DataTable("Workers");
-            dataTable.Columns.Add("Id", typeof(String));
-            dataTable.Columns.Add("FullName", typeof(String));
-            dataTable.Columns.Add("Email_address", typeof(String));
-            dataTable.Columns.Add("Image", typeof(byte[]));
-            foreach (DataRow row in results)
-            {
-                dataTable.ImportRow(row);
-            }*/
             SearchWorkerDetailsTableProperty = SearchTableByQuery("Id = '" + idWorker + "' AND FullName = '" + fullName + "'");
         }
         public void SearchByFullName(string fullName)
         {
-            /*DataRow[] results = WorkerDetailsTableProperty.Select("FullName = '" + fullName + "'");
-            DataTable dataTable = new DataTable("Workers");
-            dataTable.Columns.Add("Id", typeof(String));
-            dataTable.Columns.Add("FullName", typeof(String));
-            dataTable.Columns.Add("Email_address", typeof(String));
-            dataTable.Columns.Add("Image", typeof(byte[]));
-            foreach (DataRow row in results)
-            {
-                dataTable.ImportRow(row);
-            }*/
             SearchWorkerDetailsTableProperty = SearchTableByQuery("FullName = '" + fullName + "'");
         }
         public void SearchByFullNameAndEmail(string fullName, string emailAddress)
         {
-            /*DataRow[] results = WorkerDetailsTableProperty.Select("FullName = '" + fullName + "' AND Email_address = '" + emailAddress + "'");
-            DataTable dataTable = new DataTable("Workers");
-            dataTable.Columns.Add("Id", typeof(String));
-            dataTable.Columns.Add("FullName", typeof(String));
-            dataTable.Columns.Add("Email_address", typeof(String));
-            dataTable.Columns.Add("Image", typeof(byte[]));
-            foreach (DataRow row in results)
-            {
-                dataTable.ImportRow(row);
-            }*/
             SearchWorkerDetailsTableProperty = SearchTableByQuery("FullName = '" + fullName + "' AND Email_address = '" + emailAddress + "'");
         }
         public void SearchByEmail(string emailAddress)
         {
-            /*DataRow[] results = WorkerDetailsTableProperty.Select("Email_address = '" + emailAddress + "'");
-            DataTable dataTable = new DataTable("Workers");
-            dataTable.Columns.Add("Id", typeof(String));
-            dataTable.Columns.Add("FullName", typeof(String));
-            dataTable.Columns.Add("Email_address", typeof(String));
-            dataTable.Columns.Add("Image", typeof(byte[]));
-            foreach (DataRow row in results)
-            {
-                dataTable.ImportRow(row);
-            }*/
             SearchWorkerDetailsTableProperty = SearchTableByQuery("Email_address = '" + emailAddress + "'");
         }
         public void SearchByIdAndFullNameAndEmail(string idWorker, string fullName, string emailAddress)
         {
-            /*DataRow[] results = WorkerDetailsTableProperty.Select("Id = '" + idWorker + "' AND FullName = '" + fullName + "' AND Email_address = '" + emailAddress + "'");
-            DataTable dataTable = new DataTable("Workers");
-            dataTable.Columns.Add("Id", typeof(String));
-            dataTable.Columns.Add("FullName", typeof(String));
-            dataTable.Columns.Add("Email_address", typeof(String));
-            dataTable.Columns.Add("Image", typeof(byte[]));
-            foreach (DataRow row in results)
-            {
-                dataTable.ImportRow(row);
-            }*/
             SearchWorkerDetailsTableProperty = SearchTableByQuery("Id = '" + idWorker + "' AND FullName = '" + fullName + "' AND Email_address = '" + emailAddress + "'");
         }
 
