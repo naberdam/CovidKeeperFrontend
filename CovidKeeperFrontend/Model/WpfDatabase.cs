@@ -110,8 +110,8 @@ namespace CovidKeeperFrontend.Model
         }
         public enum HandleFlag
         {
-            Close = 0,
-            Start = 1
+            Close = 1,
+            Start = 0
         }
 
         private HandleFlag activeButtonContent;
@@ -533,7 +533,7 @@ namespace CovidKeeperFrontend.Model
                 command.CommandText = updateQuery;
                 command.Parameters.AddWithValue("@Minutes_between_mails", minutesBreakToChange);
                 command.Parameters.AddWithValue("@Handle", 1);
-                command.ExecuteNonQuery();
+                command.ExecuteNonQueryAsync();
             }
         }
 
@@ -616,7 +616,7 @@ namespace CovidKeeperFrontend.Model
                 command.Parameters.AddWithValue("@Id", idWorker);
                 command.Parameters.AddWithValue("@Fullname", fullname);
                 command.Parameters.AddWithValue("@Email_address", emailAddress);
-                command.ExecuteNonQuery();
+                command.ExecuteNonQueryAsync();
                 UploadImageToStorage(idWorker, imageToByte);
                 DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
                 workerDetailsTableTemp.Rows.Add(idWorker, fullname, emailAddress, imageToByte);
@@ -675,7 +675,7 @@ namespace CovidKeeperFrontend.Model
                 command.Parameters.AddWithValue("@Id", idWorker);
                 command.Parameters.AddWithValue("@Fullname", fullname);
                 command.Parameters.AddWithValue("@Email_address", emailAddress);
-                command.ExecuteNonQuery();
+                command.ExecuteNonQueryAsync();
                 UploadImageToStorage(idWorker, imageToByte);
                 rowToChange["Id"] = idWorker;
                 rowToChange["Fullname"] = fullname;
@@ -691,7 +691,7 @@ namespace CovidKeeperFrontend.Model
             {
                 string deleteQuery = @"DELETE FROM [dbo].[Workers] WHERE Id = " + idWorker + ";";
                 command.CommandText = deleteQuery;
-                command.ExecuteNonQuery();
+                command.ExecuteNonQueryAsync();
                 DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
                 var rowToChange = workerDetailsTableTemp.Rows[indexOfSelectedRow];
                 rowToChange.Delete();
@@ -921,12 +921,12 @@ namespace CovidKeeperFrontend.Model
         {            
             if (ActiveButtonContentProperty == HandleFlag.Start)
             {
-                UpdateHandleInStarter("1", "0");
+                UpdateHandleInStarter("0", "1");
                 ActiveButtonContentProperty = HandleFlag.Close;
             }
             else
             {
-                UpdateHandleInStarter("0", "1");
+                UpdateHandleInStarter("1", "0");
                 ActiveButtonContentProperty = HandleFlag.Start;
             }
         }
@@ -938,7 +938,7 @@ namespace CovidKeeperFrontend.Model
                 string updateQuery = @"UPDATE [dbo].[Starter] SET Handle = @Handle where Handle = " + valueInTable;
                 command.CommandText = updateQuery;
                 command.Parameters.AddWithValue("@Handle", valueToUpdate);
-                command.ExecuteNonQuery();
+                command.ExecuteNonQueryAsync();
             }
         }
         private void UpdateHandleInAnalayzerConfig()
@@ -948,7 +948,7 @@ namespace CovidKeeperFrontend.Model
                 string updateQuery = @"UPDATE [dbo].[Analayzer_config] SET Handle = @Handle";
                 command.CommandText = updateQuery;
                 command.Parameters.AddWithValue("@Handle", "1");
-                command.ExecuteNonQuery();
+                command.ExecuteNonQueryAsync();
             }
         }
         private void RefreshSearchWorkers()
