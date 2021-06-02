@@ -25,10 +25,15 @@ namespace CovidKeeperFrontend.ViewModel
                 NotifyPropertyChanged("VM_" + e.PropertyName);
             };
         }
+        public string VM_CountWorkersInWorkersDetailsTableProperty 
+        { 
+            get { return model.CountWorkersInWorkersDetailsTableProperty; }
+        }
         public DataTable VM_WorkerDetailsTableProperty
         {
             get { return model.WorkerDetailsTableProperty; }
         }
+        
 
         public void NotifyPropertyChanged(string propName)
         {

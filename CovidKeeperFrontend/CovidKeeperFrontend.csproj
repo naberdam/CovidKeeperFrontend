@@ -218,6 +218,9 @@
     <Compile Include="Views\HomeUserControl.xaml.cs">
       <DependentUpon>HomeUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ManageWorkersUserControl.xaml.cs">
+      <DependentUpon>ManageWorkersUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SearchWorkersUserControl.xaml.cs">
       <DependentUpon>SearchWorkersUserControl.xaml</DependentUpon>
     </Compile>
@@ -248,6 +251,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\HomeUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ManageWorkersUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

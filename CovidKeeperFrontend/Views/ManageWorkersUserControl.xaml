@@ -1,0 +1,119 @@
+﻿<UserControl x:Class="CovidKeeperFrontend.Views.ManageWorkersUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CovidKeeperFrontend.Views"             
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <materialDesign:TransitioningContent x:Name="TransitioningContentSlide" OpeningEffect="{materialDesign:TransitionEffect SlideInFromLeft, Duration=0:0:0.8}"/>
+        <materialDesign:DialogHost BorderBrush="{DynamicResource MaterialDesignDivider}">
+            <materialDesign:DialogHost.DialogContent>
+                <Grid Width="400" Height="315" VerticalAlignment="Top" HorizontalAlignment="Center">
+                    
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal" Margin="15">
+                            <materialDesign:PackIcon Kind="PeopleAdd" Foreground="{StaticResource PrimaryHueMidBrush}" Width="50" Height="50"/>        
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="15, 0, 0, 0">
+                            <Label Content="ID:" Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30"/>
+                            <TextBox x:Name="IdWorker" materialDesign:HintAssist.Hint="ID" Text="" Foreground="Gray" FontFamily="Champagne &amp; Limousines" Height="30" FontSize="18" Width="200" Margin="15, 0, 0, 0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="15, 0, 0, 0">
+                            <Label Content="FULL NAME:" Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30"/>
+                            <TextBox x:Name="FullName" materialDesign:HintAssist.Hint="FULL NAME" Text=""  Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30" Width="200" Margin="15, 0, 0, 0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="15, 0, 0, 0">
+                            <Label Content="EMAIL ADDRESS:" Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30"/>
+                            <TextBox x:Name="EmailAddress" materialDesign:HintAssist.Hint="EMAIL ADDRESS" Text=""  Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30" Width="200" Margin="15, 0, 0, 0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="15, 0, 0, 0">
+                            <Label Content="ADD IMAGE" Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30" />
+                            <Button x:Name="LoadButton" Width="30" Height="30" Padding="0" Click="LoadButton_Click"
+                            Background="{x:Null}" BorderBrush="{x:Null}" Foreground="Gray" Margin="15, 0, 0, 0">
+                                <materialDesign:PackIcon Kind="AttachFile"/>
+                            </Button>
+                            <Image x:Name="ImageWorker" Stretch="Fill" Width="80" Height="80" Margin="15, 0, 0, 0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="15">
+                            <Button x:Name="AddButton" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" 
+                                    Style="{DynamicResource MaterialDesignFlatButton}" Margin="4" 
+                                    VerticalAlignment="Center" Click="AddButton_Click">
+                                Add
+                            </Button>
+                            <Button x:Name="CancelAddWorkerButton"  
+                                    Style="{DynamicResource MaterialDesignFlatButton}" Margin="4" 
+                                    VerticalAlignment="Center" Click="CancelAddWorkerButton_Click">
+                                Cancel
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </materialDesign:DialogHost.DialogContent>
+            <Grid Height="80" VerticalAlignment="Top" HorizontalAlignment="Center">
+                <StackPanel Orientation="Horizontal" >
+                    <Button x:Name="PlusButton" Width="30" Height="30" Padding="0" Foreground="Gray" Background="{x:Null}" BorderBrush="{x:Null}" 
+                            Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}" Click="PlusButton_Click">
+                        <materialDesign:PackIcon Kind="PlusBold"/>
+                    </Button>
+                    <Button x:Name="SearchButton" Width="30" Height="30" Padding="0" 
+                            Background="{x:Null}" BorderBrush="{x:Null}" Foreground="Gray">
+                        <materialDesign:PackIcon Kind="Search"/>
+                    </Button>
+                    <TextBox x:Name="IdWorkerSearch" materialDesign:HintAssist.Hint="SEARCH IN WORKERS TABLE" Foreground="Gray" 
+                         FontFamily="Champagne &amp; Limousines" Height="30" FontSize="18" Margin="10 0"/>
+                </StackPanel>
+            </Grid>
+        </materialDesign:DialogHost>
+        <Grid Height="450">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="380"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>            
+            
+            <Grid Grid.Row="1" Grid.ColumnSpan="3">
+                <ScrollViewer Margin="0,0,0,30">
+                    <DataGrid x:Name="WorkerDetailsTable" ItemsSource="{Binding Path=VM_WorkerDetailsTableProperty, Mode=OneWay}" 
+                              HorizontalAlignment="Left" AutoGenerateColumns="False" CurrentCellChanged="WorkerDetailsTable_CurrentCellChanged"
+                              SelectionChanged="WorkerDetailsTable_SelectionChanged" CanUserDeleteRows="True" CanUserAddRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button x:Name="DeleteButton" Click="DeleteButton_Click" Width="30" Height="30" Padding="0" 
+                            Background="{x:Null}" BorderBrush="{x:Null}" Foreground="Gray">
+                                            <materialDesign:PackIcon Kind="Trash"/>
+                                        </Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Binding="{Binding Id}" Header="Id" Width="150" />
+                            <DataGridTextColumn Binding="{Binding FullName}" Header="Full Name" Width="150" />
+                            <DataGridTextColumn Binding="{Binding Email_address}" Header="Email address" Width="250"/>
+                            <DataGridTemplateColumn Header="Image" IsReadOnly="True">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding Image_checkbox}" IsEnabled="False"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Binding="{Binding Image}" Visibility="Hidden" Header="Image" Width="150" IsReadOnly="True"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </ScrollViewer>
+                <StackPanel Orientation="Horizontal" Margin="0,350,0,0">
+                    <TextBlock Text="{Binding Path=VM_CountWorkersInWorkersDetailsTableProperty, StringFormat='Total Workers: {0}'}"
+                              Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30" FontWeight="Bold" />
+                </StackPanel>
+            </Grid>
+        </Grid>        
+
+    </Grid>
+</UserControl>

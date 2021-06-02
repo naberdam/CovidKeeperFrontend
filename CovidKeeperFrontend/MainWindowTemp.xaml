@@ -18,7 +18,7 @@
                         <TextBox x:Name="BreakTimeForSendMailText" materialDesign:HintAssist.Hint="TIME" Foreground="Gray" Margin="15 5 0 10"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="15">
-                        <Button x:Name="UpdateBreakTimeForSendMailButton" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" 
+                        <Button x:Name="UpdateBreakTimeForSendMailButton" 
                                     Style="{DynamicResource MaterialDesignFlatButton}" Margin="4" 
                                     VerticalAlignment="Center" Click="UpdateBreakTimeForSendMailButton_Click">
                             Update
@@ -36,7 +36,9 @@
                         <Grid Margin="5">
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10 0">
-                            <Button x:Name="SettingsButton" Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Foreground="Gray" Margin="0 0 10 0" Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}">
+                            <Button x:Name="SettingsButton" Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" 
+                                    Padding="0" Foreground="Gray" Margin="0 0 10 0" Click="SettingsButton_Click"
+                                    Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}">
                                 <materialDesign:PackIcon Kind="Settings"/>
                             </Button>
                             <Button x:Name="RefreshButton" Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Foreground="Gray" Margin="0 0 10 0" Click="RefreshButton_Click">
@@ -83,6 +85,12 @@
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="ChartBar" Width="30" Height="30" VerticalAlignment="Center" Margin="5"/>
                         <TextBlock Text="Statistics" FontSize="17" VerticalAlignment="Center" Margin="20 0"/>
+                    </StackPanel>
+                </ListViewItem>
+                <ListViewItem Height="60">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="ChartBar" Width="30" Height="30" VerticalAlignment="Center" Margin="5"/>
+                        <TextBlock Text="temp" FontSize="17" VerticalAlignment="Center" Margin="20 0"/>
                     </StackPanel>
                 </ListViewItem>
             </ListView>

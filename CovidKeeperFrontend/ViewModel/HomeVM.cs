@@ -35,6 +35,14 @@ namespace CovidKeeperFrontend.ViewModel
         {
             get 
             {
+                if (this.model.ActiveButtonContentProperty == WpfDatabase.HandleFlag.Start)
+                {
+                    BackgroundColorActiveButtonProperty = System.Windows.Media.Brushes.Green;
+                }
+                else
+                {
+                    BackgroundColorActiveButtonProperty = System.Windows.Media.Brushes.Red;
+                }
                 return this.model.ActiveButtonContentProperty.ToString();
             }
         }
@@ -68,7 +76,7 @@ namespace CovidKeeperFrontend.ViewModel
             set
             {
                 foregroundColorPercentageWorkers = value;
-                NotifyPropertyChanged("ForegroundColor");
+                NotifyPropertyChanged("ForegroundColorPercentageWorkersProperty");
             }
         }
         private string GetFormatPercentageWorkers(float percentageWorkers, string signPercentage)
@@ -90,6 +98,17 @@ namespace CovidKeeperFrontend.ViewModel
                 return String.Format(signPercentage + "{0:0000}%", percentageWorkers);
             }
             return String.Format(signPercentage + "{0:00000}%", percentageWorkers);
+        }
+        private System.Windows.Media.Brush backgroundColorActiveButton = System.Windows.Media.Brushes.DarkSeaGreen;
+
+        public System.Windows.Media.Brush BackgroundColorActiveButtonProperty
+        {
+            get { return backgroundColorActiveButton; }
+            set
+            {
+                backgroundColorActiveButton = value;
+                NotifyPropertyChanged("BackgroundColorActiveButtonProperty");
+            }
         }
 
         public void NotifyPropertyChanged(string propName)

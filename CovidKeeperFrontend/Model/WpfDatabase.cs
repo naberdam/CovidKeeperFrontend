@@ -50,6 +50,21 @@ namespace CovidKeeperFrontend.Model
                 }
             }
         }
+        private string countWorkersInWorkersDetailsTable;
+
+        public string CountWorkersInWorkersDetailsTableProperty
+        {
+            get { return countWorkersInWorkersDetailsTable; }
+            set 
+            {
+                if (countWorkersInWorkersDetailsTable != value)
+                {
+                    countWorkersInWorkersDetailsTable = value;
+                    NotifyPropertyChanged("CountWorkersInWorkersDetailsTableProperty");
+                }                
+            }
+        }
+
 
         private DataTable workerDetailsTable = default;
         public DataTable WorkerDetailsTableProperty 
@@ -60,6 +75,8 @@ namespace CovidKeeperFrontend.Model
                 if (workerDetailsTable != value)
                 {
                     workerDetailsTable = value;
+                    CountWorkersInWorkersDetailsTableProperty = value.Rows.Count.ToString();
+                    UpdateHandleInAnalayzerConfig();
                     NotifyPropertyChanged("WorkerDetailsTableProperty");
                 }
             }
@@ -91,15 +108,15 @@ namespace CovidKeeperFrontend.Model
                 }
             }
         }
-        public enum StartOrClose
+        public enum HandleFlag
         {
             Close = 0,
             Start = 1
         }
 
-        private StartOrClose activeButtonContent;
+        private HandleFlag activeButtonContent;
 
-        public StartOrClose ActiveButtonContentProperty
+        public HandleFlag ActiveButtonContentProperty
         {
             get { return activeButtonContent; }
             set
@@ -141,6 +158,8 @@ namespace CovidKeeperFrontend.Model
                             break;
                         case 3:
                             RefreshStatisticalData();
+                            break;
+                        case 4:
                             break;
                         default:
                             break;
@@ -496,18 +515,27 @@ namespace CovidKeeperFrontend.Model
                 }
             }
         }
+
+        public WpfDatabase()
+        {
+            connectionString = "Server=tcp:mysqlservercovid.database.windows.net,1433;Initial Catalog=myCovidKeeper;Persist Security Info=False;User ID=azureuser;Password=Amitai5925;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+            sqlConnection = new SqlConnection(connectionString);
+            sqlConnection.Open();
+            object[] result = QuerySelectOfOneRow("select Handle from [dbo].[Starter]");
+            HandleFlag starterHandleEnum = (HandleFlag)Enum.Parse(typeof(HandleFlag), result[0].ToString());
+            ActiveButtonContentProperty = starterHandleEnum;
+        }
         private void UpdateTimeBreakForMails(int minutesBreakToChange)
         {
             using (var command = sqlConnection.CreateCommand())
             {
-                string updateQuery = @"UPDATE [dbo].[Manager_Config] SET Minutes_between_mails = @Minutes_between_mails, Config_time = @Config_time";
+                string updateQuery = @"UPDATE [dbo].[Manager_Config] SET Minutes_between_mails = @Minutes_between_mails, Handle = @Handle";
                 command.CommandText = updateQuery;
                 command.Parameters.AddWithValue("@Minutes_between_mails", minutesBreakToChange);
-                command.Parameters.AddWithValue("@Config_time", DateTime.Now);
+                command.Parameters.AddWithValue("@Handle", 1);
                 command.ExecuteNonQuery();
             }
         }
-
 
         public static bool AreTablesTheSame(DataTable tbl1, DataTable tbl2)
         {
@@ -523,13 +551,6 @@ namespace CovidKeeperFrontend.Model
                 }
             }
             return true;
-        }
-
-        public WpfDatabase()
-        {
-            connectionString = "Server=tcp:mysqlservercovid.database.windows.net,1433;Initial Catalog=myCovidKeeper;Persist Security Info=False;User ID=azureuser;Password=Amitai5925;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
-            sqlConnection = new SqlConnection(connectionString);
-            sqlConnection.Open();
         }
         public void NotifyPropertyChanged(string propName)
         {
@@ -766,7 +787,7 @@ namespace CovidKeeperFrontend.Model
             object[] handle = QuerySelectOfOneRow(handleQuery);
             if (handle != null)
             {
-                StartOrClose startOrClose = (StartOrClose)Enum.Parse(typeof(StartOrClose), handle[0].ToString());
+                HandleFlag startOrClose = (HandleFlag)Enum.Parse(typeof(HandleFlag), handle[0].ToString());
                 ActiveButtonContentProperty = startOrClose;
             }
         }
@@ -822,19 +843,15 @@ namespace CovidKeeperFrontend.Model
             DataTable dataTableImages = new DataTable("Workers");
             sqlDataAdapter.Fill(dataTableImages);
             dataTableImages.Columns.Add("Image", typeof(byte[]));
+            dataTableImages.Columns.Add("Image_checkbox", typeof(bool));
 
-            CloudBlobContainer cloudBlobContainer = GetCloudBlobContainer(); 
+            CloudBlobContainer cloudBlobContainer = GetCloudBlobContainer();
             foreach (DataRow row in dataTableImages.Rows)
             {
                 string idWorker = row[0].ToString();
                 row["Image"] = GetImageWorker(idWorker, cloudBlobContainer);
-                /*CloudBlockBlob blockBlob = cloudBlobContainer.GetBlockBlobReference(idWorker + ".jpg");
-                using (var memoryStream = new MemoryStream())
-                {
-                    blockBlob.DownloadToStream(memoryStream);
-                    row["Image"] = memoryStream.ToArray();
-                }*/
-            }            
+                row["Image_checkbox"] = true;
+            }
             WorkerDetailsTableProperty = dataTableImages;
         }
         public void PercentageWorkersWithoutMaskTodayPerYesterday()
@@ -902,15 +919,15 @@ namespace CovidKeeperFrontend.Model
 
         public void StartOrCloseProgram()
         {            
-            if (ActiveButtonContentProperty == StartOrClose.Start)
+            if (ActiveButtonContentProperty == HandleFlag.Start)
             {
                 UpdateHandleInStarter("1", "0");
-                ActiveButtonContentProperty = StartOrClose.Close;
+                ActiveButtonContentProperty = HandleFlag.Close;
             }
             else
             {
                 UpdateHandleInStarter("0", "1");
-                ActiveButtonContentProperty = StartOrClose.Start;
+                ActiveButtonContentProperty = HandleFlag.Start;
             }
         }
 
@@ -921,6 +938,16 @@ namespace CovidKeeperFrontend.Model
                 string updateQuery = @"UPDATE [dbo].[Starter] SET Handle = @Handle where Handle = " + valueInTable;
                 command.CommandText = updateQuery;
                 command.Parameters.AddWithValue("@Handle", valueToUpdate);
+                command.ExecuteNonQuery();
+            }
+        }
+        private void UpdateHandleInAnalayzerConfig()
+        {
+            using (var command = sqlConnection.CreateCommand())
+            {
+                string updateQuery = @"UPDATE [dbo].[Analayzer_config] SET Handle = @Handle";
+                command.CommandText = updateQuery;
+                command.Parameters.AddWithValue("@Handle", "1");
                 command.ExecuteNonQuery();
             }
         }

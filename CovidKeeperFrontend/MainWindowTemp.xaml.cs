@@ -1,5 +1,6 @@
 ﻿using CovidKeeperFrontend.ViewModel;
 using CovidKeeperFrontend.Views;
+using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -27,6 +28,7 @@ namespace CovidKeeperFrontend
         WorkersTableUserControl workersTableUserControl = new WorkersTableUserControl();
         SearchWorkersUserControl searchWorkersUserControl = new SearchWorkersUserControl();
         StatisticalDataUserControl statisticalDataUserControl = new StatisticalDataUserControl();
+        ManageWorkersUserControl manageWorkersUserControl = new ManageWorkersUserControl();
         public MainWindowTemp()
         {
             InitializeComponent();
@@ -35,7 +37,9 @@ namespace CovidKeeperFrontend
             workersTableUserControl.DataContext = (Application.Current as App).WorkersTableViewModel;
             searchWorkersUserControl.DataContext = (Application.Current as App).SearchWorkersViewModel;
             statisticalDataUserControl.DataContext = (Application.Current as App).StatisticalDataViewModel;
+            manageWorkersUserControl.DataContext = (Application.Current as App).WorkersTableViewModel;
             ListViewMenu.SelectedIndex = 0;
+            manageWorkersUserControl.SetMainWindow(this);
         }
 
         private void ButtonFechar_Click(object sender, RoutedEventArgs e)
@@ -74,6 +78,11 @@ namespace CovidKeeperFrontend
                     GridPrincipal.Children.Clear();
                     GridPrincipal.Children.Add(statisticalDataUserControl);
                     break;
+                case 4:
+                    manageWorkersUserControl.ClearFields();
+                    GridPrincipal.Children.Clear();
+                    GridPrincipal.Children.Add(manageWorkersUserControl);
+                    break;
                 default:
                     break;
             }
@@ -96,12 +105,24 @@ namespace CovidKeeperFrontend
             if (BreakTimeForSendMailText.Text != "" && isNumeric)
             {
                 (Application.Current as App).MainMenuViewModel.VM_MinutesBreakForMailsProperty = minutes;
+                this.IsEnabled = true;
+                DialogHost.CloseDialogCommand.Execute(null, null);
+            }
+            else if (!isNumeric)
+            {
+                MessageBox.Show("You need to insert minutes only with numbers (and not letters)");
             }
         }
 
         private void CancelBreakTimeForSendMailButton_Click(object sender, RoutedEventArgs e)
         {
+            DialogHost.CloseDialogCommand.Execute(null, null);
+            this.IsEnabled = true;
+        }
 
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.IsEnabled = false;
         }
     }
 }
