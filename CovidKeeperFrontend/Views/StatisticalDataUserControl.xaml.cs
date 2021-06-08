@@ -71,6 +71,7 @@ namespace CovidKeeperFrontend.Views
             EndDatePicker.Visibility = Visibility.Hidden;*/
             ShowGraphInThisRange.Visibility = Visibility.Hidden;
             GridCursor.Visibility = Visibility.Hidden;
+            ShowGraphInThisRangeText.Visibility = Visibility.Hidden;
             statisticsOptionListEnum = StatisticsOptionListEnum.Nothing;
             /*CommentText.Visibility = Visibility.Hidden;*/
         }
@@ -123,7 +124,7 @@ namespace CovidKeeperFrontend.Views
                     EndDatePicker.Visibility = Visibility.Visible;*/
                     ShowGraphInThisRange.Visibility = Visibility.Visible;
                     CommentText.Text = "Please select a day for the week you are interested in:";
-                    ShowGraphInThisRangeText.Text = "If you are intrested in date range, please click on the calendar - ";
+                    ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
                     break;
                 case StatisticsOptionListEnum.AGE_PER_MONTH:
@@ -135,6 +136,7 @@ namespace CovidKeeperFrontend.Views
                     EndDatePicker.Visibility = Visibility.Visible;*/
                     ShowGraphInThisRange.Visibility = Visibility.Visible;
                     CommentText.Text = "Please select a day for the month you are interested in:";
+                    ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
                     break;
                 case StatisticsOptionListEnum.AGE_PER_WEEKDAY:
@@ -146,6 +148,7 @@ namespace CovidKeeperFrontend.Views
                     EndDatePicker.Visibility = Visibility.Hidden;*/
                     ShowGraphInThisRange.Visibility = Visibility.Hidden;
                     CommentText.Text = "Please select a day for the week you are interested in:";
+                    ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
                     break;
                 case StatisticsOptionListEnum.TOTAL_EVENTS:
@@ -157,6 +160,7 @@ namespace CovidKeeperFrontend.Views
                     EndDatePicker.Visibility = Visibility.Hidden;*/
                     ShowGraphInThisRange.Visibility = Visibility.Hidden;
                     CommentText.Text = "Please select a day for the week you are interested in:";
+                    ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
                     break;
                 default:
