@@ -96,7 +96,7 @@ namespace CovidKeeperFrontend.Views
             }
         }
 
-        private void AddButton_Click(object sender, RoutedEventArgs e)
+        private async void AddButton_Click(object sender, RoutedEventArgs e)
         {
             string fullName = FullName.Text;
             string emailAddress = EmailAddress.Text;
@@ -107,7 +107,7 @@ namespace CovidKeeperFrontend.Views
             }
             else
             {
-                (Application.Current as App).WorkersTableViewModel.InsertWorker(idWorker, fullName, emailAddress, bitmapImage);
+                await (Application.Current as App).WorkersTableViewModel.InsertWorker(idWorker, fullName, emailAddress, bitmapImage);
                 ClearFields();
                 MessageBox.Show("The worker " + idWorker + " " + fullName + " uploaded successfully.\nThe email is: " + emailAddress);
             }
@@ -128,7 +128,7 @@ namespace CovidKeeperFrontend.Views
             }
         }
 
-        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        private async void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             string fullName = FullName.Text;
             string emailAddress = EmailAddress.Text;
@@ -139,7 +139,7 @@ namespace CovidKeeperFrontend.Views
             }
             else
             {
-                (Application.Current as App).WorkersTableViewModel.DeleteWorker(idWorker, indexOfSelectedRow);
+                await (Application.Current as App).WorkersTableViewModel.DeleteWorker(idWorker, indexOfSelectedRow);
                 ClearFields();
                 MessageBox.Show("The worker " + idWorker + " " + fullName + " deleted successfully.\nThe email is: " + emailAddress);
             }

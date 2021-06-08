@@ -37,76 +37,6 @@ namespace CovidKeeperFrontend.ViewModel
         }
 
 
-
-        /*public string[] VM_StatisticsOptionListEnumProperty
-        {
-            get
-            {
-                WpfDatabase.StatisticsOptionListEnum[] statisticsOptionListEnum = this.model.StatisticsOptionListEnumProperty;
-                if (statisticsOptionListEnum == null)
-                {
-                    return default;
-                }
-                List<string> statisticsOptionListConverted = new List<string>();
-                foreach (var item in statisticsOptionListEnum)
-                {
-                    statisticsOptionListConverted.Add(item.ToString().Replace("_", " "));
-                }
-                if (statisticsOptionListConverted.Count == 0)
-                {
-                    return default;
-                }
-                return statisticsOptionListConverted.ToArray();
-            }
-        }*/
-        /*public List<string> VM_StatisticsOptionListEnumProperty
-        {
-            get
-            {
-                WpfDatabase.StatisticsOptionListEnum[] statisticsOptionListEnum = this.model.StatisticsOptionListEnumProperty;
-                if (statisticsOptionListEnum == null)
-                {
-                    return default;
-                }
-                List<string> statisticsOptionListConverted = new List<string>();
-                foreach (var item in statisticsOptionListEnum)
-                {
-                    statisticsOptionListConverted.Add(item.ToString().Replace("_", " "));
-                }
-                if (statisticsOptionListConverted.Count == 0)
-                {
-                    return default;
-                }
-                return statisticsOptionListConverted;
-            }
-        }*/
-
-        /*public string VM_SelectedValueOfStatisticsOptionListProperty
-        {
-            set
-            {
-                if (value == WpfDatabase.StatisticsOptionListEnum.Age_per_month.ToString().Replace("_", " "))
-                {
-                    this.model.SelectedValueOfStatisticsOptionListProperty = WpfDatabase.StatisticsOptionListEnum.Age_per_month;
-                }
-                else if (value == WpfDatabase.StatisticsOptionListEnum.Age_per_week.ToString().Replace("_", " "))
-                {
-                    this.model.SelectedValueOfStatisticsOptionListProperty = WpfDatabase.StatisticsOptionListEnum.Age_per_week;
-                }
-                else if (value == WpfDatabase.StatisticsOptionListEnum.Age_per_weekday.ToString().Replace("_", " "))
-                {
-                    this.model.SelectedValueOfStatisticsOptionListProperty = WpfDatabase.StatisticsOptionListEnum.Age_per_weekday;
-                }
-                else if (value == WpfDatabase.StatisticsOptionListEnum.Amount_events.ToString().Replace("_", " "))
-                {
-                    this.model.SelectedValueOfStatisticsOptionListProperty = WpfDatabase.StatisticsOptionListEnum.Amount_events;
-                }
-                else
-                {
-                    this.model.SelectedValueOfStatisticsOptionListProperty = WpfDatabase.StatisticsOptionListEnum.Nothing;
-                }
-            }
-        }*/
         public StatisticsOptionListEnum VM_SelectedValueOfStatisticsOptionListProperty
         {
             set
@@ -178,6 +108,14 @@ namespace CovidKeeperFrontend.ViewModel
         public string VM_IdWorkerForLineGraphProperty 
         {
             set { this.model.IdWorkerForLineGraphProperty = value; }
+        }
+        public void GetAvgEventsPerMonthWithRange(DateTime startDate, DateTime endDate)
+        {
+            this.model.GetAvgEventsPerMonthWithRange(startDate, endDate);
+        }
+        public void GetAvgEventsPerWeekWithRange(DateTime startDate, DateTime endDate)
+        {
+            this.model.GetAvgEventsPerWeekWithRange(startDate, endDate);
         }
     }
 }

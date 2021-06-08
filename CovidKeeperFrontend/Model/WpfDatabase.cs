@@ -65,7 +65,7 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
-
+        public NotifyTaskCompletion<int> UpdateHandleInAnalayzerConfigAsync { get; private set; }
         private DataTable workerDetailsTable = default;
         public DataTable WorkerDetailsTableProperty 
         {
@@ -76,7 +76,7 @@ namespace CovidKeeperFrontend.Model
                 {
                     workerDetailsTable = value;
                     CountWorkersInWorkersDetailsTableProperty = value.Rows.Count.ToString();
-                    UpdateHandleInAnalayzerConfig();
+                    UpdateHandleInAnalayzerConfigAsync = new NotifyTaskCompletion<int>(UpdateHandleInAnalayzerConfig());
                     NotifyPropertyChanged("WorkerDetailsTableProperty");
                 }
             }
@@ -129,9 +129,8 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
-
+        public NotifyTaskCompletion<int> RefreshUserControlAsync { get; private set; }
         private int indexOfMenuList = -1;
-
         public int IndexOfMenuListProperty
         {
             set 
@@ -139,8 +138,8 @@ namespace CovidKeeperFrontend.Model
                 // The first time the client entered the program
                 if (indexOfMenuList == -1)
                 {
-                    RefreshDataHome();
                     RefreshDataWorkersTable();
+                    RefreshUserControlAsync = new NotifyTaskCompletion<int>(RefreshDataHome());                    
                     indexOfMenuList = value;
                     return;
                 }
@@ -149,15 +148,16 @@ namespace CovidKeeperFrontend.Model
                     switch (value)
                     {
                         case 0:
-                            RefreshDataHome();
+                            RefreshUserControlAsync = new NotifyTaskCompletion<int>(RefreshDataHome());
                             break;
                         case 1:
                             break;
                         case 2:
-                            RefreshSearchWorkers();
+                            RefreshUserControlAsync = new NotifyTaskCompletion<int>(RefreshStatisticalData());
+                            //RefreshSearchWorkers();
                             break;
                         case 3:
-                            RefreshStatisticalData();
+                            
                             break;
                         case 4:
                             break;
@@ -224,9 +224,7 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
-
         private StatisticsOptionListEnum selectedValueOfStatisticsOptionList = StatisticsOptionListEnum.Nothing;
-
         public StatisticsOptionListEnum SelectedValueOfStatisticsOptionListProperty
         {
             get { return selectedValueOfStatisticsOptionList; }
@@ -487,7 +485,6 @@ namespace CovidKeeperFrontend.Model
         }
 
         private string idWorkerForLineGraph = default;
-
         public string IdWorkerForLineGraphProperty
         {
             get { return idWorkerForLineGraph; }
@@ -501,8 +498,8 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
+        public NotifyTaskCompletion<int> UpdateTimeBreakForMailsAsync { get; private set; }
         private int minutesBreakForMails;
-
         public int MinutesBreakForMailsProperty
         {
             get { return minutesBreakForMails; }
@@ -511,21 +508,29 @@ namespace CovidKeeperFrontend.Model
                 if (minutesBreakForMails != value)
                 {
                     minutesBreakForMails = value;
-                    UpdateTimeBreakForMails(minutesBreakForMails);
+                    UpdateTimeBreakForMailsAsync = new NotifyTaskCompletion<int>(UpdateTimeBreakForMails(minutesBreakForMails));                   
                 }
             }
         }
 
         public WpfDatabase()
         {
-            connectionString = "Server=tcp:mysqlservercovid.database.windows.net,1433;Initial Catalog=myCovidKeeper;Persist Security Info=False;User ID=azureuser;Password=Amitai5925;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+            connectionString = "Server=tcp:mysqlservercovid.database.windows.net,1433;" +
+                "Initial Catalog=myCovidKeeper;" +
+                "Persist Security Info=False;" +
+                "User ID=azureuser;" +
+                "Password=Amitai5925;" +
+                "MultipleActiveResultSets=True;" +
+                "Encrypt=True;" +
+                "TrustServerCertificate=False;Connection Timeout=30;";
             sqlConnection = new SqlConnection(connectionString);
             sqlConnection.Open();
             object[] result = QuerySelectOfOneRow("select Handle from [dbo].[Starter]");
             HandleFlag starterHandleEnum = (HandleFlag)Enum.Parse(typeof(HandleFlag), result[0].ToString());
             ActiveButtonContentProperty = starterHandleEnum;
+            RefreshUserControlAsync = new NotifyTaskCompletion<int>(RefreshDataHome());
         }
-        private void UpdateTimeBreakForMails(int minutesBreakToChange)
+        private async Task<int> UpdateTimeBreakForMails(int minutesBreakToChange)
         {
             using (var command = sqlConnection.CreateCommand())
             {
@@ -533,8 +538,9 @@ namespace CovidKeeperFrontend.Model
                 command.CommandText = updateQuery;
                 command.Parameters.AddWithValue("@Minutes_between_mails", minutesBreakToChange);
                 command.Parameters.AddWithValue("@Handle", 1);
-                command.ExecuteNonQueryAsync();
+                await command.ExecuteNonQueryAsync();
             }
+            return default;
         }
 
         public static bool AreTablesTheSame(DataTable tbl1, DataTable tbl2)
@@ -606,7 +612,7 @@ namespace CovidKeeperFrontend.Model
             }
             return valueToCheck;
         }
-        public void InsertWorker(string idWorker, string fullname, string emailAddress, BitmapImage imagePath)
+        public async Task InsertWorker(string idWorker, string fullname, string emailAddress, BitmapImage imagePath)
         {
             using (var command = sqlConnection.CreateCommand())
             {
@@ -616,8 +622,8 @@ namespace CovidKeeperFrontend.Model
                 command.Parameters.AddWithValue("@Id", idWorker);
                 command.Parameters.AddWithValue("@Fullname", fullname);
                 command.Parameters.AddWithValue("@Email_address", emailAddress);
-                command.ExecuteNonQueryAsync();
-                UploadImageToStorage(idWorker, imageToByte);
+                await command.ExecuteNonQueryAsync();
+                await UploadImageToStorage(idWorker, imageToByte);
                 DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
                 workerDetailsTableTemp.Rows.Add(idWorker, fullname, emailAddress, imageToByte);
                 WorkerDetailsTableProperty = workerDetailsTableTemp;
@@ -626,20 +632,23 @@ namespace CovidKeeperFrontend.Model
 
         private CloudBlobContainer GetCloudBlobContainer()
         {
-            var cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
-            var cloudBlobContainer = cloudBlobClient.GetContainerReference("pictures");
+            /*StorageCredentials storageCredentials = new StorageCredentials("faceimages2", );
+            CloudStorageAccount cloudStorageAccount = new CloudStorageAccount(storageCredentials, useHttps: true);
+*/
+            CloudBlobClient cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
+            CloudBlobContainer cloudBlobContainer = cloudBlobClient.GetContainerReference("pictures");
             cloudBlobContainer.CreateIfNotExists();
             cloudBlobContainer.SetPermissions(new BlobContainerPermissions() { PublicAccess = BlobContainerPublicAccessType.Blob });
             return cloudBlobContainer;
         }
 
-        private void UploadImageToStorage(string idWorker, byte[] imageToByte)
+        private async Task UploadImageToStorage(string idWorker, byte[] imageToByte)
         {
             CloudBlobContainer cloudBlobContainer = GetCloudBlobContainer();
             CloudBlockBlob blockBlob = cloudBlobContainer.GetBlockBlobReference(idWorker + ".jpg");
             using (var stream = new MemoryStream(imageToByte, writable: false))
             {
-                blockBlob.UploadFromStream(stream);
+                await blockBlob.UploadFromStreamAsync(stream);
             }
         }
         
@@ -663,50 +672,54 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
-        public void UpdateWorkerDetails(string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
+        public async Task<int> UpdateWorkerDetails(string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
         {
             using (var command = sqlConnection.CreateCommand())
             {
                 byte[] imageToByte = ImagePathToByteArray(imagePath);
                 DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
                 var rowToChange = workerDetailsTableTemp.Rows[indexOfSelectedRow];
-                string updateQuery = @"UPDATE [dbo].[Workers] SET Fullname = @Fullname, Email_address = @Email_address Where Id = @Id;";
+                string updateQuery = @"UPDATE [dbo].[Workers] SET FullName = @FullName, Email_address = @Email_address Where Id = @Id;";
                 command.CommandText = updateQuery;
                 command.Parameters.AddWithValue("@Id", idWorker);
-                command.Parameters.AddWithValue("@Fullname", fullname);
+                command.Parameters.AddWithValue("@FullName", fullname);
                 command.Parameters.AddWithValue("@Email_address", emailAddress);
-                command.ExecuteNonQueryAsync();
-                UploadImageToStorage(idWorker, imageToByte);
+                await command.ExecuteNonQueryAsync();
+                await UploadImageToStorage(idWorker, imageToByte);
                 rowToChange["Id"] = idWorker;
                 rowToChange["Fullname"] = fullname;
                 rowToChange["Email_address"] = emailAddress;
                 rowToChange["Image"] = imageToByte;
                 WorkerDetailsTableProperty = workerDetailsTableTemp;
             }
+            return default;
         }
 
-        public void DeleteWorker(string idWorker, int indexOfSelectedRow)
+        public async Task DeleteWorker(string idWorker, int indexOfSelectedRow)
         {
             using (var command = sqlConnection.CreateCommand())
             {
                 string deleteQuery = @"DELETE FROM [dbo].[Workers] WHERE Id = " + idWorker + ";";
                 command.CommandText = deleteQuery;
-                command.ExecuteNonQueryAsync();
+                await command.ExecuteNonQueryAsync();
                 DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
                 var rowToChange = workerDetailsTableTemp.Rows[indexOfSelectedRow];
                 rowToChange.Delete();
                 WorkerDetailsTableProperty = workerDetailsTableTemp;
             }
         }
-        public void RefreshDataHome()
+        public async Task<int> RefreshDataHome()
         {
-            CountWorkersWithoutMaskToday();
-            GetActiveButtonContent();
+            await CountWorkersWithoutMaskToday();
+            await GetActiveButtonContent();
+            await PercentageWorkersWithoutMaskTodayPerYesterday();
+            return default;
         }
 
-        public void RefreshStatisticalData()
+        public async Task<int> RefreshStatisticalData()
         {
-            GetMinDateInHistoryEvents();
+            await GetMinDateInHistoryEvents();
+            return default;
         }
         private void InitialWorkWeekAndAmountEventsDict()
         {
@@ -719,10 +732,6 @@ namespace CovidKeeperFrontend.Model
             DayOfWeek myFirstDOW = myCI.DateTimeFormat.FirstDayOfWeek;
             int firstWorkWeekWithEvents = myCal.GetWeekOfYear(StartDateInDatePickerProperty, myCWR, myFirstDOW);
             int lastWorkWeek = myCal.GetWeekOfYear(DateTime.Now, myCWR, myFirstDOW);
-            /*if ((int) DateTime.Now.DayOfWeek < 5)
-            {
-                lastWorkWeek--;
-            }*/
             for (int i = StartDateInDatePickerProperty.Year; i <= DateTime.Now.Year; i++)
             {
                 DateTime LastDay = new System.DateTime(i, 12, 31);
@@ -766,55 +775,67 @@ namespace CovidKeeperFrontend.Model
                 }
             }
         }
-        private void GetMinDateInHistoryEvents()
+        private async Task GetMinDateInHistoryEvents()
         {
-            if (StartDateInDatePickerProperty.Equals(default))
+            await Task.Run(() =>
             {
-                string minDateQuery = "select min(Time_of_event) from [dbo].[History_Events]";
-                object[] minDate = QuerySelectOfOneRow(minDateQuery);
-                if (minDate != null)
+                if (StartDateInDatePickerProperty.Equals(default))
                 {
-                    StartDateInDatePickerProperty = Convert.ToDateTime(minDate[0]);
+                    string minDateQuery = "select min(Time_of_event) from [dbo].[History_Events]";
+                    object[] minDate = QuerySelectOfOneRow(minDateQuery);
+                    if (minDate != null)
+                    {
+                        StartDateInDatePickerProperty = Convert.ToDateTime(minDate[0]);
+                    }
+                    InitialWorkWeekAndAmountEventsDict();
+                    InitialMonthAndAmountEventsDict();
                 }
-                InitialWorkWeekAndAmountEventsDict();
-                InitialMonthAndAmountEventsDict();
-            }
+            });            
         }
 
-        private void GetActiveButtonContent()
+        private async Task GetActiveButtonContent()
         {
-            string handleQuery = "SELECT Handle from [dbo].[Starter]";
-            object[] handle = QuerySelectOfOneRow(handleQuery);
-            if (handle != null)
+            await Task.Run(() =>
             {
-                HandleFlag startOrClose = (HandleFlag)Enum.Parse(typeof(HandleFlag), handle[0].ToString());
-                ActiveButtonContentProperty = startOrClose;
-            }
+                string handleQuery = "SELECT Handle from [dbo].[Starter]";
+                object[] handle = QuerySelectOfOneRow(handleQuery);
+                if (handle != null)
+                {
+                    HandleFlag startOrClose = (HandleFlag)Enum.Parse(typeof(HandleFlag), handle[0].ToString());
+                    ActiveButtonContentProperty = startOrClose;
+                }
+            });            
         }
 
-        public void CountWorkersWithoutMaskToday()
+        public async Task CountWorkersWithoutMaskToday()
         {
-            string countQuery = "SELECT COUNT( DISTINCT[Id_worker]) as num_bad_workers FROM[dbo].[History_Events] WHERE DATEDIFF(day, Time_of_event, GETDATE())<= 0;";
-            object[] counter = QuerySelectOfOneRow(countQuery);
-            if (counter != null)
+            string countAllWorkers = await CountWorkers();
+            await Task.Run(() =>
             {
-                string countAllWorkers = CountWorkers();
-                if (countAllWorkers != null)
-                {
-                    HowManyWorkersWithoutMaskProperty = counter[0].ToString() + "/" + countAllWorkers;
+                string countQuery = "SELECT COUNT( DISTINCT[Id_worker]) as num_bad_workers FROM[dbo].[History_Events] WHERE DATEDIFF(day, Time_of_event, GETDATE())<= 0;";
+                object[] counter = QuerySelectOfOneRow(countQuery);
+                if (counter != null)
+                {                    
+                    if (countAllWorkers != null)
+                    {
+                        HowManyWorkersWithoutMaskProperty = counter[0].ToString() + "/" + countAllWorkers;
+                    }
                 }
-                
-            }
+            });            
         }
-        private string CountWorkers()
+        private async Task<string> CountWorkers()
         {
-            string countQuery = "SELECT Count(Id) FROM [dbo].[Workers];";
-            object[] counter = QuerySelectOfOneRow(countQuery);
-            if (counter != null)
+            return await Task.Run(() =>
             {
-                return counter[0].ToString();
-            }
-            return null;
+                string countQuery = "SELECT Count(Id) FROM [dbo].[Workers];";
+                object[] counter = QuerySelectOfOneRow(countQuery);
+                if (counter != null)
+                {
+                    return counter[0].ToString();
+                }
+                return null;
+            });
+            
         }
         public void RefreshDataWorkersTable()
         {
@@ -854,25 +875,28 @@ namespace CovidKeeperFrontend.Model
             }
             WorkerDetailsTableProperty = dataTableImages;
         }
-        public void PercentageWorkersWithoutMaskTodayPerYesterday()
+        public async Task PercentageWorkersWithoutMaskTodayPerYesterday()
         {
-            string todayPerYesterdayQuery = "select " +
+            await Task.Run(() =>
+            {
+                string todayPerYesterdayQuery = "select " +
                 "(SELECT COUNT( DISTINCT[Id_worker]) as num_bad_workers " +
                 "FROM[dbo].[History_Events] " +
                 "WHERE DATEDIFF(day, Time_of_event, GETDATE())<= 0) as countToday, " +
                 "(SELECT COUNT(DISTINCT[Id_worker]) as num_bad_workers " +
                 "FROM[dbo].[History_Events] " +
                 "WHERE DATEDIFF(day, Time_of_event, GETDATE()-1)<= 0) as countYesterday; ";
-            object[] todayPerYesterday = QuerySelectOfOneRow(todayPerYesterdayQuery);
-            if (todayPerYesterday != null)
-            {
-                int countToday = Convert.ToInt32(todayPerYesterday[0]);
-                int countYesterday = Convert.ToInt32(todayPerYesterday[1]);
-                if (countYesterday != 0)
+                object[] todayPerYesterday = QuerySelectOfOneRow(todayPerYesterdayQuery);
+                if (todayPerYesterday != null)
                 {
-                    PercentageWorkersWithoutMaskTodayPerYesterdayProperty = (countToday / countYesterday) * 100 - 100;
+                    int countToday = Convert.ToInt32(todayPerYesterday[0]);
+                    int countYesterday = Convert.ToInt32(todayPerYesterday[1]);
+                    if (countYesterday != 0)
+                    {
+                        PercentageWorkersWithoutMaskTodayPerYesterdayProperty = (countToday / countYesterday) * 100 - 100;
+                    }
                 }
-            }
+            });            
         }
         private DataTable SearchTableByQuery(string query)
         {
@@ -917,39 +941,40 @@ namespace CovidKeeperFrontend.Model
             SearchWorkerDetailsTableProperty = SearchTableByQuery("Id = '" + idWorker + "' AND FullName = '" + fullName + "' AND Email_address = '" + emailAddress + "'");
         }
 
-        public void StartOrCloseProgram()
+        public async Task StartOrCloseProgram()
         {            
             if (ActiveButtonContentProperty == HandleFlag.Start)
             {
-                UpdateHandleInStarter("0", "1");
+                await UpdateHandleInStarter("0", "1");
                 ActiveButtonContentProperty = HandleFlag.Close;
             }
             else
             {
-                UpdateHandleInStarter("1", "0");
+                await UpdateHandleInStarter("1", "0");
                 ActiveButtonContentProperty = HandleFlag.Start;
             }
         }
 
-        private void UpdateHandleInStarter(string valueInTable, string valueToUpdate)
+        private async Task UpdateHandleInStarter(string valueInTable, string valueToUpdate)
         {
             using (var command = sqlConnection.CreateCommand())
             {
                 string updateQuery = @"UPDATE [dbo].[Starter] SET Handle = @Handle where Handle = " + valueInTable;
                 command.CommandText = updateQuery;
                 command.Parameters.AddWithValue("@Handle", valueToUpdate);
-                command.ExecuteNonQueryAsync();
+                await command.ExecuteNonQueryAsync();
             }
         }
-        private void UpdateHandleInAnalayzerConfig()
+        private async Task<int> UpdateHandleInAnalayzerConfig()
         {
             using (var command = sqlConnection.CreateCommand())
             {
                 string updateQuery = @"UPDATE [dbo].[Analayzer_config] SET Handle = @Handle";
                 command.CommandText = updateQuery;
                 command.Parameters.AddWithValue("@Handle", "1");
-                command.ExecuteNonQueryAsync();
+                await command.ExecuteNonQueryAsync();
             }
+            return default;
         }
         private void RefreshSearchWorkers()
         {
@@ -973,7 +998,7 @@ namespace CovidKeeperFrontend.Model
                 "from[dbo].[History_Events] " +
                 "group by DATEPART(WEEK, Time_of_event), DATEPART(year, Time_of_event); ";
             List<object[]> avgEventsPerWeekList = QuerySelectOfMultiRows(avgEventsPerWeekQuery);
-            
+
             if (avgEventsPerWeekList != null)
             {
                 SetValuesInDictToZero(this.workWeekAndAmountEventsDict);
@@ -983,6 +1008,46 @@ namespace CovidKeeperFrontend.Model
                     this.workWeekAndAmountEventsDict[weekStr] = Convert.ToDouble(item[2]);
                 }
                 ColumnGraphProperty = ConvertDictToListGraphContent(this.workWeekAndAmountEventsDict);
+            }
+        }
+        public void GetAvgEventsPerWeekWithRange(DateTime startDate, DateTime endDate)
+        {
+            string avgEventsPerWeekQuery = "Select DISTINCT DATEPART(WEEK, Time_of_event) AS WW, DATEPART(year, Time_of_event) AS Year, " +
+                "COUNT(CONVERT(date, Time_of_event)) / 5.0 AS Avg " +
+                "from[dbo].[History_Events] " +
+                "group by DATEPART(WEEK, Time_of_event), DATEPART(year, Time_of_event); ";
+            List<object[]> avgEventsPerWeekList = QuerySelectOfMultiRows(avgEventsPerWeekQuery);
+
+            if (avgEventsPerWeekList != null)
+            {
+                CultureInfo myCI = new CultureInfo("en-US");
+                Calendar myCal = myCI.Calendar;
+                int firstWorkWeekWithEvents = myCal.GetWeekOfYear(startDate, myCI.DateTimeFormat.CalendarWeekRule, myCI.DateTimeFormat.FirstDayOfWeek);
+                int lastWorkWeek = myCal.GetWeekOfYear(endDate, myCI.DateTimeFormat.CalendarWeekRule, myCI.DateTimeFormat.FirstDayOfWeek);
+                Dictionary<string, double> workWeekAndAmountEventsDictForRange = GetWorkWeekAndAmountEventsDictForRange(firstWorkWeekWithEvents, 
+                    lastWorkWeek, myCI, startDate.Year, endDate.Year);
+                if (startDate.DayOfWeek != DayOfWeek.Sunday)
+                {
+                    int daysOffset = DayOfWeek.Saturday - startDate.DayOfWeek;
+                    startDate = startDate.AddDays((6 - daysOffset) * -1);
+                }
+                if (endDate.DayOfWeek != DayOfWeek.Saturday)
+                {
+                    int daysOffset = DayOfWeek.Saturday - endDate.DayOfWeek;
+                    endDate = endDate.AddDays(daysOffset);
+                }
+                foreach (var item in avgEventsPerWeekList)
+                {
+                    DateTime temp = new DateTime(Convert.ToInt32(item[1]), 1, 1);
+                    temp = temp.AddDays(Convert.ToInt32(item[0]) * 7 + 1);
+                    if (startDate.Ticks > temp.Ticks || endDate.Ticks < temp.Ticks)
+                    {
+                        continue;
+                    }
+                    string weekStr = item[0].ToString() + "-" + item[1].ToString();
+                    workWeekAndAmountEventsDictForRange[weekStr] = Convert.ToDouble(item[2]);
+                }
+                ColumnGraphProperty = ConvertDictToListGraphContent(workWeekAndAmountEventsDictForRange);
             }
         }
 
@@ -1005,6 +1070,84 @@ namespace CovidKeeperFrontend.Model
                 }
                 ColumnGraphProperty = ConvertDictToListGraphContent(this.monthAndAmountEventsDict); ;
             }
+        }
+        public void GetAvgEventsPerMonthWithRange(DateTime startDate, DateTime endDate)
+        {
+            string avgEventsPerMonthQuery = "Select DISTINCT DATEPART(month, Time_of_event) AS Month, DATEPART(year, Time_of_event) AS Year, " +
+                "COUNT(CONVERT(date, Time_of_event)) / 20.0 AS Avg " +
+                "from[dbo].[History_Events] " +
+                "group by DATEPART(month, Time_of_event), DATEPART(year, Time_of_event); ";
+            List<object[]> avgEventsPerMonthList = QuerySelectOfMultiRows(avgEventsPerMonthQuery);
+
+            if (avgEventsPerMonthList != null)
+            {
+                int minMonth = startDate.Month;
+                int maxMonth = endDate.Month;
+                int minYear = startDate.Year;
+                int maxYear = endDate.Year;
+                DateTime minDate = new DateTime(minYear, minMonth, 1);
+                DateTime maxDate = new DateTime(maxYear, maxMonth, DateTime.DaysInMonth(maxYear, maxMonth));
+                Dictionary<string, double> monthAndAmountEventsDictForRange = GetMonthAndAmountEventsDictForRange(minMonth, maxMonth, minYear, maxYear);
+                foreach (var item in avgEventsPerMonthList)
+                {
+                    DateTime temp = new DateTime(Convert.ToInt32(item[1]), Convert.ToInt32(item[0]), 15);
+                    if (minDate.Ticks > temp.Ticks || maxDate.Ticks < temp.Ticks)
+                    {
+                        continue;
+                    }
+                    MonthEnumForGraphs monthEnum = (MonthEnumForGraphs)Enum.Parse(typeof(MonthEnumForGraphs), item[0].ToString());                    
+                    string monthStr = monthEnum.ToString() + "-" + item[1].ToString();
+                    monthAndAmountEventsDictForRange[monthStr] = Convert.ToDouble(item[2]);
+                }
+                ColumnGraphProperty = ConvertDictToListGraphContent(monthAndAmountEventsDictForRange);
+            }
+        }
+        private Dictionary<string, double> GetMonthAndAmountEventsDictForRange(int minMonth, int maxMonth, int minYear, int maxYear)
+        {
+            Dictionary<string, double> monthAndAmountEventsDictForRange = new Dictionary<string, double>();
+            Calendar myCal = CultureInfo.InvariantCulture.Calendar;
+            for (int i = minYear; i <= maxYear; i++)
+            {
+                int monthAmount = myCal.GetMonthsInYear(i);
+                int firstMonth = 1;
+                if (i == minYear)
+                {
+                    firstMonth = minMonth;
+                }
+                if (i == maxYear)
+                {
+                    monthAmount = maxMonth;
+                }
+                for (; firstMonth <= monthAmount; firstMonth++)
+                {
+                    monthAndAmountEventsDictForRange.Add(((MonthEnumForGraphs)firstMonth).ToString() + "-" + i, 0);
+                }
+            }
+            return monthAndAmountEventsDictForRange;
+        }
+        private Dictionary<string, double> GetWorkWeekAndAmountEventsDictForRange(int firstWorkWeekWithEvents, int lastWorkWeek, CultureInfo myCI, int minYear, int maxYear)
+        {
+            Dictionary<string, double> workWeekAndAmountEventsDictForRange = new Dictionary<string, double>();
+            Calendar myCal = myCI.Calendar;
+            for (int i = minYear; i <= maxYear; i++)
+            {
+                DateTime LastDay = new System.DateTime(i, 12, 31);
+                int weekAmount = myCal.GetWeekOfYear(LastDay, myCI.DateTimeFormat.CalendarWeekRule, myCI.DateTimeFormat.FirstDayOfWeek);
+                int firstWorkWeek = 1;
+                if (i == minYear)
+                {
+                    firstWorkWeek = firstWorkWeekWithEvents;
+                }
+                if (i == maxYear)
+                {
+                    weekAmount = lastWorkWeek;
+                }
+                for (; firstWorkWeek <= weekAmount; firstWorkWeek++)
+                {
+                    workWeekAndAmountEventsDictForRange.Add(firstWorkWeek + "-" + i, 0);
+                }
+            }
+            return workWeekAndAmountEventsDictForRange;
         }
 
         public void GetAvgEventsPerWeekday()
@@ -1068,8 +1211,6 @@ namespace CovidKeeperFrontend.Model
                     string weekStr = item[0].ToString() + "-" + item[1].ToString();
                     this.workWeekAndAmountEventsDict[weekStr] = Convert.ToDouble(item[2]);
                 }
-                /*TitleOfLineChartOfWorkerProperty = WeekOrMonth.Week;
-                LineGraphOfWorkerProperty = this.workWeekAndAmountEventsDict;*/
                 DataTable tempAmountEventsByWorkerTableProperty = AmountEventsByWorkerTableProperty;
                 DataRow[] foundRows = tempAmountEventsByWorkerTableProperty.Select("Id_worker = " + idWorker);
                 foundRows[0]["LineSeriesGraph"] = GetLineSeriesGraph("Total Events Per Week Of " + foundRows[0]["FullName"].ToString());
@@ -1099,7 +1240,7 @@ namespace CovidKeeperFrontend.Model
             string avgEventsPerMonthPerWorkerQuery = "Select DISTINCT DATEPART(month, Time_of_event) AS Month, " +
                 "COUNT(CONVERT(date, Time_of_event)) AS Avg " +
                 "from[dbo].[History_Events] " +
-                "where Id_worker = " + idWorker +" " +
+                "where Id_worker = " + idWorker + " " +
                 "group by DATEPART(month, Time_of_event); ";
             List<object[]> avgEventsPerMonthPerWorkerList = QuerySelectOfMultiRows(avgEventsPerMonthPerWorkerQuery);
 
@@ -1111,13 +1252,12 @@ namespace CovidKeeperFrontend.Model
                     avgEventsPerMonthPerWorker.Add(new KeyValuePair<string, double>(item[0].ToString(), Convert.ToDouble(item[1])));
                 }
                 TitleOfLineChartOfWorkerProperty = WeekOrMonth.Week;
-                //GraphProperty = avgEventsPerMonthPerWorker.ToArray();
             }
         }
 
         private Dictionary<string,double> SetValuesInDictToZero(Dictionary<string, double> dictToSet)
         {
-            foreach (var key in this.workWeekAndAmountEventsDict.Keys.ToList())
+            foreach (var key in dictToSet.Keys.ToList())
             {
                 dictToSet[key] = 0;
             }

@@ -40,6 +40,7 @@ namespace CovidKeeperFrontend
             manageWorkersUserControl.DataContext = (Application.Current as App).WorkersTableViewModel;
             ListViewMenu.SelectedIndex = 0;
             manageWorkersUserControl.SetMainWindow(this);
+            statisticalDataUserControl.SetMainWindow(this);
         }
 
         private void ButtonFechar_Click(object sender, RoutedEventArgs e)
@@ -64,24 +65,22 @@ namespace CovidKeeperFrontend
                     GridPrincipal.Children.Add(homeUserControl);                    
                     break;
                 case 1:
-                    workersTableUserControl.ClearFields();
+                    /*workersTableUserControl.ClearFields();
                     GridPrincipal.Children.Clear();
                     GridPrincipal.Children.Add(workersTableUserControl);
-                    break;
-                case 2:
-                    searchWorkersUserControl.ClearFields();
-                    GridPrincipal.Children.Clear();
-                    GridPrincipal.Children.Add(searchWorkersUserControl);
-                    break;
-                case 3:
-                    statisticalDataUserControl.ClearFields();
-                    GridPrincipal.Children.Clear();
-                    GridPrincipal.Children.Add(statisticalDataUserControl);
-                    break;
-                case 4:
+                    break;*/
                     manageWorkersUserControl.ClearFields();
                     GridPrincipal.Children.Clear();
                     GridPrincipal.Children.Add(manageWorkersUserControl);
+                    break;
+                case 2:
+                    /*searchWorkersUserControl.ClearFields();
+                    GridPrincipal.Children.Clear();
+                    GridPrincipal.Children.Add(searchWorkersUserControl);
+                    break;*/
+                    statisticalDataUserControl.ClearFields();
+                    GridPrincipal.Children.Clear();
+                    GridPrincipal.Children.Add(statisticalDataUserControl);
                     break;
                 default:
                     break;
@@ -91,7 +90,7 @@ namespace CovidKeeperFrontend
         private void MoveCursorMenu(int index)
         {
             TransitioningContentSlide.OnApplyTemplate();
-            GridCursor.Margin = new Thickness(0, (100 + (60 * index)), 0, 0);
+            GridCursor.Margin = new Thickness(0, (190 + (60 * index)), 0, 0);
         }
 
         private void RefreshButton_Click(object sender, RoutedEventArgs e)

@@ -46,11 +46,11 @@
                     <ScrollViewer x:Name="ScrollOfAmountEventPerWeekTable" Width="620" Height="300" >
                         <DataGrid x:Name="AmountEventPerWeekTable" ItemsSource="{Binding Path=VM_AmountEventsByWorkerTableProperty, Mode=OneWay}" 
                               Width="600" VerticalAlignment="Top" AutoGenerateColumns="False" 
-                                  SelectionChanged="AmountEventPerWeekTable_SelectionChanged" RowHeight="40">
+                                  SelectionChanged="AmountEventPerWeekTable_SelectionChanged" RowHeight="40" CanUserAddRows="False" CanUserDeleteRows="False">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Id_worker}" Header="Id worker" Width="150" IsReadOnly="True"/>
                                 <DataGridTextColumn Binding="{Binding FullName}" Header="Full name" Width="150" IsReadOnly="True"/>
-                                <DataGridTextColumn Binding="{Binding Count}" Header="Count events" Width="150" IsReadOnly="True"/>
+                                <DataGridTextColumn Binding="{Binding Count}" Header="Count events" Width="120" IsReadOnly="True"/>
                                 <DataGridTextColumn Binding="{Binding LineSeriesGraph}" Visibility="Hidden" Header="LineSeriesGraph" Width="150" IsReadOnly="True"/>
                                 <DataGridTextColumn Binding="{Binding LabelsGraph}" Visibility="Hidden" Header="LabelsGraph" Width="150" IsReadOnly="True"/>
                                 <DataGridTextColumn Binding="{Binding TitleGraph}" Visibility="Hidden" Header="TitleGraph" Width="150" IsReadOnly="True"/>
@@ -94,29 +94,53 @@
                     </MetroChart:ClusteredColumnChart.Series>
                 </MetroChart:ClusteredColumnChart>
             </Grid>
-            <Grid Grid.Row="2" Grid.Column="0">
-                <DatePicker x:Name="StartDatePicker" DisplayDate="{x:Static sys:DateTime.Now}" 
-                            DisplayDateStart="{Binding Path=VM_StartDateInDatePickerProperty, Mode=OneWay}" 
-                            DisplayDateEnd="{x:Static sys:DateTime.Now}"
-                            FirstDayOfWeek="Sunday" IsTodayHighlighted="True" VerticalAlignment="Center" 
-                            HorizontalAlignment="Center" Width="200"
-                            SelectedDate="{Binding Path=VM_SelectedDateStartInDatePickerProperty, Mode=OneWayToSource}"/>
-            </Grid>
-            <Grid Grid.Row="2" Grid.Column="1">
-                <DatePicker x:Name="EndDatePicker" DisplayDate="{x:Static sys:DateTime.Now}" 
-                            DisplayDateStart="{Binding Path=VM_StartDateInDatePickerProperty, Mode=OneWay}" 
-                            DisplayDateEnd="{x:Static sys:DateTime.Now}"
-                            FirstDayOfWeek="Sunday" IsTodayHighlighted="True" VerticalAlignment="Center" 
-                            HorizontalAlignment="Center" Width="200"
-                            SelectedDate="{Binding Path=VM_SelectedDateEndInDatePickerProperty, Mode=OneWayToSource}"/>
-            </Grid>
-            <Grid Grid.Row="2" Grid.Column="2">
-                <Grid.Effect>
-                    <DropShadowEffect BlurRadius="20" Color="#FFDEDEDE" ShadowDepth="1"/>
-                </Grid.Effect>
-                <Button x:Name="ShowGraphInThisRange" Content="Show" VerticalAlignment="Center" 
-                        HorizontalAlignment="Center" Width="70"/>
-            </Grid>
         </Grid>
+        <materialDesign:DialogHost BorderBrush="{DynamicResource MaterialDesignDivider}" Height="450">
+            <materialDesign:DialogHost.DialogContent>
+                <StackPanel Orientation="Vertical" Margin="5">
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock x:Name="CommentText" Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <DatePicker x:Name="StartDatePicker" DisplayDate="{x:Static sys:DateTime.Now}" 
+                            DisplayDateStart="{Binding Path=VM_StartDateInDatePickerProperty, Mode=OneWay}" 
+                            DisplayDateEnd="{x:Static sys:DateTime.Now}"
+                            FirstDayOfWeek="Sunday" IsTodayHighlighted="True" VerticalAlignment="Center" 
+                            HorizontalAlignment="Center" Width="120" Margin="15, 5"
+                            SelectedDate="{Binding Path=VM_SelectedDateStartInDatePickerProperty, Mode=OneWayToSource}"/>
+                        <DatePicker x:Name="EndDatePicker" DisplayDate="{x:Static sys:DateTime.Now}" 
+                            DisplayDateStart="{Binding Path=VM_StartDateInDatePickerProperty, Mode=OneWay}" 
+                            DisplayDateEnd="{x:Static sys:DateTime.Now}"
+                            FirstDayOfWeek="Sunday" IsTodayHighlighted="True" VerticalAlignment="Center" 
+                            HorizontalAlignment="Center" Width="120" Margin="15, 5"
+                            SelectedDate="{Binding Path=VM_SelectedDateEndInDatePickerProperty, Mode=OneWayToSource}"/>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="15">
+                        <Button x:Name="AddButton" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" 
+                                    Style="{DynamicResource MaterialDesignFlatButton}" Margin="4" 
+                                    VerticalAlignment="Center" Click="AddButton_Click">
+                            Add
+                        </Button>
+                        <Button x:Name="CancelAddWorkerButton" HorizontalAlignment="Center"  
+                                    Style="{DynamicResource MaterialDesignFlatButton}" Margin="4" 
+                                    VerticalAlignment="Center" Click="CancelAddWorkerButton_Click">
+                            Cancel
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </materialDesign:DialogHost.DialogContent>
+            <Grid Height="35" Margin="20, 390, 20, 25">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="ShowGraphInThisRangeText" Text="If you are intrested in date range, please click on the calendar - "
+                               Foreground="Gray" FontSize="18" Height="30"/>
+                    <Button x:Name="ShowGraphInThisRange" VerticalAlignment="Bottom" Click="ShowGraphInThisRange_Click" Foreground="Gray"
+                                HorizontalAlignment="Center" Width="30" Height="30" Padding="0" Margin="10, 0" Background="{x:Null}"
+                                Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}" BorderBrush="{x:Null}">
+                        <materialDesign:PackIcon Kind="CalendarRange"/>
+                    </Button>
+                </StackPanel>                
+            </Grid>
+        </materialDesign:DialogHost>
     </Grid>
 </UserControl>

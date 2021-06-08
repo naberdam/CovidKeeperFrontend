@@ -39,17 +39,22 @@ namespace CovidKeeperFrontend.ViewModel
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
-        public void InsertWorker(string idWorker, string fullname, string emailAddress, BitmapImage imagePath)
+        public async Task InsertWorker(string idWorker, string fullname, string emailAddress, BitmapImage imagePath)
         {
-            this.model.InsertWorker(idWorker, fullname, emailAddress, imagePath);
+            await this.model.InsertWorker(idWorker, fullname, emailAddress, imagePath);
         }
+        public NotifyTaskCompletion<int> UpdateWorkerDetailsAsync { get; private set; }
+        /*public async Task UpdateWorkerDetails(string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
+        {
+            await this.model.UpdateWorkerDetails(idWorker, fullname, emailAddress, imagePath, indexOfSelectedRow);
+        }*/
         public void UpdateWorkerDetails(string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
         {
-            this.model.UpdateWorkerDetails(idWorker, fullname, emailAddress, imagePath, indexOfSelectedRow);
+            UpdateWorkerDetailsAsync = new NotifyTaskCompletion<int>(this.model.UpdateWorkerDetails(idWorker, fullname, emailAddress, imagePath, indexOfSelectedRow));
         }
-        public void DeleteWorker(string idWorker, int indexOfSelectedRow)
+        public async Task DeleteWorker(string idWorker, int indexOfSelectedRow)
         {
-            this.model.DeleteWorker(idWorker, indexOfSelectedRow);
+            await this.model.DeleteWorker(idWorker, indexOfSelectedRow);
         }
     }
 }

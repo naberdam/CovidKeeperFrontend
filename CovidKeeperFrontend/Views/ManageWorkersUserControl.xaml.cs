@@ -26,8 +26,10 @@ namespace CovidKeeperFrontend.Views
     {
         int indexOfSelectedRow = -1;
         BitmapImage bitmapImage = default;
-        DataRowView rowSelected = default;
+        DataRowView rowViewSelected = default;
         MainWindowTemp mainWindowTemp = default;
+        DataGridRow gridRowSelected = default;
+        Button detailsBtn = default;
 
         public ManageWorkersUserControl()
         {
@@ -37,17 +39,18 @@ namespace CovidKeeperFrontend.Views
         {
             indexOfSelectedRow = -1;
             bitmapImage = default;
-            rowSelected = default;
+            rowViewSelected = default;
+            gridRowSelected = default;
+            detailsBtn = default;
         }
-        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        private async void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             DataGrid gd = (DataGrid)sender;
             indexOfSelectedRow = gd.Items.IndexOf(gd.CurrentItem);
             DataRowView rowSelectedNow = gd.SelectedItem as DataRowView;
             string idWorker = rowSelectedNow["Id"].ToString();
-            (Application.Current as App).WorkersTableViewModel.DeleteWorker(idWorker, indexOfSelectedRow);
+            await (Application.Current as App).WorkersTableViewModel.DeleteWorker(idWorker, indexOfSelectedRow);
             ClearFields();
-            MessageBox.Show("The worker " + idWorker + " deleted successfully");
         }
         private void WorkerDetailsTable_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -55,7 +58,7 @@ namespace CovidKeeperFrontend.Views
         }
         private void SetImageFromTableToBitmapImage()
         {
-            byte[] imageArray = (byte[])rowSelected["Image"];
+            byte[] imageArray = (byte[])rowViewSelected["Image"];
             if (imageArray.Length == 0)
             {
                 bitmapImage = default;
@@ -79,7 +82,7 @@ namespace CovidKeeperFrontend.Views
             image.Freeze();
             return image;
         }
-        private void AddButton_Click(object sender, RoutedEventArgs e)
+        private async void AddButton_Click(object sender, RoutedEventArgs e)
         {
             string idWorker = IdWorker.Text;
             string emailAddress = EmailAddress.Text;
@@ -90,7 +93,7 @@ namespace CovidKeeperFrontend.Views
             }
             else
             {
-                (Application.Current as App).WorkersTableViewModel.InsertWorker(idWorker, fullName, emailAddress, bitmapImage);
+                await (Application.Current as App).WorkersTableViewModel.InsertWorker(idWorker, fullName, emailAddress, bitmapImage);
                 ClearFields();
                 MessageBox.Show("The worker " + idWorker + " " + fullName + " uploaded successfully.\nThe email is: " + emailAddress);
                 this.IsEnabled = true;
@@ -128,26 +131,28 @@ namespace CovidKeeperFrontend.Views
         private void CheckChangeOfSelection(object sender)
         {
             DataGrid gd = (DataGrid)sender;
-            indexOfSelectedRow = gd.Items.IndexOf(gd.CurrentItem);
-            DataRowView rowSelectedNow = gd.SelectedItem as DataRowView;
-            if (rowSelected == rowSelectedNow)
+            
+            DataRowView rowSelectedNow = gd.CurrentItem as DataRowView;
+            //DataRowView rowSelectedNow = gd.SelectedItem as DataRowView;
+            if (rowViewSelected == rowSelectedNow)
             {
                 return;
             }
-            else if (rowSelectedNow != null && rowSelected == default)
+            else if (rowSelectedNow != null && rowViewSelected == default)
             {
-                rowSelected = rowSelectedNow;
+                rowViewSelected = rowSelectedNow;
+                indexOfSelectedRow = gd.Items.IndexOf(gd.CurrentItem);
             }
-            else if (rowSelectedNow != null && rowSelected != default)
+            else if (rowSelectedNow != null && rowViewSelected != default)
             {
-                string idWorker = rowSelectedNow["Id"].ToString();
-                string emailAddress = rowSelectedNow["Fullname"].ToString();
-                string fullName = rowSelectedNow["Email_address"].ToString();
+                string idWorker = rowViewSelected["Id"].ToString();
+                string emailAddress = rowViewSelected["Email_address"].ToString();
+                string fullName = rowViewSelected["Fullname"].ToString();
                 SetImageFromTableToBitmapImage();
                 (Application.Current as App).WorkersTableViewModel.UpdateWorkerDetails(idWorker, fullName, emailAddress, bitmapImage, indexOfSelectedRow);
+                indexOfSelectedRow = gd.Items.IndexOf(gd.CurrentItem);
                 ClearFields();
-                rowSelected = rowSelectedNow;
-                MessageBox.Show("The worker " + idWorker + " " + fullName + " updated successfully.\nThe email is: " + emailAddress);
+                rowViewSelected = rowSelectedNow;
             }
         }
 
@@ -165,6 +170,77 @@ namespace CovidKeeperFrontend.Views
             if (mainWindowTemp != default)
             {
                 mainWindowTemp.IsEnabled = isEnable;
+            }
+        }
+
+        private void SearchButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void DetailsButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // the original source is what was clicked.  For example 
+                // a button.
+                DependencyObject dep = (DependencyObject)e.OriginalSource;
+
+                // iteratively traverse the visual tree upwards looking for
+                // the clicked row.
+                while ((dep != null) && !(dep is DataGridRow))
+                {
+                    dep = VisualTreeHelper.GetParent(dep);
+                }
+
+                // if we found the clicked row
+                if (dep != null && dep is DataGridRow)
+                {
+                    // get the row
+                    DataGridRow gridRowSelectedNow = (DataGridRow)dep;
+                    Button detailsBtnNow = (Button)sender;
+                    if (gridRowSelected == gridRowSelectedNow)
+                    {
+                        detailsBtn.Content = new MaterialDesignThemes.Wpf.PackIcon
+                        { Kind = MaterialDesignThemes.Wpf.PackIconKind.ArrowDown };
+                        gridRowSelected.DetailsVisibility = Visibility.Collapsed;
+                        gridRowSelected = default;
+                        detailsBtn = default;
+                        return;
+                    }
+                    else if (gridRowSelectedNow != null && gridRowSelected == default)
+                    {
+                        detailsBtnNow.Content = new MaterialDesignThemes.Wpf.PackIcon
+                        { Kind = MaterialDesignThemes.Wpf.PackIconKind.ArrowUp };
+                        detailsBtn = detailsBtnNow;
+                        gridRowSelected = gridRowSelectedNow;
+                        gridRowSelected.DetailsVisibility = Visibility.Visible;
+                    }
+                    else if (gridRowSelectedNow != null && gridRowSelected != default)
+                    {
+                        detailsBtn.Content = new MaterialDesignThemes.Wpf.PackIcon
+                        { Kind = MaterialDesignThemes.Wpf.PackIconKind.ArrowDown };
+                        gridRowSelected.DetailsVisibility = Visibility.Collapsed;
+                        gridRowSelected = gridRowSelectedNow;
+                        gridRowSelected.DetailsVisibility = Visibility.Visible;
+                        detailsBtnNow.Content = new MaterialDesignThemes.Wpf.PackIcon
+                        { Kind = MaterialDesignThemes.Wpf.PackIconKind.ArrowUp };
+                        detailsBtn = detailsBtnNow;
+                    }
+
+                    // change the details visibility
+                    /*if (gridRowSelected.DetailsVisibility == Visibility.Collapsed)
+                    {
+                        gridRowSelected.DetailsVisibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        gridRowSelected.DetailsVisibility = Visibility.Collapsed;
+                    }*/
+                }
+            }
+            catch (System.Exception)
+            {
             }
         }
     }

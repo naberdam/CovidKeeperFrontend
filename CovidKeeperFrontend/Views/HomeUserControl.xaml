@@ -12,14 +12,15 @@
         <Grid Height="450">
             <Grid.RowDefinitions>
                 <RowDefinition/>
-                <RowDefinition Height="288.8"/>
+                <RowDefinition/>
+                <RowDefinition Height="200"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,261.4,5.8">
+            <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,261.4,5.8">
                 <Rectangle Height="120" Margin="20" Fill="White" RadiusY="10" RadiusX="10">
                     <Rectangle.Effect>
                         <DropShadowEffect BlurRadius="20" Color="#FFDEDEDE" RenderingBias="Quality" ShadowDepth="1"/>
@@ -30,19 +31,42 @@
                         <Grid.Effect>
                             <DropShadowEffect BlurRadius="20" RenderingBias="Quality" ShadowDepth="1" Color="#FFECECEC"/>
                         </Grid.Effect>
-                        <materialDesign:PackIcon Kind="FaceMask" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
+                        <materialDesign:PackIcon Kind="Person" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
                     </Grid>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10 20">
                         <TextBlock x:Name="WorkersWithoutMaskText" Text="{Binding Path=VM_HowManyWorkersWithoutMaskProperty, Mode=OneWay}" FontFamily="Champagne &amp; Limousines" VerticalAlignment="Center" Foreground="Gray" FontSize="50"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="20" >
-                        <TextBlock Text="Workers Without Mask Today" FontSize="8" HorizontalAlignment="Right" FontFamily="Champagne &amp; Limousines" Margin="5" VerticalAlignment="Top" Foreground="Gray"/>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="15, 20" >
+                        <TextBlock Text="Workers Without Mask Today" FontSize="12" HorizontalAlignment="Right" FontFamily="Champagne &amp; Limousines" Margin="5" VerticalAlignment="Top" Foreground="Gray"/>
                     </StackPanel>
                 </Grid>
             </Grid>
-            
-            <Grid Grid.Column="1" Grid.ColumnSpan="2" Margin="261.2,0,0.2,5.8">
+            <Grid Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,261.4,5.8">
+                <Rectangle Height="120" Margin="20" Fill="White" RadiusY="10" RadiusX="10">
+                    <Rectangle.Effect>
+                        <DropShadowEffect BlurRadius="20" Color="#FFDEDEDE" RenderingBias="Quality" ShadowDepth="1"/>
+                    </Rectangle.Effect>
+                </Rectangle>
+                <Grid Margin="25" Height="120">
+                    <Grid Width="35" Height="50" Background="#FF24C3FF" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20 0">
+                        <Grid.Effect>
+                            <DropShadowEffect BlurRadius="20" RenderingBias="Quality" ShadowDepth="1" Color="#FFECECEC"/>
+                        </Grid.Effect>
+                        <materialDesign:PackIcon Kind="FaceMask" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10 20">
+                        <TextBlock x:Name="EventsAmountToday" Text="{Binding Path=VM_HowManyWorkersWithoutMaskProperty, Mode=OneWay}" FontFamily="Champagne &amp; Limousines" VerticalAlignment="Center" Foreground="Gray" FontSize="50"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Margin="12, 10" >
+                        <TextBlock Text="The amount of workers without a mask today" TextWrapping="Wrap" FontSize="12" Foreground="Gray" Margin="5"/>
+
+                    </StackPanel>
+                </Grid>
+            </Grid>
+
+            <Grid Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="261.2,0,0.2,5.8">
                 <Rectangle Height="120" Margin="20" Fill="White" RadiusY="10" RadiusX="10" >
                     <Rectangle.Effect>
                         <DropShadowEffect BlurRadius="20" Color="#FFDEDEDE" RenderingBias="Quality" ShadowDepth="1"/>
@@ -53,52 +77,36 @@
                         <Grid.Effect>
                             <DropShadowEffect BlurRadius="20" Color="#FFECECEC" RenderingBias="Quality" ShadowDepth="1"/>
                         </Grid.Effect>
-                        <materialDesign:PackIcon Kind="NotebookEdit"  HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
+                        <materialDesign:PackIcon Kind="Percent"  HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
                     </Grid>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10 30">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10 20">
                         <TextBlock Text="{Binding Path=VM_PercentageWorkersWithoutMaskTodayPerYesterdayProperty, Mode=OneWay}" FontFamily="Champagne &amp; Limousines" VerticalAlignment="Center" 
-                                   Foreground="{Binding Path=ForegroundColorPercentageWorkersProperty, Mode=OneWay}" FontSize="40" />
+                                   Foreground="{Binding Path=ForegroundColorPercentageWorkersProperty, Mode=OneWay}" FontSize="50" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="20">
-                        <TextBlock Text="Today's change compared to yesterday." FontSize="8" Foreground="Gray"/>
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Margin="12, 10">
+                        <TextBlock Text="Today's change compared to yesterday" FontSize="12" TextWrapping="Wrap" Foreground="Gray" Margin="5"/>
                     </StackPanel>
                 </Grid>
             </Grid>
-            <Grid Grid.Row="1" Grid.ColumnSpan="3" HorizontalAlignment="Center" Width="500" Height="400" Margin="114,0,113.2,0">
-                <Grid Background="White" Margin="20,65,20,223">
-                    <Grid.OpacityMask>
-                        <VisualBrush Visual="{ Binding ElementName=BorderG1 }"/>
-                    </Grid.OpacityMask>
-                    <Border x:Name="BorderG1" CornerRadius="5" Background="White" Margin="0,95,0,-95"/>
-                </Grid>
-                <Grid Margin="50 20 50 150">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="90"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.OpacityMask>
-                        <VisualBrush Visual="{ Binding ElementName=BorderG2 }"/>
-                    </Grid.OpacityMask>
-                    <Grid Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="2">
-                        <Border x:Name="BorderG2" CornerRadius="15" Background="#FF340051" Margin="0,12,0,-13"/>
-                    </Grid>
-                    <Grid Grid.Row="0" Grid.ColumnSpan="3">
-                        <TextBlock Text="Welcome to Covid Keeper" FontSize="28" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Top" FontFamily="Broadway" Margin="0,30"/>
-                    </Grid>
-                    <Grid Grid.Row="1" Grid.ColumnSpan="3">
-                        <Grid.Effect>
-                            <DropShadowEffect BlurRadius="20" Color="#FFDEDEDE" ShadowDepth="1"/>
-                        </Grid.Effect>
-                        <Button x:Name="ActiveButton" Content="{Binding Path=VM_ActiveButtonContentProperty, Mode=OneWay}" 
-                                HorizontalAlignment="Center" VerticalAlignment="Center" Width="76" Margin="162,49,162,59" 
-                                Click="ActiveButton_Click" Background="{Binding Path=BackgroundColorActiveButtonProperty, Mode=OneWay}"/>
-                    </Grid>                    
-                </Grid>
+            <Grid Grid.Row="1" Grid.Column="1">
+                <Grid.Effect>
+                    <DropShadowEffect BlurRadius="20" Color="#FFDEDEDE" ShadowDepth="1"/>
+                </Grid.Effect>
+                <Button x:Name="ActiveButton" Content="{Binding Path=VM_ActiveButtonContentProperty, Mode=OneWay}" 
+                                HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Height="100"
+                                Click="ActiveButton_Click" Style="{StaticResource RoundButtonTemplate}" FontSize="22" FontWeight="Bold">
+                    <Button.Background>
+                        <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+                            <GradientStop Offset="1" Color="#FF005D15"/>
+                            <GradientStop Color="{Binding BackgroundColorActiveButtonSecondProperty, Mode=OneWay}" />
+                            <GradientStop Color="#FF00F50B"/>
+                            <GradientStop Color="#9600AA27" Offset="0.482"/>
+                        </LinearGradientBrush>
+                    </Button.Background>
+                </Button>
+            </Grid>
+            <Grid Grid.Row="0" Grid.ColumnSpan="3" VerticalAlignment="Center" Width="650" Height="120" HorizontalAlignment="Center" >
+                <TextBlock Text="Welcome to Covid Keeper" Foreground="DarkBlue" FontSize="50" HorizontalAlignment="Center" VerticalAlignment="Top" FontFamily="Yu Gothic UI Semibold"/>
             </Grid>
         </Grid>
     </Grid>

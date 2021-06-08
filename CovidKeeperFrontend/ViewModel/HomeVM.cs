@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace CovidKeeperFrontend.ViewModel
 {
@@ -22,30 +23,16 @@ namespace CovidKeeperFrontend.ViewModel
                 NotifyPropertyChanged("VM_" + e.PropertyName);
             };
         }
-        public void ActiveButtonClicked()
+        public async Task ActiveButtonClicked()
         {
-            this.model.StartOrCloseProgram();
+            await this .model.StartOrCloseProgram();
         }
 
         public string VM_HowManyWorkersWithoutMaskProperty
         {
             get { return model.HowManyWorkersWithoutMaskProperty; }
         }
-        public string VM_ActiveButtonContentProperty
-        {
-            get 
-            {
-                if (this.model.ActiveButtonContentProperty == WpfDatabase.HandleFlag.Start)
-                {
-                    BackgroundColorActiveButtonProperty = System.Windows.Media.Brushes.Green;
-                }
-                else
-                {
-                    BackgroundColorActiveButtonProperty = System.Windows.Media.Brushes.Red;
-                }
-                return this.model.ActiveButtonContentProperty.ToString();
-            }
-        }
+        
         public string VM_PercentageWorkersWithoutMaskTodayPerYesterdayProperty
         {
             get 
@@ -99,7 +86,7 @@ namespace CovidKeeperFrontend.ViewModel
             }
             return String.Format(signPercentage + "{0:00000}%", percentageWorkers);
         }
-        private System.Windows.Media.Brush backgroundColorActiveButton = System.Windows.Media.Brushes.DarkSeaGreen;
+        /*private System.Windows.Media.Brush backgroundColorActiveButton = System.Windows.Media.Brushes.DarkSeaGreen;
 
         public System.Windows.Media.Brush BackgroundColorActiveButtonProperty
         {
@@ -109,8 +96,55 @@ namespace CovidKeeperFrontend.ViewModel
                 backgroundColorActiveButton = value;
                 NotifyPropertyChanged("BackgroundColorActiveButtonProperty");
             }
+        }*/
+        public string VM_ActiveButtonContentProperty
+        {
+            get
+            {
+                if (this.model.ActiveButtonContentProperty == WpfDatabase.HandleFlag.Start)
+                {
+                    BackgroundColorActiveButtonProperty = System.Windows.Media.Color.FromArgb(100, 0, 93, 21);
+                    BackgroundColorActiveButtonSecondProperty = System.Windows.Media.Color.FromArgb(59, 0, 170, 39);
+                    BackgroundColorActiveButtonSecondProperty = System.Windows.Media.Color.FromArgb(100, 0, 245, 11);
+                }
+                else
+                {
+                    BackgroundColorActiveButtonProperty = System.Windows.Media.Color.FromArgb(100, 212, 8, 8);
+                    BackgroundColorActiveButtonSecondProperty = System.Windows.Media.Color.FromArgb(100, 100, 0, 0);
+                }
+                return this.model.ActiveButtonContentProperty.ToString();
+            }
         }
-
+        private System.Windows.Media.Color backgroundColorActiveButton = System.Windows.Media.Color.FromArgb(100, 0, 93, 21);
+        public System.Windows.Media.Color BackgroundColorActiveButtonProperty
+        {
+            get { return backgroundColorActiveButton; }
+            set
+            {
+                backgroundColorActiveButton = value;
+                NotifyPropertyChanged("BackgroundColorActiveButtonProperty");
+            }
+        }
+        private System.Windows.Media.Color backgroundColorActiveButtonSecond = System.Windows.Media.Color.FromArgb(59, 0, 170, 39);
+        public System.Windows.Media.Color BackgroundColorActiveButtonSecondProperty
+        {
+            get { return backgroundColorActiveButtonSecond; }
+            set
+            {
+                backgroundColorActiveButtonSecond = value;
+                NotifyPropertyChanged("BackgroundColorActiveButtonSecondProperty");
+            }
+        }
+        private System.Windows.Media.Color backgroundColorActiveButtonThird = System.Windows.Media.Color.FromArgb(100, 0, 245, 11);
+        public System.Windows.Media.Color BackgroundColorActiveButtonThirdProperty
+        {
+            get { return backgroundColorActiveButtonThird; }
+            set
+            {
+                backgroundColorActiveButtonThird = value;
+                NotifyPropertyChanged("BackgroundColorActiveButtonThirdProperty");
+            }
+        }
         public void NotifyPropertyChanged(string propName)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));

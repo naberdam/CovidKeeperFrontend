@@ -1,4 +1,5 @@
 ﻿using CovidKeeperFrontend.HelperClasses;
+using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,6 +26,8 @@ namespace CovidKeeperFrontend.Views
     public partial class StatisticalDataUserControl : UserControl
     {
         DataGridRow lastSelectedRow = default;
+        MainWindowTemp mainWindowTemp = default;
+        StatisticsOptionListEnum statisticsOptionListEnum = StatisticsOptionListEnum.Nothing;
         public enum StatisticsOptionListEnum
         {
             AGE_PER_WEEK = 0,
@@ -64,10 +67,12 @@ namespace CovidKeeperFrontend.Views
             ColumnGraph.Visibility = Visibility.Hidden;
             PieGraph.Visibility = Visibility.Hidden;
             ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
-            StartDatePicker.Visibility = Visibility.Hidden;
-            EndDatePicker.Visibility = Visibility.Hidden;
+            /*StartDatePicker.Visibility = Visibility.Hidden;
+            EndDatePicker.Visibility = Visibility.Hidden;*/
             ShowGraphInThisRange.Visibility = Visibility.Hidden;
             GridCursor.Visibility = Visibility.Hidden;
+            statisticsOptionListEnum = StatisticsOptionListEnum.Nothing;
+            /*CommentText.Visibility = Visibility.Hidden;*/
         }
 
         private void AmountEventPerWeekTable_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -104,7 +109,7 @@ namespace CovidKeeperFrontend.Views
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Button btn = (Button)sender;
-            StatisticsOptionListEnum statisticsOptionListEnum = (StatisticsOptionListEnum)Enum.Parse(typeof(StatisticsOptionListEnum), btn.Content.ToString().Replace(" ", "_"));
+            statisticsOptionListEnum = (StatisticsOptionListEnum)Enum.Parse(typeof(StatisticsOptionListEnum), btn.Content.ToString().Replace(" ", "_"));
             GridCursor.Margin = new Thickness(10 + (180 * Convert.ToInt32(statisticsOptionListEnum)), 0, 0, 0);
             GridCursor.Visibility = Visibility.Visible;
             switch (statisticsOptionListEnum)
@@ -114,41 +119,106 @@ namespace CovidKeeperFrontend.Views
                     ColumnGraph.Visibility = Visibility.Visible;
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
-                    StartDatePicker.Visibility = Visibility.Visible;
-                    EndDatePicker.Visibility = Visibility.Visible;
+                    /*StartDatePicker.Visibility = Visibility.Visible;
+                    EndDatePicker.Visibility = Visibility.Visible;*/
                     ShowGraphInThisRange.Visibility = Visibility.Visible;
+                    CommentText.Text = "Please select a day for the week you are interested in:";
+                    ShowGraphInThisRangeText.Text = "If you are intrested in date range, please click on the calendar - ";
+                    CommentText.Visibility = Visibility.Visible;
                     break;
                 case StatisticsOptionListEnum.AGE_PER_MONTH:
                     (Application.Current as App).StatisticalDataViewModel.VM_SelectedValueOfStatisticsOptionListProperty = StatisticsOptionListEnum.AGE_PER_MONTH;
                     ColumnGraph.Visibility = Visibility.Visible;
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
-                    StartDatePicker.Visibility = Visibility.Visible;
-                    EndDatePicker.Visibility = Visibility.Visible;
+                    /*StartDatePicker.Visibility = Visibility.Visible;
+                    EndDatePicker.Visibility = Visibility.Visible;*/
                     ShowGraphInThisRange.Visibility = Visibility.Visible;
+                    CommentText.Text = "Please select a day for the month you are interested in:";
+                    CommentText.Visibility = Visibility.Visible;
                     break;
                 case StatisticsOptionListEnum.AGE_PER_WEEKDAY:
                     (Application.Current as App).StatisticalDataViewModel.VM_SelectedValueOfStatisticsOptionListProperty = StatisticsOptionListEnum.AGE_PER_WEEKDAY;
                     ColumnGraph.Visibility = Visibility.Hidden;
                     PieGraph.Visibility = Visibility.Visible;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
-                    StartDatePicker.Visibility = Visibility.Hidden;
-                    EndDatePicker.Visibility = Visibility.Hidden;
+                    /*StartDatePicker.Visibility = Visibility.Hidden;
+                    EndDatePicker.Visibility = Visibility.Hidden;*/
                     ShowGraphInThisRange.Visibility = Visibility.Hidden;
+                    CommentText.Text = "Please select a day for the week you are interested in:";
+                    CommentText.Visibility = Visibility.Visible;
                     break;
                 case StatisticsOptionListEnum.TOTAL_EVENTS:
                     (Application.Current as App).StatisticalDataViewModel.VM_SelectedValueOfStatisticsOptionListProperty = StatisticsOptionListEnum.TOTAL_EVENTS;
                     ColumnGraph.Visibility = Visibility.Hidden;
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Visible;
-                    StartDatePicker.Visibility = Visibility.Hidden;
-                    EndDatePicker.Visibility = Visibility.Hidden;
+                    /*StartDatePicker.Visibility = Visibility.Hidden;
+                    EndDatePicker.Visibility = Visibility.Hidden;*/
                     ShowGraphInThisRange.Visibility = Visibility.Hidden;
+                    CommentText.Text = "Please select a day for the week you are interested in:";
+                    CommentText.Visibility = Visibility.Visible;
                     break;
                 default:
                     break;
             }
         }
+
+        private void ShowGraphInThisRange_Click(object sender, RoutedEventArgs e)
+        {
+            this.IsEnabled = false;
+            SetIsEnabled(false);
+        }
+        private void SetIsEnabled(bool isEnable)
+        {
+            if (mainWindowTemp != default)
+            {
+                mainWindowTemp.IsEnabled = isEnable;
+            }
+        }
+        public void SetMainWindow(MainWindowTemp mainWindowTemp)
+        {
+            this.mainWindowTemp = mainWindowTemp;
+        }
+
+        private void CancelAddWorkerButton_Click(object sender, RoutedEventArgs e)
+        {
+            DialogHost.CloseDialogCommand.Execute(null, null);
+            this.IsEnabled = true;
+            SetIsEnabled(true);
+        }
+
+        private void AddButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (StartDatePicker.SelectedDate == default && EndDatePicker.SelectedDate == default)
+            {
+                MessageBox.Show("You have to insert start date and end date");
+                return;
+            }
+            DateTime startDate = Convert.ToDateTime((StartDatePicker.SelectedDate).ToString());
+            DateTime endDate = Convert.ToDateTime((EndDatePicker.SelectedDate).ToString());
+            switch (statisticsOptionListEnum)
+            {
+                case StatisticsOptionListEnum.AGE_PER_WEEK:
+                    (Application.Current as App).StatisticalDataViewModel.GetAvgEventsPerWeekWithRange(startDate, endDate);
+                    break;
+                case StatisticsOptionListEnum.AGE_PER_MONTH:
+                    (Application.Current as App).StatisticalDataViewModel.GetAvgEventsPerMonthWithRange(startDate, endDate);
+                    break;
+                case StatisticsOptionListEnum.AGE_PER_WEEKDAY:
+                    break;
+                case StatisticsOptionListEnum.TOTAL_EVENTS:
+                    break;
+                case StatisticsOptionListEnum.Nothing:
+                    break;
+                default:
+                    break;
+            }
+            DialogHost.CloseDialogCommand.Execute(null, null);
+            this.IsEnabled = true;
+            SetIsEnabled(true);
+        }
+
     }
     class MyButton
     {

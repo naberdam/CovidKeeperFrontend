@@ -203,6 +203,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="HelperClasses\GraphContent.cs" />
+    <Compile Include="HelperClasses\NotifyTaskCompletion.cs" />
     <Compile Include="MainWindowTemp.xaml.cs">
       <DependentUpon>MainWindowTemp.xaml</DependentUpon>
     </Compile>

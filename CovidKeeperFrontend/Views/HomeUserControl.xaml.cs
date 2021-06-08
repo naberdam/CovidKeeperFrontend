@@ -25,9 +25,9 @@ namespace CovidKeeperFrontend.Views
             InitializeComponent();
         }
 
-        private void ActiveButton_Click(object sender, RoutedEventArgs e)
+        private async void ActiveButton_Click(object sender, RoutedEventArgs e)
         {
-            (Application.Current as App).HomeViewModel.ActiveButtonClicked();
+            await (Application.Current as App).HomeViewModel.ActiveButtonClicked();
         }
     }
 }
