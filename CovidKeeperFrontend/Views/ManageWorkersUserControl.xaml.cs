@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -39,6 +41,10 @@ namespace CovidKeeperFrontend.Views
         {
             indexOfSelectedRow = -1;
             bitmapImage = default;
+            if (gridRowSelected != default)
+            {
+                gridRowSelected.DetailsVisibility = Visibility.Collapsed;
+            }
             rowViewSelected = default;
             gridRowSelected = default;
             detailsBtn = default;
@@ -131,7 +137,7 @@ namespace CovidKeeperFrontend.Views
         private void CheckChangeOfSelection(object sender)
         {
             DataGrid gd = (DataGrid)sender;
-            
+
             DataRowView rowSelectedNow = gd.CurrentItem as DataRowView;
             //DataRowView rowSelectedNow = gd.SelectedItem as DataRowView;
             if (rowViewSelected == rowSelectedNow)
@@ -174,6 +180,11 @@ namespace CovidKeeperFrontend.Views
         }
 
         private void SearchButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ShowDetails()
         {
 
         }
@@ -227,21 +238,79 @@ namespace CovidKeeperFrontend.Views
                         { Kind = MaterialDesignThemes.Wpf.PackIconKind.ArrowUp };
                         detailsBtn = detailsBtnNow;
                     }
-
-                    // change the details visibility
-                    /*if (gridRowSelected.DetailsVisibility == Visibility.Collapsed)
-                    {
-                        gridRowSelected.DetailsVisibility = Visibility.Visible;
-                    }
-                    else
-                    {
-                        gridRowSelected.DetailsVisibility = Visibility.Collapsed;
-                    }*/
                 }
             }
             catch (System.Exception)
             {
             }
         }
+        /*private object ExtractBoundValue(DataGridRow row, DataGridCell cell)
+        {
+            // find the property that this cell's column is bound to
+            string boundPropertyName = FindBoundProperty(cell.Column);
+
+            // find the object that is realted to this row
+            object data = row.Item;
+
+            // extract the property value
+            PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(data);
+            PropertyDescriptor property = properties[boundPropertyName];
+            object value = property.GetValue(data);
+
+            return value;
+        }
+
+
+        private string FindBoundProperty(DataGridColumn col)
+        {
+            DataGridBoundColumn boundColumn = col as DataGridBoundColumn;
+
+            // find the property that this column is bound to
+            Binding binding = boundColumn.Binding as Binding;
+            string boundPropertyName = binding.Path.Path;
+
+            return boundPropertyName;
+        }
+        private void DataGrid_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            DependencyObject dep = (DependencyObject)e.OriginalSource;
+
+            while ((dep != null) && !(dep is DataGridCell) && !(dep is DataGridColumnHeader))
+            {
+                dep = VisualTreeHelper.GetParent(dep);
+            }
+
+            if (dep == null)
+                return;
+
+
+            if (dep is DataGridCell)
+            {
+                DataGridCell cell = dep as DataGridCell;
+
+
+                // navigate further up the tree
+                while ((dep != null) && !(dep is DataGridRow))
+                {
+                    dep = VisualTreeHelper.GetParent(dep);
+                }
+
+                if (dep == null)
+                    return;
+
+                DataGridRow row = dep as DataGridRow;
+
+                object value = ExtractBoundValue(row, cell);
+
+                int columnIndex = cell.Column.DisplayIndex;// clicked columnindex
+                if (columnIndex == 1)
+                {
+
+                }
+                //int rowIndex = FindRowIndex(row);//clicked row index
+
+            }
+
+        }*/
     }
 }

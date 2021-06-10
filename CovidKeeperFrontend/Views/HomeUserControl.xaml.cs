@@ -23,6 +23,7 @@ namespace CovidKeeperFrontend.Views
         public HomeUserControl()
         {
             InitializeComponent();
+            var x = ActiveButton.Background;
         }
 
         private async void ActiveButton_Click(object sender, RoutedEventArgs e)

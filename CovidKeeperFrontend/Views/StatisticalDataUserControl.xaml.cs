@@ -28,6 +28,8 @@ namespace CovidKeeperFrontend.Views
         DataGridRow lastSelectedRow = default;
         MainWindowTemp mainWindowTemp = default;
         StatisticsOptionListEnum statisticsOptionListEnum = StatisticsOptionListEnum.Nothing;
+        Button detailsBtn = default;
+        DataGridRow gridRowSelected = default;
         public enum StatisticsOptionListEnum
         {
             AGE_PER_WEEK = 0,
@@ -43,7 +45,6 @@ namespace CovidKeeperFrontend.Views
 
         public void ClearFields()
         {
-            /*StatisticsOptionList.Text = "";*/
             List<StatisticsOptionListEnum> buttonContentList = new List<StatisticsOptionListEnum>() { StatisticsOptionListEnum.AGE_PER_WEEK, 
                 StatisticsOptionListEnum.AGE_PER_MONTH, StatisticsOptionListEnum.AGE_PER_WEEKDAY, StatisticsOptionListEnum.TOTAL_EVENTS };
             List<MyButton> buttons = new List<MyButton>();
@@ -67,13 +68,12 @@ namespace CovidKeeperFrontend.Views
             ColumnGraph.Visibility = Visibility.Hidden;
             PieGraph.Visibility = Visibility.Hidden;
             ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
-            /*StartDatePicker.Visibility = Visibility.Hidden;
-            EndDatePicker.Visibility = Visibility.Hidden;*/
             ShowGraphInThisRange.Visibility = Visibility.Hidden;
             GridCursor.Visibility = Visibility.Hidden;
             ShowGraphInThisRangeText.Visibility = Visibility.Hidden;
             statisticsOptionListEnum = StatisticsOptionListEnum.Nothing;
-            /*CommentText.Visibility = Visibility.Hidden;*/
+            detailsBtn = default;
+            gridRowSelected = default;
         }
 
         private void AmountEventPerWeekTable_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -84,27 +84,6 @@ namespace CovidKeeperFrontend.Views
             {
                 (Application.Current as App).StatisticalDataViewModel.VM_IdWorkerForLineGraphProperty = rowSelected["Id_worker"].ToString();
             }            
-        }
-        private void OnMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            DataGridRow row = sender as DataGridRow;
-            if (row != null)
-            {
-                if ((row.DetailsVisibility == Visibility.Collapsed || row.DetailsVisibility == Visibility.Hidden))
-                {
-                    row.DetailsVisibility = Visibility.Visible;
-                    if (lastSelectedRow != default)
-                    {
-                        lastSelectedRow.DetailsVisibility = Visibility.Collapsed;
-                    }                    
-                    lastSelectedRow = row;
-                }
-                else if (row.IsSelected && row.DetailsVisibility == Visibility.Visible)
-                {
-                    row.DetailsVisibility = Visibility.Collapsed;
-                    lastSelectedRow = default;
-                }
-            }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -120,8 +99,6 @@ namespace CovidKeeperFrontend.Views
                     ColumnGraph.Visibility = Visibility.Visible;
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
-                    /*StartDatePicker.Visibility = Visibility.Visible;
-                    EndDatePicker.Visibility = Visibility.Visible;*/
                     ShowGraphInThisRange.Visibility = Visibility.Visible;
                     CommentText.Text = "Please select a day for the week you are interested in:";
                     ShowGraphInThisRangeText.Visibility = Visibility.Visible;
@@ -132,8 +109,6 @@ namespace CovidKeeperFrontend.Views
                     ColumnGraph.Visibility = Visibility.Visible;
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
-                    /*StartDatePicker.Visibility = Visibility.Visible;
-                    EndDatePicker.Visibility = Visibility.Visible;*/
                     ShowGraphInThisRange.Visibility = Visibility.Visible;
                     CommentText.Text = "Please select a day for the month you are interested in:";
                     ShowGraphInThisRangeText.Visibility = Visibility.Visible;
@@ -144,9 +119,7 @@ namespace CovidKeeperFrontend.Views
                     ColumnGraph.Visibility = Visibility.Hidden;
                     PieGraph.Visibility = Visibility.Visible;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
-                    /*StartDatePicker.Visibility = Visibility.Hidden;
-                    EndDatePicker.Visibility = Visibility.Hidden;*/
-                    ShowGraphInThisRange.Visibility = Visibility.Hidden;
+                    ShowGraphInThisRange.Visibility = Visibility.Visible;
                     CommentText.Text = "Please select a day for the week you are interested in:";
                     ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
@@ -156,9 +129,7 @@ namespace CovidKeeperFrontend.Views
                     ColumnGraph.Visibility = Visibility.Hidden;
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Visible;
-                    /*StartDatePicker.Visibility = Visibility.Hidden;
-                    EndDatePicker.Visibility = Visibility.Hidden;*/
-                    ShowGraphInThisRange.Visibility = Visibility.Hidden;
+                    ShowGraphInThisRange.Visibility = Visibility.Visible;
                     CommentText.Text = "Please select a day for the week you are interested in:";
                     ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
@@ -201,6 +172,11 @@ namespace CovidKeeperFrontend.Views
             }
             DateTime startDate = Convert.ToDateTime((StartDatePicker.SelectedDate).ToString());
             DateTime endDate = Convert.ToDateTime((EndDatePicker.SelectedDate).ToString());
+            if (startDate > endDate)
+            {
+                MessageBox.Show("The start date can not be bigger than end date.\nPlease insert another dates.");
+                return;
+            }
             switch (statisticsOptionListEnum)
             {
                 case StatisticsOptionListEnum.AGE_PER_WEEK:
@@ -210,8 +186,10 @@ namespace CovidKeeperFrontend.Views
                     (Application.Current as App).StatisticalDataViewModel.GetAvgEventsPerMonthWithRange(startDate, endDate);
                     break;
                 case StatisticsOptionListEnum.AGE_PER_WEEKDAY:
+                    (Application.Current as App).StatisticalDataViewModel.GetAvgEventsPerWeekdayWithRange(startDate, endDate);
                     break;
                 case StatisticsOptionListEnum.TOTAL_EVENTS:
+                    (Application.Current as App).StatisticalDataViewModel.GetAmountEventsByWorkerWithRange(startDate, endDate);
                     break;
                 case StatisticsOptionListEnum.Nothing:
                     break;
@@ -221,6 +199,61 @@ namespace CovidKeeperFrontend.Views
             DialogHost.CloseDialogCommand.Execute(null, null);
             this.IsEnabled = true;
             SetIsEnabled(true);
+        }
+        private void DetailsButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // the original source is what was clicked.  For example 
+                // a button.
+                DependencyObject dep = (DependencyObject)e.OriginalSource;
+
+                // iteratively traverse the visual tree upwards looking for
+                // the clicked row.
+                while ((dep != null) && !(dep is DataGridRow))
+                {
+                    dep = VisualTreeHelper.GetParent(dep);
+                }
+
+                // if we found the clicked row
+                if (dep != null && dep is DataGridRow)
+                {
+                    // get the row
+                    DataGridRow gridRowSelectedNow = (DataGridRow)dep;
+                    Button detailsBtnNow = (Button)sender;
+                    if (gridRowSelected == gridRowSelectedNow)
+                    {
+                        detailsBtn.Content = new MaterialDesignThemes.Wpf.PackIcon
+                        { Kind = MaterialDesignThemes.Wpf.PackIconKind.ArrowDown };
+                        gridRowSelected.DetailsVisibility = Visibility.Collapsed;
+                        gridRowSelected = default;
+                        detailsBtn = default;
+                        return;
+                    }
+                    else if (gridRowSelectedNow != null && gridRowSelected == default)
+                    {
+                        detailsBtnNow.Content = new MaterialDesignThemes.Wpf.PackIcon
+                        { Kind = MaterialDesignThemes.Wpf.PackIconKind.ArrowUp };
+                        detailsBtn = detailsBtnNow;
+                        gridRowSelected = gridRowSelectedNow;
+                        gridRowSelected.DetailsVisibility = Visibility.Visible;
+                    }
+                    else if (gridRowSelectedNow != null && gridRowSelected != default)
+                    {
+                        detailsBtn.Content = new MaterialDesignThemes.Wpf.PackIcon
+                        { Kind = MaterialDesignThemes.Wpf.PackIconKind.ArrowDown };
+                        gridRowSelected.DetailsVisibility = Visibility.Collapsed;
+                        gridRowSelected = gridRowSelectedNow;
+                        gridRowSelected.DetailsVisibility = Visibility.Visible;
+                        detailsBtnNow.Content = new MaterialDesignThemes.Wpf.PackIcon
+                        { Kind = MaterialDesignThemes.Wpf.PackIconKind.ArrowUp };
+                        detailsBtn = detailsBtnNow;
+                    }
+                }
+            }
+            catch (System.Exception)
+            {
+            }
         }
 
     }

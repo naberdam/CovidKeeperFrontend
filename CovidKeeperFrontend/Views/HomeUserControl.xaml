@@ -60,7 +60,7 @@
                         <TextBlock x:Name="EventsAmountToday" Text="{Binding Path=VM_HowManyWorkersWithoutMaskProperty, Mode=OneWay}" FontFamily="Champagne &amp; Limousines" VerticalAlignment="Center" Foreground="Gray" FontSize="50"/>
                     </StackPanel>
                     <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Margin="12, 10" >
-                        <TextBlock Text="The amount of workers without a mask today" TextWrapping="Wrap" FontSize="12" Foreground="Gray" Margin="5"/>
+                        <TextBlock Text="The amount of events of workers without a mask today" TextWrapping="Wrap" FontSize="12" Foreground="Gray" Margin="5"/>
 
                     </StackPanel>
                 </Grid>
@@ -97,10 +97,10 @@
                                 Click="ActiveButton_Click" Style="{StaticResource RoundButtonTemplate}" FontSize="22" FontWeight="Bold">
                     <Button.Background>
                         <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                            <GradientStop Offset="1" Color="#FF005D15"/>
-                            <GradientStop Color="{Binding BackgroundColorActiveButtonSecondProperty, Mode=OneWay}" />
-                            <GradientStop Color="#FF00F50B"/>
-                            <GradientStop Color="#9600AA27" Offset="0.482"/>
+                            <GradientStop Offset="1" Color="{Binding BackgroundColorActiveButtonThirdProperty, Mode=OneWay}"/>
+                            <GradientStop Color="{Binding BackgroundColorActiveButtonSecondProperty, Mode=OneWay}"/>
+                            <GradientStop Color="{Binding BackgroundColorActiveButtonProperty, Mode=OneWay}"/>
+                            <GradientStop Color="{Binding BackgroundColorActiveButtonSecondProperty, Mode=OneWay}" Offset="0.482"/>
                         </LinearGradientBrush>
                     </Button.Background>
                 </Button>

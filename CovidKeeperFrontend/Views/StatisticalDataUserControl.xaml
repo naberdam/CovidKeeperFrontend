@@ -42,42 +42,46 @@
 
             </Grid>
             <Grid Grid.Row="1" Grid.ColumnSpan="3">
-                <StackPanel>
-                    <ScrollViewer x:Name="ScrollOfAmountEventPerWeekTable" Width="620" Height="300" >
-                        <DataGrid x:Name="AmountEventPerWeekTable" ItemsSource="{Binding Path=VM_AmountEventsByWorkerTableProperty, Mode=OneWay}" 
-                              Width="600" VerticalAlignment="Top" AutoGenerateColumns="False" 
+                <ScrollViewer x:Name="ScrollOfAmountEventPerWeekTable" Height="310" >
+                    <DataGrid x:Name="AmountEventPerWeekTable" ItemsSource="{Binding Path=VM_AmountEventsByWorkerTableProperty, Mode=OneWay}" 
+                              Width="600" VerticalAlignment="Top" AutoGenerateColumns="False" RowDetailsVisibilityMode="Collapsed"
                                   SelectionChanged="AmountEventPerWeekTable_SelectionChanged" RowHeight="40" CanUserAddRows="False" CanUserDeleteRows="False">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Binding="{Binding Id_worker}" Header="Id worker" Width="150" IsReadOnly="True"/>
-                                <DataGridTextColumn Binding="{Binding FullName}" Header="Full name" Width="150" IsReadOnly="True"/>
-                                <DataGridTextColumn Binding="{Binding Count}" Header="Count events" Width="120" IsReadOnly="True"/>
-                                <DataGridTextColumn Binding="{Binding LineSeriesGraph}" Visibility="Hidden" Header="LineSeriesGraph" Width="150" IsReadOnly="True"/>
-                                <DataGridTextColumn Binding="{Binding LabelsGraph}" Visibility="Hidden" Header="LabelsGraph" Width="150" IsReadOnly="True"/>
-                                <DataGridTextColumn Binding="{Binding TitleGraph}" Visibility="Hidden" Header="TitleGraph" Width="150" IsReadOnly="True"/>
-                            </DataGrid.Columns>
-                            <DataGrid.ItemContainerStyle>
-                                <Style TargetType="DataGridRow">
-                                    <EventSetter Event="PreviewMouseLeftButtonDown" Handler="OnMouseDown"/>
-                                </Style>
-                            </DataGrid.ItemContainerStyle>
-                            <DataGrid.RowDetailsTemplate>
-                                <DataTemplate>
-                                    <DockPanel Height="200">
-                                        <lvc:CartesianChart Series="{Binding Path=LineSeriesGraph}" LegendLocation="Bottom">
-                                            <lvc:CartesianChart.AxisX>
-                                                <lvc:Axis Title="{Binding Path=TitleGraph}" 
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button x:Name="DetailsButton" ButtonBase.Click="DetailsButton_Click" 
+                                                Background="{x:Null}" BorderBrush="{x:Null}" Foreground="Gray" 
+                                                Width="30" Height="30" Padding="0" >
+                                            <materialDesign:PackIcon Kind="ArrowDown"/>
+                                        </Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Binding="{Binding Id_worker}" Header="Id worker" Width="150" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding FullName}" Header="Full name" Width="150" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding Count}" Header="Count events" Width="120" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding LineSeriesGraph}" Visibility="Hidden" Header="LineSeriesGraph" Width="150" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding LabelsGraph}" Visibility="Hidden" Header="LabelsGraph" Width="150" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding TitleGraph}" Visibility="Hidden" Header="TitleGraph" Width="150" IsReadOnly="True"/>
+                        </DataGrid.Columns>
+                        <DataGrid.RowDetailsTemplate>
+                            <DataTemplate>
+                                <DockPanel Height="200">
+                                    <lvc:CartesianChart Series="{Binding Path=LineSeriesGraph}" LegendLocation="Bottom">
+                                        <lvc:CartesianChart.AxisX>
+                                            <lvc:Axis Title="{Binding Path=TitleGraph}" 
                                                               Labels="{Binding Path=LabelsGraph}"/>
-                                            </lvc:CartesianChart.AxisX>
-                                            <lvc:CartesianChart.AxisY>
-                                                <lvc:Axis Title="Total Events" />
-                                            </lvc:CartesianChart.AxisY>
-                                        </lvc:CartesianChart>
-                                    </DockPanel>
-                                </DataTemplate>
-                            </DataGrid.RowDetailsTemplate>
-                        </DataGrid>
-                    </ScrollViewer>
-                </StackPanel>
+                                        </lvc:CartesianChart.AxisX>
+                                        <lvc:CartesianChart.AxisY>
+                                            <lvc:Axis Title="Total Events" />
+                                        </lvc:CartesianChart.AxisY>
+                                    </lvc:CartesianChart>
+                                </DockPanel>
+                            </DataTemplate>
+                        </DataGrid.RowDetailsTemplate>
+                    </DataGrid>
+                </ScrollViewer>
 
                 <MetroChart:PieChart x:Name="PieGraph" Background="{x:Null}" ChartTitle="Average Per Weekday"
                                                  ChartSubTitle="Each slice represent one weekday">
@@ -117,7 +121,7 @@
                     </StackPanel>
                     
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="15">
-                        <Button x:Name="AddButton" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" 
+                        <Button x:Name="AddButton"
                                     Style="{DynamicResource MaterialDesignFlatButton}" Margin="4" 
                                     VerticalAlignment="Center" Click="AddButton_Click">
                             Add
@@ -135,7 +139,7 @@
                     <TextBlock x:Name="ShowGraphInThisRangeText" Text="If you are intrested in date range, please click on the calendar - "
                                Foreground="Gray" FontSize="18" Height="30"/>
                     <Button x:Name="ShowGraphInThisRange" VerticalAlignment="Bottom" Click="ShowGraphInThisRange_Click" Foreground="Gray"
-                                HorizontalAlignment="Center" Width="30" Height="30" Padding="0" Margin="10, 0" Background="{x:Null}"
+                                HorizontalAlignment="Center" Width="30" Height="35" Padding="0" Margin="10, 0" Background="{x:Null}"
                                 Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}" BorderBrush="{x:Null}">
                         <materialDesign:PackIcon Kind="CalendarRange"/>
                     </Button>

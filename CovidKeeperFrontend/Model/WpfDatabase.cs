@@ -176,7 +176,7 @@ namespace CovidKeeperFrontend.Model
             get { return amountEventsByWorkerTable; }
             set 
             {
-                if (amountEventsByWorkerTable == default || AreTablesTheSame(amountEventsByWorkerTable, value))
+                if (amountEventsByWorkerTable == default || !AreTablesTheSame(amountEventsByWorkerTable, value))
                 {
                     amountEventsByWorkerTable = value;
                     NotifyPropertyChanged("AmountEventsByWorkerTableProperty");
@@ -257,122 +257,7 @@ namespace CovidKeeperFrontend.Model
                 }
                 
             }
-        }
-        private Visibility visibilityOfLineGraph = Visibility.Hidden;
-
-        public Visibility VisibilityOfLineGraphProperty
-        {
-            get { return visibilityOfLineGraph; }
-            set 
-            {
-                if (visibilityOfLineGraph != value)
-                {
-                    visibilityOfLineGraph = value;
-                    NotifyPropertyChanged("VisibilityOfLineGraphProperty");
-                }                
-            }
-        }
-
-        private Visibility visibilityOfPieGraph = Visibility.Hidden;
-
-        public Visibility VisibilityOfPieGraphProperty
-        {
-            get { return visibilityOfPieGraph; }
-            set
-            {
-                if (visibilityOfPieGraph != value)
-                {
-                    visibilityOfPieGraph = value;
-                    NotifyPropertyChanged("VisibilityOfPieGraphProperty");
-                }
-            }
-        }
-
-        private Visibility visibilityOfAmountEventByWorkerTable = Visibility.Hidden;
-
-        public Visibility VisibilityOfAmountEventByWorkerTableProperty
-        {
-            get { return visibilityOfAmountEventByWorkerTable; }
-            set
-            {
-                if (visibilityOfAmountEventByWorkerTable != value)
-                {
-                    visibilityOfAmountEventByWorkerTable = value;
-                    NotifyPropertyChanged("VisibilityOfAmountEventByWorkerTableProperty");
-                }
-            }
-        }
-
-        private Visibility visibilityOfAmountEventPerWeekTable = Visibility.Hidden;
-
-        public Visibility VisibilityOfAmountEventPerWeekTableProperty
-        {
-            get { return visibilityOfAmountEventPerWeekTable; }
-            set
-            {
-                if (visibilityOfAmountEventPerWeekTable != value)
-                {
-                    visibilityOfAmountEventPerWeekTable = value;
-                    NotifyPropertyChanged("VisibilityOfAmountEventPerWeekTableProperty");
-                }
-            }
-        }
-        private Visibility visibilityOfAmountEventPerMonthTable = Visibility.Hidden;
-
-        public Visibility VisibilityOfAmountEventPerMonthTableProperty
-        {
-            get { return visibilityOfAmountEventPerMonthTable; }
-            set
-            {
-                if (visibilityOfAmountEventPerMonthTable != value)
-                {
-                    visibilityOfAmountEventPerMonthTable = value;
-                    NotifyPropertyChanged("VisibilityOfAmountEventPerMonthTableProperty");
-                }
-            }
-        }
-        private Visibility visibilityStartDatePicker = Visibility.Hidden;
-
-        public Visibility VisibilityStartDatePickerProperty
-        {
-            get { return visibilityStartDatePicker; }
-            set
-            {
-                if (visibilityStartDatePicker != value)
-                {
-                    visibilityStartDatePicker = value;
-                    NotifyPropertyChanged("VisibilityStartDatePickerProperty");
-                }
-            }
-        }
-        private Visibility visibilityEndDatePicker = Visibility.Hidden;
-
-        public Visibility VisibilityEndDatePickerProperty
-        {
-            get { return visibilityEndDatePicker; }
-            set
-            {
-                if (visibilityEndDatePicker != value)
-                {
-                    visibilityEndDatePicker = value;
-                    NotifyPropertyChanged("VisibilityEndDatePickerProperty");
-                }
-            }
-        }
-        private Visibility visibilityShowGraphInThisRange = Visibility.Hidden;
-
-        public Visibility VisibilityShowGraphInThisRangeProperty
-        {
-            get { return visibilityShowGraphInThisRange; }
-            set
-            {
-                if (visibilityShowGraphInThisRange != value)
-                {
-                    visibilityShowGraphInThisRange = value;
-                    NotifyPropertyChanged("VisibilityShowGraphInThisRangeProperty");
-                }
-            }
-        }
+        }        
 
         public enum MonthEnumForGraphs
         {
@@ -1169,12 +1054,59 @@ namespace CovidKeeperFrontend.Model
                 ColumnGraphProperty = avgEventsPerWeekday;
             }
         }
+        public void GetAvgEventsPerWeekdayWithRange(DateTime startDate, DateTime endDate)
+        {
+            string avgEventsPerWeekdayQuery = "Select DISTINCT DATEPART(weekday, Time_of_event) AS Weekday, " +
+                "COUNT(CONVERT(date, Time_of_event)) / 5.0 AS Avg " +
+                "from [dbo].[History_Events] " +
+                "where (Time_of_event > '" + startDate.ToString("MM/dd/yyyy") + "' and Time_of_event < '" + endDate.ToString("MM/dd/yyyy") + "') " +
+                "group by DATEPART(weekday, Time_of_event); ";
+            List<object[]> avgEventsPerWeekdayList = QuerySelectOfMultiRows(avgEventsPerWeekdayQuery);
+
+            if (avgEventsPerWeekdayList != null)
+            {
+                List<GraphContent> avgEventsPerWeekday = new List<GraphContent>();
+                foreach (var item in avgEventsPerWeekdayList)
+                {
+                    DayEnumForGraphs dayEnum = (DayEnumForGraphs)Enum.Parse(typeof(DayEnumForGraphs), item[0].ToString());
+                    avgEventsPerWeekday.Add(new GraphContent() { WorkWeek = dayEnum.ToString(), AvgValue = Convert.ToDouble(item[1]) });
+                }
+                ColumnGraphProperty = avgEventsPerWeekday;
+            }
+        }
         public void GetAmountEventsByWorker()
         {
             string amountEventsPerWorkerQuery = "Select DISTINCT Id_worker, FullName, " +
                 "COUNT(Id_worker) AS Count " +
                 "from[dbo].[History_Events] " +
                 "INNER JOIN [dbo].[Workers] ON [dbo].[History_Events].Id_worker=[dbo].[Workers].Id " +
+                "group by Id_worker, FullName " +
+                "order by count desc; ";
+            SqlCommand command = new SqlCommand();
+            command.CommandText = amountEventsPerWorkerQuery;
+            command.Connection = sqlConnection;
+            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command);
+            DataTable dataTableAmountEventsPerWorker = new DataTable("History_Events");
+            sqlDataAdapter.Fill(dataTableAmountEventsPerWorker);
+            dataTableAmountEventsPerWorker.Columns.Add("LineSeriesGraph", typeof(SeriesCollection));
+            dataTableAmountEventsPerWorker.Columns.Add("LabelsGraph", typeof(string[]));
+            dataTableAmountEventsPerWorker.Columns.Add("TitleGraph", typeof(string));
+            foreach (DataRow row in dataTableAmountEventsPerWorker.Rows)
+            {
+                row["LineSeriesGraph"] = default;
+                row["LabelsGraph"] = default;
+                row["TitleGraph"] = default;
+            }
+            AmountEventsByWorkerTableProperty = dataTableAmountEventsPerWorker;
+        }
+
+        public void GetAmountEventsByWorkerWithRange(DateTime startDate, DateTime endDate)
+        {
+            string amountEventsPerWorkerQuery = "Select DISTINCT Id_worker, FullName, " +
+                "COUNT(Id_worker) AS Count " +
+                "from[dbo].[History_Events] " +
+                "INNER JOIN [dbo].[Workers] ON [dbo].[History_Events].Id_worker=[dbo].[Workers].Id " +
+                "where (Time_of_event > '" + startDate.ToString("MM/dd/yyyy") + "' and Time_of_event < '" + endDate.ToString("MM/dd/yyyy") + "') " +
                 "group by Id_worker, FullName " +
                 "order by count desc; ";
             SqlCommand command = new SqlCommand();
@@ -1235,7 +1167,7 @@ namespace CovidKeeperFrontend.Model
                         }
                     };
         }
-        public void GetAvgEventsPerMonthPerWorker(string idWorker)
+        /*public void GetAvgEventsPerMonthPerWorker(string idWorker)
         {
             string avgEventsPerMonthPerWorkerQuery = "Select DISTINCT DATEPART(month, Time_of_event) AS Month, " +
                 "COUNT(CONVERT(date, Time_of_event)) AS Avg " +
@@ -1253,7 +1185,7 @@ namespace CovidKeeperFrontend.Model
                 }
                 TitleOfLineChartOfWorkerProperty = WeekOrMonth.Week;
             }
-        }
+        }*/
 
         private Dictionary<string,double> SetValuesInDictToZero(Dictionary<string, double> dictToSet)
         {

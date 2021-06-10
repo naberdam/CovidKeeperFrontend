@@ -86,36 +86,27 @@ namespace CovidKeeperFrontend.ViewModel
             }
             return String.Format(signPercentage + "{0:00000}%", percentageWorkers);
         }
-        /*private System.Windows.Media.Brush backgroundColorActiveButton = System.Windows.Media.Brushes.DarkSeaGreen;
-
-        public System.Windows.Media.Brush BackgroundColorActiveButtonProperty
-        {
-            get { return backgroundColorActiveButton; }
-            set
-            {
-                backgroundColorActiveButton = value;
-                NotifyPropertyChanged("BackgroundColorActiveButtonProperty");
-            }
-        }*/
         public string VM_ActiveButtonContentProperty
         {
             get
             {
                 if (this.model.ActiveButtonContentProperty == WpfDatabase.HandleFlag.Start)
                 {
-                    BackgroundColorActiveButtonProperty = System.Windows.Media.Color.FromArgb(100, 0, 93, 21);
-                    BackgroundColorActiveButtonSecondProperty = System.Windows.Media.Color.FromArgb(59, 0, 170, 39);
-                    BackgroundColorActiveButtonSecondProperty = System.Windows.Media.Color.FromArgb(100, 0, 245, 11);
+                    BackgroundColorActiveButtonProperty = System.Windows.Media.Color.FromRgb(0, 93, 21);
+                    BackgroundColorActiveButtonSecondProperty = System.Windows.Media.Color.FromRgb( 0, 170, 39);
+                    BackgroundColorActiveButtonThirdProperty = System.Windows.Media.Color.FromRgb(0, 245, 11);
+                    
                 }
                 else
                 {
-                    BackgroundColorActiveButtonProperty = System.Windows.Media.Color.FromArgb(100, 212, 8, 8);
-                    BackgroundColorActiveButtonSecondProperty = System.Windows.Media.Color.FromArgb(100, 100, 0, 0);
+                    BackgroundColorActiveButtonProperty = System.Windows.Media.Color.FromRgb(245, 0, 0);
+                    BackgroundColorActiveButtonSecondProperty = System.Windows.Media.Color.FromRgb(170, 0, 0);
+                    BackgroundColorActiveButtonThirdProperty = System.Windows.Media.Color.FromRgb(93, 0, 0);
                 }
                 return this.model.ActiveButtonContentProperty.ToString();
             }
         }
-        private System.Windows.Media.Color backgroundColorActiveButton = System.Windows.Media.Color.FromArgb(100, 0, 93, 21);
+        private System.Windows.Media.Color backgroundColorActiveButton = System.Windows.Media.Color.FromRgb(0, 93, 21);
         public System.Windows.Media.Color BackgroundColorActiveButtonProperty
         {
             get { return backgroundColorActiveButton; }
@@ -125,7 +116,7 @@ namespace CovidKeeperFrontend.ViewModel
                 NotifyPropertyChanged("BackgroundColorActiveButtonProperty");
             }
         }
-        private System.Windows.Media.Color backgroundColorActiveButtonSecond = System.Windows.Media.Color.FromArgb(59, 0, 170, 39);
+        private System.Windows.Media.Color backgroundColorActiveButtonSecond = System.Windows.Media.Color.FromRgb(0, 170, 39);
         public System.Windows.Media.Color BackgroundColorActiveButtonSecondProperty
         {
             get { return backgroundColorActiveButtonSecond; }
@@ -135,7 +126,7 @@ namespace CovidKeeperFrontend.ViewModel
                 NotifyPropertyChanged("BackgroundColorActiveButtonSecondProperty");
             }
         }
-        private System.Windows.Media.Color backgroundColorActiveButtonThird = System.Windows.Media.Color.FromArgb(100, 0, 245, 11);
+        private System.Windows.Media.Color backgroundColorActiveButtonThird = System.Windows.Media.Color.FromRgb(0, 245, 11);
         public System.Windows.Media.Color BackgroundColorActiveButtonThirdProperty
         {
             get { return backgroundColorActiveButtonThird; }

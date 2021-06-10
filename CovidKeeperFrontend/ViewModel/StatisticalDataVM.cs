@@ -45,7 +45,7 @@ namespace CovidKeeperFrontend.ViewModel
             }
         }
 
-        public Visibility VM_VisibilityOfLineGraphProperty
+        /*public Visibility VM_VisibilityOfLineGraphProperty
         {
             get { return this.model.VisibilityOfLineGraphProperty; }
         }
@@ -64,7 +64,7 @@ namespace CovidKeeperFrontend.ViewModel
         public Visibility VM_VisibilityOfAmountEventByWorkerTableProperty
         {
             get { return this.model.VisibilityOfAmountEventByWorkerTableProperty; }
-        }
+        }*/
         public DataTable VM_AmountEventsByWorkerTableProperty
         {
             get { return model.AmountEventsByWorkerTableProperty; }
@@ -93,7 +93,7 @@ namespace CovidKeeperFrontend.ViewModel
         {
             get { return this.model.ColumnChartSubTitleProperty.ToString().Replace("_", " "); }
         }
-        public Visibility VM_VisibilityStartDatePickerProperty
+        /*public Visibility VM_VisibilityStartDatePickerProperty
         {
             get { return this.model.VisibilityStartDatePickerProperty; }
         }
@@ -104,7 +104,7 @@ namespace CovidKeeperFrontend.ViewModel
         public Visibility VM_VisibilityShowGraphInThisRangeProperty
         {
             get { return this.model.VisibilityShowGraphInThisRangeProperty; }
-        }
+        }*/
         public string VM_IdWorkerForLineGraphProperty 
         {
             set { this.model.IdWorkerForLineGraphProperty = value; }
@@ -116,6 +116,14 @@ namespace CovidKeeperFrontend.ViewModel
         public void GetAvgEventsPerWeekWithRange(DateTime startDate, DateTime endDate)
         {
             this.model.GetAvgEventsPerWeekWithRange(startDate, endDate);
+        }
+        public void GetAvgEventsPerWeekdayWithRange(DateTime startDate, DateTime endDate)
+        {
+            this.model.GetAvgEventsPerWeekdayWithRange(startDate, endDate);
+        }
+        public void GetAmountEventsByWorkerWithRange(DateTime startDate, DateTime endDate)
+        {
+            this.model.GetAmountEventsByWorkerWithRange(startDate, endDate);
         }
     }
 }
