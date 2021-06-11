@@ -208,12 +208,8 @@
       <DependentUpon>MainWindowTemp.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\WpfDatabase.cs" />
-    <Compile Include="Settings.xaml.cs">
-      <DependentUpon>Settings.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ViewModel\HomeVM.cs" />
     <Compile Include="ViewModel\MainMenuVM.cs" />
-    <Compile Include="ViewModel\SearchWorkersVM.cs" />
     <Compile Include="ViewModel\StatisticalDataVM.cs" />
     <Compile Include="ViewModel\WorkersTableVM.cs" />
     <Compile Include="Views\HomeUserControl.xaml.cs">
@@ -222,14 +218,8 @@
     <Compile Include="Views\ManageWorkersUserControl.xaml.cs">
       <DependentUpon>ManageWorkersUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SearchWorkersUserControl.xaml.cs">
-      <DependentUpon>SearchWorkersUserControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\StatisticalDataUserControl.xaml.cs">
       <DependentUpon>StatisticalDataUserControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\WorkersTableUserControl.xaml.cs">
-      <DependentUpon>WorkersTableUserControl.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -247,10 +237,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Settings.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\HomeUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -259,15 +245,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\SearchWorkersUserControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\StatisticalDataUserControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\WorkersTableUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

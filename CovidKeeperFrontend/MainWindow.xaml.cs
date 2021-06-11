@@ -73,14 +73,14 @@ namespace CovidKeeperFrontend
 
         private void Button_Click_Settings(object sender, RoutedEventArgs e)
         {
-            send_message("settings");
+            /*send_message("settings");
 
             Settings view = new Settings();
             // Change the boolean type to true for closing the program.
 
             this.Close();
             // Show the SubMainMenu.
-            view.Show();
+            view.Show();*/
         }
 
         private void Button_Click_Delete_Worker(object sender, RoutedEventArgs e)

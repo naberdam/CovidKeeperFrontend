@@ -18,7 +18,6 @@ namespace CovidKeeperFrontend
         public WpfDatabase WpfDatabaseObject = new WpfDatabase();
         public HomeVM HomeViewModel { get; internal set; }
         public WorkersTableVM WorkersTableViewModel { get; internal set; }
-        public SearchWorkersVM SearchWorkersViewModel { get; internal set; }
         public MainMenuVM MainMenuViewModel { get; internal set; }
         public StatisticalDataVM StatisticalDataViewModel { get; internal set; }
 
@@ -26,7 +25,6 @@ namespace CovidKeeperFrontend
         {
             HomeViewModel = new HomeVM(WpfDatabaseObject);
             WorkersTableViewModel = new WorkersTableVM(WpfDatabaseObject);
-            SearchWorkersViewModel = new SearchWorkersVM(WpfDatabaseObject);
             MainMenuViewModel = new MainMenuVM(WpfDatabaseObject);
             StatisticalDataViewModel = new StatisticalDataVM(WpfDatabaseObject);
         }

@@ -25,8 +25,6 @@ namespace CovidKeeperFrontend
     public partial class MainWindowTemp : Window
     {
         HomeUserControl homeUserControl = new HomeUserControl();
-        WorkersTableUserControl workersTableUserControl = new WorkersTableUserControl();
-        SearchWorkersUserControl searchWorkersUserControl = new SearchWorkersUserControl();
         StatisticalDataUserControl statisticalDataUserControl = new StatisticalDataUserControl();
         ManageWorkersUserControl manageWorkersUserControl = new ManageWorkersUserControl();
         public MainWindowTemp()
@@ -34,8 +32,6 @@ namespace CovidKeeperFrontend
             InitializeComponent();
             DataContext = (Application.Current as App).MainMenuViewModel;
             homeUserControl.DataContext = (Application.Current as App).HomeViewModel;
-            workersTableUserControl.DataContext = (Application.Current as App).WorkersTableViewModel;
-            searchWorkersUserControl.DataContext = (Application.Current as App).SearchWorkersViewModel;
             statisticalDataUserControl.DataContext = (Application.Current as App).StatisticalDataViewModel;
             manageWorkersUserControl.DataContext = (Application.Current as App).WorkersTableViewModel;
             ListViewMenu.SelectedIndex = 0;
@@ -65,19 +61,11 @@ namespace CovidKeeperFrontend
                     GridPrincipal.Children.Add(homeUserControl);                    
                     break;
                 case 1:
-                    /*workersTableUserControl.ClearFields();
-                    GridPrincipal.Children.Clear();
-                    GridPrincipal.Children.Add(workersTableUserControl);
-                    break;*/
                     manageWorkersUserControl.ClearFields();
                     GridPrincipal.Children.Clear();
                     GridPrincipal.Children.Add(manageWorkersUserControl);
                     break;
                 case 2:
-                    /*searchWorkersUserControl.ClearFields();
-                    GridPrincipal.Children.Clear();
-                    GridPrincipal.Children.Add(searchWorkersUserControl);
-                    break;*/
                     statisticalDataUserControl.ClearFields();
                     GridPrincipal.Children.Clear();
                     GridPrincipal.Children.Add(statisticalDataUserControl);
@@ -91,11 +79,6 @@ namespace CovidKeeperFrontend
         {
             TransitioningContentSlide.OnApplyTemplate();
             GridCursor.Margin = new Thickness(0, (190 + (60 * index)), 0, 0);
-        }
-
-        private void RefreshButton_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void UpdateBreakTimeForSendMailButton_Click(object sender, RoutedEventArgs e)
