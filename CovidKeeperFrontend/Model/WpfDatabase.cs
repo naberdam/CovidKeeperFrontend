@@ -77,6 +77,7 @@ namespace CovidKeeperFrontend.Model
                     workerDetailsTable = value;
                     CountWorkersInWorkersDetailsTableProperty = value.Rows.Count.ToString();
                     UpdateHandleInAnalayzerConfigAsync = new NotifyTaskCompletion<int>(UpdateHandleInAnalayzerConfig());
+                    SearchOrWorkersTableProperty = false;
                     NotifyPropertyChanged("WorkerDetailsTableProperty");
                 }
             }
@@ -90,10 +91,20 @@ namespace CovidKeeperFrontend.Model
                 if (searchWorkerDetailsTable != value)
                 {
                     searchWorkerDetailsTable = value;
-                    NotifyPropertyChanged("SearchWorkerDetailsTableProperty");
+                    CountWorkersInWorkersDetailsTableProperty = value.Rows.Count.ToString();
+                    SearchOrWorkersTableProperty = true;
+                    NotifyPropertyChanged("WorkerDetailsTableProperty");
                 }
             }
         }
+        private bool searchOrWorkersTable = false;
+
+        public bool SearchOrWorkersTableProperty
+        {
+            get { return searchOrWorkersTable; }
+            set { searchOrWorkersTable = value; }
+        }
+
         private float percentageWorkersWithoutMaskTodayPerYesterday = 0;
 
         public float PercentageWorkersWithoutMaskTodayPerYesterdayProperty
@@ -336,6 +347,7 @@ namespace CovidKeeperFrontend.Model
                 if (!startDateInDatePicker.Date.Equals(value.Date))
                 {
                     startDateInDatePicker = value;
+                    StartDateInDatePickerAfterPickProperty = value;
                     NotifyPropertyChanged("StartDateInDatePickerProperty");
                 }                
             }
@@ -351,20 +363,22 @@ namespace CovidKeeperFrontend.Model
                 if (!selectedDateStartInDatePicker.Date.Equals(value.Date))
                 {
                     selectedDateStartInDatePicker = value;
+                    StartDateInDatePickerAfterPickProperty = value;
                 }
             }
         }
 
-        private DateTime selectedDateEndInDatePicker = default;
+        private DateTime startDateInDatePickerAfterPick = default;
 
-        public DateTime SelectedDateEndInDatePickerProperty
+        public DateTime StartDateInDatePickerAfterPickProperty
         {
-            get { return selectedDateEndInDatePicker; }
+            get { return startDateInDatePickerAfterPick; }
             set
             {
-                if (!selectedDateEndInDatePicker.Date.Equals(value.Date))
+                if (!startDateInDatePickerAfterPick.Date.Equals(value.Date))
                 {
-                    selectedDateEndInDatePicker = value;
+                    startDateInDatePickerAfterPick = value;
+                    NotifyPropertyChanged("StartDateInDatePickerAfterPickProperty");
                 }
             }
         }
@@ -380,6 +394,20 @@ namespace CovidKeeperFrontend.Model
                     idWorkerForLineGraph = value;
                     GetAvgEventsPerWeekPerWorker(idWorkerForLineGraph);
                 }                
+            }
+        }
+        private string weekOrMonthForDateRangeText;
+
+        public string WeekOrMonthForDateRangeTextProperty
+        {
+            get { return weekOrMonthForDateRangeText; }
+            set
+            {
+                if (weekOrMonthForDateRangeText != value)
+                {
+                    weekOrMonthForDateRangeText = value;
+                    NotifyPropertyChanged("WeekOrMonthForDateRangeTextProperty");
+                }
             }
         }
 
@@ -604,6 +632,7 @@ namespace CovidKeeperFrontend.Model
         public async Task<int> RefreshStatisticalData()
         {
             await GetMinDateInHistoryEvents();
+            /*await */
             return default;
         }
         private void InitialWorkWeekAndAmountEventsDict()
@@ -708,6 +737,11 @@ namespace CovidKeeperFrontend.Model
                 }
             });            
         }
+        public void GetWorkersDetailsAfterRefresh()
+        {
+            SearchOrWorkersTableProperty = false;
+            NotifyPropertyChanged("WorkerDetailsTableProperty");
+        }
         private async Task<string> CountWorkers()
         {
             return await Task.Run(() =>
@@ -799,32 +833,32 @@ namespace CovidKeeperFrontend.Model
         }
         public void SearchById(string idWorker)
         {
-            SearchWorkerDetailsTableProperty = SearchTableByQuery("Id = '" + idWorker + "'");
+            SearchWorkerDetailsTableProperty = SearchTableByQuery("Id like '%" + idWorker + "%'");
         }
-        public void SearchByIdAndEmail(string idWorker, string emailAddress)
+        /*public void SearchByIdAndEmail(string idWorker, string emailAddress)
         {
             SearchWorkerDetailsTableProperty = SearchTableByQuery("Id = '" + idWorker + "' AND Email_address = '" + emailAddress + "'");
-        }
-        public void SearchByIdAndFullName(string idWorker, string fullName)
+        }*/
+        /*public void SearchByIdAndFullName(string idWorker, string fullName)
         {
             SearchWorkerDetailsTableProperty = SearchTableByQuery("Id = '" + idWorker + "' AND FullName = '" + fullName + "'");
-        }
+        }*/
         public void SearchByFullName(string fullName)
         {
-            SearchWorkerDetailsTableProperty = SearchTableByQuery("FullName = '" + fullName + "'");
+            SearchWorkerDetailsTableProperty = SearchTableByQuery("FullName like '%" + fullName + "%'");
         }
-        public void SearchByFullNameAndEmail(string fullName, string emailAddress)
+        /*public void SearchByFullNameAndEmail(string fullName, string emailAddress)
         {
             SearchWorkerDetailsTableProperty = SearchTableByQuery("FullName = '" + fullName + "' AND Email_address = '" + emailAddress + "'");
-        }
+        }*/
         public void SearchByEmail(string emailAddress)
         {
-            SearchWorkerDetailsTableProperty = SearchTableByQuery("Email_address = '" + emailAddress + "'");
+            SearchWorkerDetailsTableProperty = SearchTableByQuery("Email_address like '%" + emailAddress + "%'");
         }
-        public void SearchByIdAndFullNameAndEmail(string idWorker, string fullName, string emailAddress)
+        /*public void SearchByIdAndFullNameAndEmail(string idWorker, string fullName, string emailAddress)
         {
             SearchWorkerDetailsTableProperty = SearchTableByQuery("Id = '" + idWorker + "' AND FullName = '" + fullName + "' AND Email_address = '" + emailAddress + "'");
-        }
+        }*/
 
         public async Task StartOrCloseProgram()
         {            
@@ -932,6 +966,7 @@ namespace CovidKeeperFrontend.Model
                     string weekStr = item[0].ToString() + "-" + item[1].ToString();
                     workWeekAndAmountEventsDictForRange[weekStr] = Convert.ToDouble(item[2]);
                 }
+                WeekOrMonthForDateRangeTextProperty = "weeks";
                 ColumnGraphProperty = ConvertDictToListGraphContent(workWeekAndAmountEventsDictForRange);
             }
         }
@@ -956,6 +991,8 @@ namespace CovidKeeperFrontend.Model
                 ColumnGraphProperty = ConvertDictToListGraphContent(this.monthAndAmountEventsDict); ;
             }
         }
+        
+
         public void GetAvgEventsPerMonthWithRange(DateTime startDate, DateTime endDate)
         {
             string avgEventsPerMonthQuery = "Select DISTINCT DATEPART(month, Time_of_event) AS Month, DATEPART(year, Time_of_event) AS Year, " +
@@ -984,6 +1021,7 @@ namespace CovidKeeperFrontend.Model
                     string monthStr = monthEnum.ToString() + "-" + item[1].ToString();
                     monthAndAmountEventsDictForRange[monthStr] = Convert.ToDouble(item[2]);
                 }
+                WeekOrMonthForDateRangeTextProperty = "months";
                 ColumnGraphProperty = ConvertDictToListGraphContent(monthAndAmountEventsDictForRange);
             }
         }
@@ -1071,6 +1109,7 @@ namespace CovidKeeperFrontend.Model
                     DayEnumForGraphs dayEnum = (DayEnumForGraphs)Enum.Parse(typeof(DayEnumForGraphs), item[0].ToString());
                     avgEventsPerWeekday.Add(new GraphContent() { WorkWeek = dayEnum.ToString(), AvgValue = Convert.ToDouble(item[1]) });
                 }
+                WeekOrMonthForDateRangeTextProperty = "weeks";
                 ColumnGraphProperty = avgEventsPerWeekday;
             }
         }
@@ -1124,6 +1163,7 @@ namespace CovidKeeperFrontend.Model
                 row["LabelsGraph"] = default;
                 row["TitleGraph"] = default;
             }
+            WeekOrMonthForDateRangeTextProperty = "days";
             AmountEventsByWorkerTableProperty = dataTableAmountEventsPerWorker;
         }
 

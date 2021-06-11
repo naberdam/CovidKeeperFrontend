@@ -31,7 +31,14 @@ namespace CovidKeeperFrontend.ViewModel
         }
         public DataTable VM_WorkerDetailsTableProperty
         {
-            get { return model.WorkerDetailsTableProperty; }
+            get 
+            {
+                if (model.SearchOrWorkersTableProperty)
+                {
+                    return model.SearchWorkerDetailsTableProperty;
+                }
+                return model.WorkerDetailsTableProperty; 
+            }
         }
         
 
@@ -55,6 +62,22 @@ namespace CovidKeeperFrontend.ViewModel
         public async Task DeleteWorker(string idWorker, int indexOfSelectedRow)
         {
             await this.model.DeleteWorker(idWorker, indexOfSelectedRow);
+        }
+        public void SearchByEmail(string emailAddress)
+        {
+            this.model.SearchByEmail(emailAddress);
+        }
+        public void SearchByFullName(string fullName)
+        {
+            this.model.SearchByFullName(fullName);
+        }
+        public void SearchById(string idWorker)
+        {
+            this.model.SearchById(idWorker);
+        }
+        public void GetWorkersDetailsAfterRefresh()
+        {
+            this.model.GetWorkersDetailsAfterRefresh();
         }
     }
 }

@@ -103,7 +103,9 @@
             <materialDesign:DialogHost.DialogContent>
                 <StackPanel Orientation="Vertical" Margin="5">
                     <StackPanel VerticalAlignment="Center">
-                        <TextBlock x:Name="CommentText" Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30"/>
+                        <TextBlock x:Name="CommentText" Foreground="Gray" TextWrapping="Wrap"
+                                   FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30"
+                                   Text="{Binding Path=VM_WeekOrMonthForDateRangeTextProperty, StringFormat='Please select a start and end date, with each of the dates you select representing the {0} you are interested in:'}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <DatePicker x:Name="StartDatePicker" DisplayDate="{x:Static sys:DateTime.Now}" 
@@ -113,11 +115,10 @@
                             HorizontalAlignment="Center" Width="120" Margin="15, 5"
                             SelectedDate="{Binding Path=VM_SelectedDateStartInDatePickerProperty, Mode=OneWayToSource}"/>
                         <DatePicker x:Name="EndDatePicker" DisplayDate="{x:Static sys:DateTime.Now}" 
-                            DisplayDateStart="{Binding Path=VM_StartDateInDatePickerProperty, Mode=OneWay}" 
+                            DisplayDateStart="{Binding Path=VM_StartDateInDatePickerAfterPickProperty, Mode=OneWay}"
                             DisplayDateEnd="{x:Static sys:DateTime.Now}"
                             FirstDayOfWeek="Sunday" IsTodayHighlighted="True" VerticalAlignment="Center" 
-                            HorizontalAlignment="Center" Width="120" Margin="15, 5"
-                            SelectedDate="{Binding Path=VM_SelectedDateEndInDatePickerProperty, Mode=OneWayToSource}"/>
+                            HorizontalAlignment="Center" Width="120" Margin="15, 5"/>
                     </StackPanel>
                     
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="15">

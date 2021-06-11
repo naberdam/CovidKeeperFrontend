@@ -100,7 +100,7 @@ namespace CovidKeeperFrontend.Views
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
                     ShowGraphInThisRange.Visibility = Visibility.Visible;
-                    CommentText.Text = "Please select a day for the week you are interested in:";
+                    //CommentText.Text = "Please select a day for the week you are interested in:";
                     ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
                     break;
@@ -110,7 +110,7 @@ namespace CovidKeeperFrontend.Views
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
                     ShowGraphInThisRange.Visibility = Visibility.Visible;
-                    CommentText.Text = "Please select a day for the month you are interested in:";
+                    //CommentText.Text = "Please select a day for the month you are interested in:";
                     ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
                     break;
@@ -120,7 +120,7 @@ namespace CovidKeeperFrontend.Views
                     PieGraph.Visibility = Visibility.Visible;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
                     ShowGraphInThisRange.Visibility = Visibility.Visible;
-                    CommentText.Text = "Please select a day for the week you are interested in:";
+                    //CommentText.Text = "Please select a day for the week you are interested in:";
                     ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
                     break;
@@ -130,7 +130,7 @@ namespace CovidKeeperFrontend.Views
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Visible;
                     ShowGraphInThisRange.Visibility = Visibility.Visible;
-                    CommentText.Text = "Please select a day for the week you are interested in:";
+                    //CommentText.Text = "Please select a day for the week you are interested in:";
                     ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
                     break;

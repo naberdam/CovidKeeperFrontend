@@ -41,9 +41,7 @@
                                     Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}">
                                 <materialDesign:PackIcon Kind="Settings"/>
                             </Button>
-                            <Button x:Name="RefreshButton" Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Foreground="Gray" Margin="0 0 10 0" Click="RefreshButton_Click">
-                               <materialDesign:PackIcon Kind="Refresh"/>
-                            </Button>
+                            
                             <Button x:Name="ButtonFechar" Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Foreground="Gray" Click="ButtonFechar_Click" Margin="0 0 10 0">
                                 <materialDesign:PackIcon Kind="Power"/>
                             </Button>

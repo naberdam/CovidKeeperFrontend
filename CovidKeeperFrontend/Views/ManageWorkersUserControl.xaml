@@ -54,6 +54,9 @@
             </materialDesign:DialogHost.DialogContent>
             <Grid Height="30" VerticalAlignment="Top" HorizontalAlignment="Center">
                 <StackPanel Orientation="Horizontal" >
+                    <Button x:Name="RefreshButton" Width="30" Height="30" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Foreground="Gray" Click="RefreshButton_Click">
+                        <materialDesign:PackIcon Kind="Refresh"/>
+                    </Button>
                     <Button x:Name="PlusButton" Width="30" Height="30" Padding="0" Foreground="Gray" Background="{x:Null}" BorderBrush="{x:Null}" 
                             Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}" Click="PlusButton_Click">
                         <materialDesign:PackIcon Kind="PlusBold"/>

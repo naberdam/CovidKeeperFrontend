@@ -44,27 +44,6 @@ namespace CovidKeeperFrontend.ViewModel
                 this.model.SelectedValueOfStatisticsOptionListProperty = value;
             }
         }
-
-        /*public Visibility VM_VisibilityOfLineGraphProperty
-        {
-            get { return this.model.VisibilityOfLineGraphProperty; }
-        }
-        public Visibility VM_VisibilityOfPieGraphProperty
-        {
-            get { return this.model.VisibilityOfPieGraphProperty; }
-        }
-        public Visibility VM_VisibilityOfAmountEventPerWeekTableProperty
-        {
-            get { return this.model.VisibilityOfAmountEventPerWeekTableProperty; }
-        }
-        public Visibility VM_VisibilityOfAmountEventPerMonthTableProperty
-        {
-            get { return this.model.VisibilityOfAmountEventPerMonthTableProperty; }
-        }
-        public Visibility VM_VisibilityOfAmountEventByWorkerTableProperty
-        {
-            get { return this.model.VisibilityOfAmountEventByWorkerTableProperty; }
-        }*/
         public DataTable VM_AmountEventsByWorkerTableProperty
         {
             get { return model.AmountEventsByWorkerTableProperty; }
@@ -81,9 +60,9 @@ namespace CovidKeeperFrontend.ViewModel
         {
             set { this.model.SelectedDateStartInDatePickerProperty = value; }
         }
-        public DateTime VM_SelectedDateEndInDatePickerProperty
+        public DateTime VM_StartDateInDatePickerAfterPickProperty
         {
-            set { this.model.SelectedDateEndInDatePickerProperty = value; }
+            get { return this.model.StartDateInDatePickerAfterPickProperty; }
         }
         public string VM_ColumnChartTitleProperty
         {
@@ -93,18 +72,10 @@ namespace CovidKeeperFrontend.ViewModel
         {
             get { return this.model.ColumnChartSubTitleProperty.ToString().Replace("_", " "); }
         }
-        /*public Visibility VM_VisibilityStartDatePickerProperty
+        public string VM_WeekOrMonthForDateRangeTextProperty
         {
-            get { return this.model.VisibilityStartDatePickerProperty; }
+            get { return this.model.WeekOrMonthForDateRangeTextProperty; }
         }
-        public Visibility VM_VisibilityEndDatePickerProperty
-        {
-            get { return this.model.VisibilityEndDatePickerProperty; }
-        }
-        public Visibility VM_VisibilityShowGraphInThisRangeProperty
-        {
-            get { return this.model.VisibilityShowGraphInThisRangeProperty; }
-        }*/
         public string VM_IdWorkerForLineGraphProperty 
         {
             set { this.model.IdWorkerForLineGraphProperty = value; }

@@ -40,11 +40,11 @@ namespace CovidKeeperFrontend.ViewModel
         }
         public void SearchByIdAndEmail(string idWorker, string emailAddress)
         {
-            this.model.SearchByIdAndEmail(idWorker, emailAddress);
+            /*this.model.SearchByIdAndEmail(idWorker, emailAddress);*/
         }
         public void SearchByIdAndFullName(string idWorker, string fullName)
         {
-            this.model.SearchByIdAndFullName(idWorker, fullName);
+            /*this.model.SearchByIdAndFullName(idWorker, fullName);*/
         }
         public void SearchByFullName(string fullName)
         {
@@ -52,7 +52,7 @@ namespace CovidKeeperFrontend.ViewModel
         }
         public void SearchByFullNameAndEmail(string fullName, string emailAddress)
         {
-            this.model.SearchByFullNameAndEmail(fullName, emailAddress);
+            /*this.model.SearchByFullNameAndEmail(fullName, emailAddress);*/
         }
         public void SearchByEmail(string emailAddress)
         {
@@ -60,7 +60,7 @@ namespace CovidKeeperFrontend.ViewModel
         }
         public void SearchByIdAndFullNameAndEmail(string idWorker, string fullName, string emailAddress)
         {
-            this.model.SearchByIdAndFullNameAndEmail(idWorker, fullName, emailAddress);
+            //this.model.SearchByIdAndFullNameAndEmail(idWorker, fullName, emailAddress);
         }
 
     }
