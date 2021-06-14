@@ -4,18 +4,29 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CovidKeeperFrontend"
+        xmlns:DetalisRules="clr-namespace:CovidKeeperFrontend.Views.UserDetailsRules"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d" Height="600" Width="1024" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None">
     <Grid Background="#FFEEEEEE" MouseDown="Grid_MouseDown">
         <materialDesign:DialogHost BorderBrush="{DynamicResource MaterialDesignDivider}">
             <materialDesign:DialogHost.DialogContent>
-                <Grid Width="400" Height="150" HorizontalAlignment="Center">
+                <Grid Width="530" Height="150" HorizontalAlignment="Center">
                     <StackPanel Orientation="Horizontal" Margin="15">
                         <materialDesign:PackIcon Kind="Settings" Foreground="{StaticResource PrimaryHueMidBrush}" Width="50" Height="50"/>
-                        <TextBlock Foreground="Gray" Width="200" Margin="15 5" TextWrapping="Wrap">
+                        <TextBlock Foreground="Gray" Width="200" Margin="15 5" TextWrapping="Wrap" >
                             In case the same employee goes without a mask several times a day, how often do you want to send him an email (minutes)?
                         </TextBlock>
-                        <TextBox x:Name="BreakTimeForSendMailText" materialDesign:HintAssist.Hint="TIME" Foreground="Gray" Margin="15 5 0 10"/>
+                        <TextBox x:Name="BreakTimeForSendMailText" Width="200" Height="30" VerticalAlignment="Top" materialDesign:HintAssist.Hint="TIME (LIKE 120)" 
+                                 Foreground="Gray" Margin="15 5 0 10" TextChanged="BreakTimeForSendMailText_TextChanged"
+                                 Validation.ErrorTemplate="{StaticResource errorTemplate}">
+                            <TextBox.Text>
+                                <Binding Path="MinutesBreakForMailsProperty" ValidatesOnDataErrors="True" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <DetalisRules:TimeBreakRules />
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="15">
                         <Button x:Name="UpdateBreakTimeForSendMailButton" 
@@ -60,7 +71,7 @@
             <materialDesign:TransitioningContent x:Name="TransitioningContentSlide" OpeningEffect="{materialDesign:TransitionEffect SlideInFromLeft, Duration=0:0:0.2}">
                 <Grid x:Name="GridCursor" Margin="0 190 0 0" Background="#FF0069C0" Width="10" HorizontalAlignment="Left" Height="60" VerticalAlignment="Top"/>
             </materialDesign:TransitioningContent>
-            <ListView x:Name="ListViewMenu" Margin="0 190" Foreground="LightGray" FontFamily="Champagne &amp; Limousines" FontSize="18" SelectionChanged="ListViewMenu_SelectionChanged" SelectedIndex="{Binding Path=VM_IndexOfMenuListProperty, Mode=OneWayToSource}">
+            <ListView x:Name="ListViewMenu" Margin="0 190" Foreground="LightGray" FontFamily="Champagne &amp; Limousines" FontSize="18" SelectionChanged="ListViewMenu_SelectionChanged">
                 <ListViewItem Height="60">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="Home" Width="30" Height="30" VerticalAlignment="Center" Margin="5"/>

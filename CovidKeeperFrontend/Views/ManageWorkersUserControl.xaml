@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:CovidKeeperFrontend.Views"             
+             xmlns:local="clr-namespace:CovidKeeperFrontend.Views"      
+             xmlns:DetalisRules="clr-namespace:CovidKeeperFrontend.Views.UserDetailsRules"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -11,23 +12,56 @@
         <materialDesign:TransitioningContent x:Name="TransitioningContentSlide" OpeningEffect="{materialDesign:TransitionEffect SlideInFromLeft, Duration=0:0:0.8}"/>
         <materialDesign:DialogHost BorderBrush="{DynamicResource MaterialDesignDivider}">
             <materialDesign:DialogHost.DialogContent>
-                <Grid Width="400" Height="315" VerticalAlignment="Top" HorizontalAlignment="Center">
+                <Grid Width="600" Height="330" VerticalAlignment="Top" HorizontalAlignment="Center">
 
-                    <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Vertical" Margin="15">
                         <StackPanel Orientation="Horizontal" Margin="15">
                             <materialDesign:PackIcon Kind="PeopleAdd" Foreground="{StaticResource PrimaryHueMidBrush}" Width="50" Height="50"/>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="15, 0, 0, 0">
-                            <Label Content="ID:" Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30"/>
-                            <TextBox x:Name="IdWorker" materialDesign:HintAssist.Hint="ID" Text="" Foreground="Gray" FontFamily="Champagne &amp; Limousines" Height="30" FontSize="18" Width="200" Margin="15, 0, 0, 0"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="15, 0, 0, 0">
-                            <Label Content="FULL NAME:" Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30"/>
-                            <TextBox x:Name="FullName" materialDesign:HintAssist.Hint="FULL NAME" Text=""  Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30" Width="200" Margin="15, 0, 0, 0"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="15, 0, 0, 0">
-                            <Label Content="EMAIL ADDRESS:" Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30"/>
-                            <TextBox x:Name="EmailAddress" materialDesign:HintAssist.Hint="EMAIL ADDRESS" Text=""  Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30" Width="200" Margin="15, 0, 0, 0"/>
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Vertical" Margin="15, 0, 0, 0" Width="150">
+                                <Label Content="ID:" Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30"/>
+                                <Label Content="FULL NAME:" Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30"/>
+                                <Label Content="EMAIL ADDRESS:" Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Vertical" Margin="15, 0, 0, 0" Width="370">
+                                <TextBox x:Name="IdWorker" materialDesign:HintAssist.Hint="ID" Foreground="Gray" 
+                                         FontFamily="Champagne &amp; Limousines" Height="30" 
+                                         FontSize="18" Margin="15, 0, 0, 0" TextChanged="IdWorker_TextChanged"
+                                         Validation.ErrorTemplate="{StaticResource errorTemplate}">
+                                    <TextBox.Text>
+                                        <Binding Path="IdWorkerRuleProperty" ValidatesOnDataErrors="True" UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <DetalisRules:IdRules MinimumDigits="5"/>
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox.Text>
+                                </TextBox>
+                                <TextBox x:Name="FullName" materialDesign:HintAssist.Hint="FULL NAME" Foreground="Gray" 
+                                         FontFamily="Champagne &amp; Limousines" FontSize="18" 
+                                         Height="30" Margin="15, 0, 0, 0" TextChanged="FullName_TextChanged"
+                                         Validation.ErrorTemplate="{StaticResource errorTemplate}">
+                                    <TextBox.Text>
+                                        <Binding Path="FullNameRuleProperty" ValidatesOnDataErrors="True" UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <DetalisRules:FullNameRules MinimumCharactersForEachWord="2"/>
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox.Text>
+                                </TextBox>
+                                <TextBox x:Name="EmailAddress" materialDesign:HintAssist.Hint="EMAIL ADDRESS" Foreground="Gray" 
+                                         FontFamily="Champagne &amp; Limousines" FontSize="18" 
+                                         Height="30" Margin="15, 0, 0, 0" TextChanged="EmailAddress_TextChanged"
+                                         Validation.ErrorTemplate="{StaticResource errorTemplate}">
+                                    <TextBox.Text>
+                                        <Binding Path="EmailAddressRuleProperty" ValidatesOnDataErrors="True" UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <DetalisRules:EmailAddressRules/>
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </TextBox.Text>
+                                </TextBox>
+                            </StackPanel>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="15, 0, 0, 0">
                             <Label Content="ADD IMAGE" Foreground="Gray" FontFamily="Champagne &amp; Limousines" FontSize="18" Height="30" />
@@ -37,9 +71,8 @@
                             </Button>
                             <Image x:Name="ImageWorker" Stretch="Fill" Width="80" Height="80" Margin="15, 0, 0, 0"/>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="15">
-                            <Button x:Name="AddButton" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" 
-                                    Style="{DynamicResource MaterialDesignFlatButton}" Margin="4" 
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                            <Button x:Name="AddButton" Margin="4" Style="{DynamicResource MaterialDesignFlatButton}"
                                     VerticalAlignment="Center" Click="AddButton_Click">
                                 Add
                             </Button>
@@ -49,7 +82,7 @@
                                 Cancel
                             </Button>
                         </StackPanel>
-                    </StackPanel>
+                    </StackPanel>                    
                 </Grid>
             </materialDesign:DialogHost.DialogContent>
             <Grid Height="30" VerticalAlignment="Top" HorizontalAlignment="Center">

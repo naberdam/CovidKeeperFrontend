@@ -207,7 +207,12 @@
     <Compile Include="MainWindowTemp.xaml.cs">
       <DependentUpon>MainWindowTemp.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Model\WpfDatabase.cs" />
+    <Compile Include="Model\AbstractModel.cs" />
+    <Compile Include="Model\Database\AzureSingleton.cs" />
+    <Compile Include="Model\HomeModel.cs" />
+    <Compile Include="Model\MainMenuModel.cs" />
+    <Compile Include="Model\ManageWorkersModel.cs" />
+    <Compile Include="Model\StatisticalDataModel.cs" />
     <Compile Include="ViewModel\HomeVM.cs" />
     <Compile Include="ViewModel\MainMenuVM.cs" />
     <Compile Include="ViewModel\StatisticalDataVM.cs" />
@@ -221,16 +226,12 @@
     <Compile Include="Views\StatisticalDataUserControl.xaml.cs">
       <DependentUpon>StatisticalDataUserControl.xaml</DependentUpon>
     </Compile>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
+    <Compile Include="Views\UserDetailsRules\EmailAddressRules.cs" />
+    <Compile Include="Views\UserDetailsRules\FullNameRules.cs" />
+    <Compile Include="Views\UserDetailsRules\IdRules.cs" />
+    <Compile Include="Views\UserDetailsRules\TimeBreakRules.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="MainWindowTemp.xaml">

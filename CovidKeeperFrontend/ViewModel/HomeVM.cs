@@ -12,9 +12,8 @@ namespace CovidKeeperFrontend.ViewModel
     public class HomeVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-
-        public WpfDatabase model;
-        public HomeVM(WpfDatabase modelCreated) 
+        public HomeModel model;
+        public HomeVM(HomeModel modelCreated)
         {
             this.model = modelCreated;
             // Notify to view from model.
@@ -32,7 +31,11 @@ namespace CovidKeeperFrontend.ViewModel
         {
             get { return model.HowManyWorkersWithoutMaskProperty; }
         }
-        
+        public string VM_HowManyEventsTodayProperty
+        {
+            get { return model.HowManyEventsTodayProperty; }
+        }
+
         public string VM_PercentageWorkersWithoutMaskTodayPerYesterdayProperty
         {
             get 
@@ -90,7 +93,7 @@ namespace CovidKeeperFrontend.ViewModel
         {
             get
             {
-                if (this.model.ActiveButtonContentProperty == WpfDatabase.HandleFlag.Start)
+                if (this.model.ActiveButtonContentProperty == HomeModel.HandleFlag.Start)
                 {
                     BackgroundColorActiveButtonProperty = System.Windows.Media.Color.FromRgb(0, 93, 21);
                     BackgroundColorActiveButtonSecondProperty = System.Windows.Media.Color.FromRgb( 0, 170, 39);
@@ -139,6 +142,11 @@ namespace CovidKeeperFrontend.ViewModel
         public void NotifyPropertyChanged(string propName)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+        }
+        public NotifyTaskCompletion<int> RefreshDataAsync { get; private set; }
+        public void RefreshData()
+        {
+            RefreshDataAsync = new NotifyTaskCompletion<int>(this.model.RefreshDataAsync());
         }
     }
 }

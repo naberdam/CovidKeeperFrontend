@@ -34,6 +34,10 @@ namespace CovidKeeperFrontend.Views
         MainWindowTemp mainWindowTemp = default;
         DataGridRow gridRowSelected = default;
         Button detailsBtn = default;
+        bool idWorkerIsGood = false;
+        bool fullNameIsGood = false;
+        bool emailAddressIsGood = false;
+        bool imageIsGood = false;
 
         public ManageWorkersUserControl()
         {
@@ -50,6 +54,10 @@ namespace CovidKeeperFrontend.Views
             rowViewSelected = default;
             gridRowSelected = default;
             detailsBtn = default;
+            idWorkerIsGood = false;
+            fullNameIsGood = false;
+            emailAddressIsGood = false;
+            imageIsGood = false;
         }
         private async void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
@@ -119,16 +127,27 @@ namespace CovidKeeperFrontend.Views
 
         private void LoadButton_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Multiselect = false;
-            openFileDialog.Title = @"Select a picture";
-            openFileDialog.Filter = @"All supported graphics|*.jpg;*.jpeg;*.png|" +
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Multiselect = false,
+                Title = @"Select a picture",
+                Filter = @"All supported graphics|*.jpg;*.jpeg;*.png|" +
               "JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|" +
-              "Portable Network Graphic (*.png)|*.png";
+              "Portable Network Graphic (*.png)|*.png"
+            };
             if (openFileDialog.ShowDialog() == true)
             {
                 bitmapImage = new BitmapImage(new Uri(openFileDialog.FileName));
                 ImageWorker.Source = bitmapImage;
+                imageIsGood = true;
+                if (fullNameIsGood && emailAddressIsGood && idWorkerIsGood)
+                {
+                    AddButton.IsEnabled = true;
+                }
+                else
+                {
+                    AddButton.IsEnabled = false;
+                }
             }
         }
 
@@ -189,7 +208,7 @@ namespace CovidKeeperFrontend.Views
                 MessageBox.Show("Please enter a word for the search");
                 return;
             }
-            CodeDomProvider provider = CodeDomProvider.CreateProvider("C#");
+            //CodeDomProvider provider = CodeDomProvider.CreateProvider("C#");
             if (Regex.IsMatch(searchString, @"^[a-zA-Z ]+$"))
             {
                 (Application.Current as App).WorkersTableViewModel.SearchByFullName(searchString);
@@ -279,6 +298,51 @@ namespace CovidKeeperFrontend.Views
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
             (Application.Current as App).WorkersTableViewModel.GetWorkersDetailsAfterRefresh();
+        }
+
+        private void IdWorker_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            UpdateIsEnabledAddButton((Application.Current as App).WorkersTableViewModel.IdWorkerRuleProperty, textBox.Text,
+                ref idWorkerIsGood, fullNameIsGood, emailAddressIsGood, imageIsGood);
+        }
+
+        private void FullName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            UpdateIsEnabledAddButton((Application.Current as App).WorkersTableViewModel.FullNameRuleProperty, textBox.Text,
+                ref fullNameIsGood, emailAddressIsGood, idWorkerIsGood, imageIsGood);
+        }
+
+        private void EmailAddress_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            UpdateIsEnabledAddButton((Application.Current as App).WorkersTableViewModel.EmailAddressRuleProperty, textBox.Text, 
+                ref emailAddressIsGood, fullNameIsGood, idWorkerIsGood, imageIsGood);
+        }
+        private void UpdateIsEnabledAddButton(string userDetailsProperty, string textBox, ref bool myValue, bool oneValue, 
+            bool secondValue, bool thirdValue)
+        {
+            if (userDetailsProperty == null)
+            {
+                AddButton.IsEnabled = false;
+            }
+            else if (userDetailsProperty.Length != textBox.Length)
+            {
+                AddButton.IsEnabled = false;
+            }
+            else
+            {
+                myValue = true;
+                if (oneValue && secondValue && thirdValue)
+                {
+                    AddButton.IsEnabled = true;
+                }
+                else
+                {
+                    AddButton.IsEnabled = false;
+                }
+            }
         }
     }
 }

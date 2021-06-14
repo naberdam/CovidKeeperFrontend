@@ -57,9 +57,9 @@
                     </Grid>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10 20">
-                        <TextBlock x:Name="EventsAmountToday" Text="{Binding Path=VM_HowManyWorkersWithoutMaskProperty, Mode=OneWay}" FontFamily="Champagne &amp; Limousines" VerticalAlignment="Center" Foreground="Gray" FontSize="50"/>
+                        <TextBlock x:Name="EventsAmountToday" Text="{Binding Path=VM_HowManyEventsTodayProperty, Mode=OneWay}" FontFamily="Champagne &amp; Limousines" VerticalAlignment="Center" Foreground="Gray" FontSize="50"/>
                     </StackPanel>
-                    <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Margin="12, 10" >
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Margin="7, 10" >
                         <TextBlock Text="The amount of events of workers without a mask today" TextWrapping="Wrap" FontSize="12" Foreground="Gray" Margin="5"/>
 
                     </StackPanel>

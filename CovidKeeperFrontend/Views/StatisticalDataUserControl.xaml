@@ -113,12 +113,24 @@
                             DisplayDateEnd="{x:Static sys:DateTime.Now}"
                             FirstDayOfWeek="Sunday" IsTodayHighlighted="True" VerticalAlignment="Center" 
                             HorizontalAlignment="Center" Width="120" Margin="15, 5"
-                            SelectedDate="{Binding Path=VM_SelectedDateStartInDatePickerProperty, Mode=OneWayToSource}"/>
+                            SelectedDate="{Binding Path=VM_SelectedDateStartInDatePickerProperty, Mode=OneWayToSource}">
+                            <DatePicker.Resources>
+                                <Style TargetType="DatePickerTextBox">
+                                    <Setter Property="IsReadOnly" Value="True"/>
+                                </Style>
+                            </DatePicker.Resources>
+                        </DatePicker>
                         <DatePicker x:Name="EndDatePicker" DisplayDate="{x:Static sys:DateTime.Now}" 
                             DisplayDateStart="{Binding Path=VM_StartDateInDatePickerAfterPickProperty, Mode=OneWay}"
                             DisplayDateEnd="{x:Static sys:DateTime.Now}"
                             FirstDayOfWeek="Sunday" IsTodayHighlighted="True" VerticalAlignment="Center" 
-                            HorizontalAlignment="Center" Width="120" Margin="15, 5"/>
+                            HorizontalAlignment="Center" Width="120" Margin="15, 5">
+                            <DatePicker.Resources>
+                                <Style TargetType="DatePickerTextBox">
+                                    <Setter Property="IsReadOnly" Value="True"/>
+                                </Style>
+                            </DatePicker.Resources>
+                        </DatePicker>
                     </StackPanel>
                     
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="15">

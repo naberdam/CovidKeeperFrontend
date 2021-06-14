@@ -14,9 +14,20 @@ namespace CovidKeeperFrontend.ViewModel
     public class WorkersTableVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        public WpfDatabase model;
+        /*public WpfDatabase model;
 
         public WorkersTableVM(WpfDatabase modelCreated)
+        {
+            this.model = modelCreated;
+            // Notify to view from model.
+            model.PropertyChanged += delegate (Object sender, PropertyChangedEventArgs e)
+            {
+                NotifyPropertyChanged("VM_" + e.PropertyName);
+            };
+        }*/
+        public ManageWorkersModel model;
+
+        public WorkersTableVM(ManageWorkersModel modelCreated)
         {
             this.model = modelCreated;
             // Notify to view from model.
@@ -40,7 +51,41 @@ namespace CovidKeeperFrontend.ViewModel
                 return model.WorkerDetailsTableProperty; 
             }
         }
-        
+        private string idWorkerRule;
+
+        public string IdWorkerRuleProperty
+        {
+            get { return idWorkerRule; }
+            set
+            {
+                idWorkerRule = value;
+                NotifyPropertyChanged("IdWorkerRuleProperty");
+            }
+        }
+        private string fullNameRule;
+
+        public string FullNameRuleProperty
+        {
+            get { return fullNameRule; }
+            set
+            {
+                fullNameRule = value;
+                NotifyPropertyChanged("FullNameRuleProperty");
+            }
+        }
+
+        private string emailAddressRule;
+
+        public string EmailAddressRuleProperty
+        {
+            get { return emailAddressRule; }
+            set
+            {
+                emailAddressRule = value;
+                NotifyPropertyChanged("EmailAddressRuleProperty");
+            }
+        }
+
 
         public void NotifyPropertyChanged(string propName)
         {
@@ -51,10 +96,9 @@ namespace CovidKeeperFrontend.ViewModel
             await this.model.InsertWorker(idWorker, fullname, emailAddress, imagePath);
         }
         public NotifyTaskCompletion<int> UpdateWorkerDetailsAsync { get; private set; }
-        /*public async Task UpdateWorkerDetails(string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
-        {
-            await this.model.UpdateWorkerDetails(idWorker, fullname, emailAddress, imagePath, indexOfSelectedRow);
-        }*/
+
+        
+
         public void UpdateWorkerDetails(string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
         {
             UpdateWorkerDetailsAsync = new NotifyTaskCompletion<int>(this.model.UpdateWorkerDetails(idWorker, fullname, emailAddress, imagePath, indexOfSelectedRow));
@@ -78,6 +122,11 @@ namespace CovidKeeperFrontend.ViewModel
         public void GetWorkersDetailsAfterRefresh()
         {
             this.model.GetWorkersDetailsAfterRefresh();
+        }
+        public NotifyTaskCompletion<int> RefreshDataAsync { get; private set; }
+        public void RefreshData()
+        {
+            RefreshDataAsync = new NotifyTaskCompletion<int>(this.model.RefreshDataAsync());
         }
     }
 }

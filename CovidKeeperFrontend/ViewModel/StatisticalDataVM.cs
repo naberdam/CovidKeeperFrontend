@@ -12,7 +12,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using static CovidKeeperFrontend.Model.WpfDatabase;
 using static CovidKeeperFrontend.Views.StatisticalDataUserControl;
 
 namespace CovidKeeperFrontend.ViewModel
@@ -20,9 +19,9 @@ namespace CovidKeeperFrontend.ViewModel
     public class StatisticalDataVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        public WpfDatabase model;
+        public StatisticalDataModel model;
 
-        public StatisticalDataVM(WpfDatabase modelCreated)
+        public StatisticalDataVM(StatisticalDataModel modelCreated)
         {
             this.model = modelCreated;
             // Notify to view from model.
@@ -95,6 +94,11 @@ namespace CovidKeeperFrontend.ViewModel
         public void GetAmountEventsByWorkerWithRange(DateTime startDate, DateTime endDate)
         {
             this.model.GetAmountEventsByWorkerWithRange(startDate, endDate);
+        }
+        public NotifyTaskCompletion<int> RefreshDataAsync { get; private set; }
+        public void RefreshData()
+        {
+            RefreshDataAsync = new NotifyTaskCompletion<int>(this.model.RefreshDataAsync());
         }
     }
 }
