@@ -11,23 +11,12 @@ using System.Windows.Media.Imaging;
 
 namespace CovidKeeperFrontend.ViewModel
 {
-    public class WorkersTableVM : INotifyPropertyChanged
+    public class ManageWorkersVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        /*public WpfDatabase model;
-
-        public WorkersTableVM(WpfDatabase modelCreated)
-        {
-            this.model = modelCreated;
-            // Notify to view from model.
-            model.PropertyChanged += delegate (Object sender, PropertyChangedEventArgs e)
-            {
-                NotifyPropertyChanged("VM_" + e.PropertyName);
-            };
-        }*/
         public ManageWorkersModel model;
 
-        public WorkersTableVM(ManageWorkersModel modelCreated)
+        public ManageWorkersVM(ManageWorkersModel modelCreated)
         {
             this.model = modelCreated;
             // Notify to view from model.

@@ -65,7 +65,7 @@ namespace CovidKeeperFrontend.Views
             indexOfSelectedRow = gd.Items.IndexOf(gd.CurrentItem);
             DataRowView rowSelectedNow = gd.SelectedItem as DataRowView;
             string idWorker = rowSelectedNow["Id"].ToString();
-            await (Application.Current as App).WorkersTableViewModel.DeleteWorker(idWorker, indexOfSelectedRow);
+            await (Application.Current as App).ManageWorkersViewModel.DeleteWorker(idWorker, indexOfSelectedRow);
             ClearFields();
         }
         private void WorkerDetailsTable_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -109,7 +109,7 @@ namespace CovidKeeperFrontend.Views
             }
             else
             {
-                await (Application.Current as App).WorkersTableViewModel.InsertWorker(idWorker, fullName, emailAddress, bitmapImage);
+                await (Application.Current as App).ManageWorkersViewModel.InsertWorker(idWorker, fullName, emailAddress, bitmapImage);
                 ClearFields();
                 MessageBox.Show("The worker " + idWorker + " " + fullName + " uploaded successfully.\nThe email is: " + emailAddress);
                 this.IsEnabled = true;
@@ -176,7 +176,7 @@ namespace CovidKeeperFrontend.Views
                 string emailAddress = rowViewSelected["Email_address"].ToString();
                 string fullName = rowViewSelected["Fullname"].ToString();
                 SetImageFromTableToBitmapImage();
-                (Application.Current as App).WorkersTableViewModel.UpdateWorkerDetails(idWorker, fullName, emailAddress, bitmapImage, indexOfSelectedRow);
+                (Application.Current as App).ManageWorkersViewModel.UpdateWorkerDetails(idWorker, fullName, emailAddress, bitmapImage, indexOfSelectedRow);
                 indexOfSelectedRow = gd.Items.IndexOf(gd.CurrentItem);
                 ClearFields();
                 rowViewSelected = rowSelectedNow;
@@ -211,15 +211,15 @@ namespace CovidKeeperFrontend.Views
             //CodeDomProvider provider = CodeDomProvider.CreateProvider("C#");
             if (Regex.IsMatch(searchString, @"^[a-zA-Z ]+$"))
             {
-                (Application.Current as App).WorkersTableViewModel.SearchByFullName(searchString);
+                (Application.Current as App).ManageWorkersViewModel.SearchByFullName(searchString);
             }
             else if (IsValidEmail(searchString))
             {
-                (Application.Current as App).WorkersTableViewModel.SearchByEmail(searchString);
+                (Application.Current as App).ManageWorkersViewModel.SearchByEmail(searchString);
             }
             else if (Regex.IsMatch(searchString, @"^[0-9_]+$"))
             {
-                (Application.Current as App).WorkersTableViewModel.SearchById(searchString);
+                (Application.Current as App).ManageWorkersViewModel.SearchById(searchString);
             }
             else
             {
@@ -297,27 +297,27 @@ namespace CovidKeeperFrontend.Views
 
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
-            (Application.Current as App).WorkersTableViewModel.GetWorkersDetailsAfterRefresh();
+            (Application.Current as App).ManageWorkersViewModel.GetWorkersDetailsAfterRefresh();
         }
 
         private void IdWorker_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textBox = sender as TextBox;
-            UpdateIsEnabledAddButton((Application.Current as App).WorkersTableViewModel.IdWorkerRuleProperty, textBox.Text,
+            UpdateIsEnabledAddButton((Application.Current as App).ManageWorkersViewModel.IdWorkerRuleProperty, textBox.Text,
                 ref idWorkerIsGood, fullNameIsGood, emailAddressIsGood, imageIsGood);
         }
 
         private void FullName_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textBox = sender as TextBox;
-            UpdateIsEnabledAddButton((Application.Current as App).WorkersTableViewModel.FullNameRuleProperty, textBox.Text,
+            UpdateIsEnabledAddButton((Application.Current as App).ManageWorkersViewModel.FullNameRuleProperty, textBox.Text,
                 ref fullNameIsGood, emailAddressIsGood, idWorkerIsGood, imageIsGood);
         }
 
         private void EmailAddress_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textBox = sender as TextBox;
-            UpdateIsEnabledAddButton((Application.Current as App).WorkersTableViewModel.EmailAddressRuleProperty, textBox.Text, 
+            UpdateIsEnabledAddButton((Application.Current as App).ManageWorkersViewModel.EmailAddressRuleProperty, textBox.Text, 
                 ref emailAddressIsGood, fullNameIsGood, idWorkerIsGood, imageIsGood);
         }
         private void UpdateIsEnabledAddButton(string userDetailsProperty, string textBox, ref bool myValue, bool oneValue, 

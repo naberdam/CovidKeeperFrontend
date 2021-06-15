@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace CovidKeeperFrontend.HelperClasses
 {
+    //Class that represent a value in the graph
     public class GraphContent
     {
         public string WorkWeek { get; set; }

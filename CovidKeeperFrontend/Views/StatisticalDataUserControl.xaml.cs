@@ -100,7 +100,6 @@ namespace CovidKeeperFrontend.Views
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
                     ShowGraphInThisRange.Visibility = Visibility.Visible;
-                    //CommentText.Text = "Please select a day for the week you are interested in:";
                     ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
                     break;
@@ -110,7 +109,6 @@ namespace CovidKeeperFrontend.Views
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
                     ShowGraphInThisRange.Visibility = Visibility.Visible;
-                    //CommentText.Text = "Please select a day for the month you are interested in:";
                     ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
                     break;
@@ -120,7 +118,6 @@ namespace CovidKeeperFrontend.Views
                     PieGraph.Visibility = Visibility.Visible;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
                     ShowGraphInThisRange.Visibility = Visibility.Visible;
-                    //CommentText.Text = "Please select a day for the week you are interested in:";
                     ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
                     break;
@@ -130,7 +127,6 @@ namespace CovidKeeperFrontend.Views
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Visible;
                     ShowGraphInThisRange.Visibility = Visibility.Visible;
-                    //CommentText.Text = "Please select a day for the week you are interested in:";
                     ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
                     break;
@@ -204,12 +200,10 @@ namespace CovidKeeperFrontend.Views
         {
             try
             {
-                // the original source is what was clicked.  For example 
-                // a button.
+                // the original source is what was clicked.  For example a button.
                 DependencyObject dep = (DependencyObject)e.OriginalSource;
 
-                // iteratively traverse the visual tree upwards looking for
-                // the clicked row.
+                // iteratively traverse the visual tree upwards looking for the clicked row.
                 while ((dep != null) && !(dep is DataGridRow))
                 {
                     dep = VisualTreeHelper.GetParent(dep);

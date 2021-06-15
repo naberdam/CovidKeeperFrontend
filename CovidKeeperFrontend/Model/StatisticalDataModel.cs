@@ -12,13 +12,16 @@ using static CovidKeeperFrontend.Views.StatisticalDataUserControl;
 
 namespace CovidKeeperFrontend.Model
 {
+    //This class is the model of StatisticalDataUserControl
     public class StatisticalDataModel : AbstractModel
     {
+        //A dictionary that contains the work week as the keys and for each work week it contains the amount events as the value
         private readonly Dictionary<string, double> workWeekAndAmountEventsDict = new Dictionary<string, double>();
+        //A dictionary that contains the month as the keys and for each month it contains the amount events as the value
         private readonly Dictionary<string, double> monthAndAmountEventsDict = new Dictionary<string, double>();
 
+        //Property that defines the start date in StartDatePicker in StatisticalDataUserControl
         private DateTime startDateInDatePicker = default;
-
         public DateTime StartDateInDatePickerProperty
         {
             get { return startDateInDatePicker; }
@@ -27,14 +30,15 @@ namespace CovidKeeperFrontend.Model
                 if (!startDateInDatePicker.Date.Equals(value.Date))
                 {
                     startDateInDatePicker = value;
+                    //Update the start date in the EndDatePicker to be from the beginning of StartDatePicker choose
                     StartDateInDatePickerAfterPickProperty = value;
                     NotifyPropertyChanged("StartDateInDatePickerProperty");
                 }
             }
         }
 
+        //Property that defines the selected date in StartDatePicker in StatisticalDataUserControl
         private DateTime selectedDateStartInDatePicker = default;
-
         public DateTime SelectedDateStartInDatePickerProperty
         {
             get { return selectedDateStartInDatePicker; }
@@ -48,8 +52,8 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
+        //Property that represent the selection of StartDatePicker and updates the start date of EndDatePicker
         private DateTime startDateInDatePickerAfterPick = default;
-
         public DateTime StartDateInDatePickerAfterPickProperty
         {
             get { return startDateInDatePickerAfterPick; }
@@ -63,6 +67,7 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
+        //Property that represent the id worker that the client wants to see a graph of amount events about him
         private string idWorkerForLineGraph = default;
         public string IdWorkerForLineGraphProperty
         {
@@ -76,8 +81,9 @@ namespace CovidKeeperFrontend.Model
                 }
             }
         }
-        private string weekOrMonthForDateRangeText;
 
+        //Property that helps the client to know what the dates that he will choose represent
+        private string weekOrMonthForDateRangeText;
         public string WeekOrMonthForDateRangeTextProperty
         {
             get { return weekOrMonthForDateRangeText; }
@@ -91,8 +97,8 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
+        //Property that represent datatable of the workers with the amount events
         private DataTable amountEventsByWorkerTable = default;
-
         public DataTable AmountEventsByWorkerTableProperty
         {
             get { return amountEventsByWorkerTable; }
@@ -106,14 +112,15 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
+        //Enum that represent the title of the month's or week's column graph
         public enum ColumnChartTitleEnum
         {
             Average_Per_Week = 1,
             Average_Per_Month = 2
         }
 
+        //Property that represent the column chart title
         private ColumnChartTitleEnum columnChartTitle;
-
         public ColumnChartTitleEnum ColumnChartTitleProperty
         {
             get { return columnChartTitle; }
@@ -126,13 +133,16 @@ namespace CovidKeeperFrontend.Model
                 }
             }
         }
+
+        //Enum for sub title for the column graph
         public enum ColumnChartSubTitleEnum
         {
             Each_column_represent_one_week_in_a_specific_year = 1,
             Each_column_represent_one_month_in_a_specific_year = 2
         }
-        private ColumnChartSubTitleEnum columnChartSubTitle;
 
+        //Property that represent the sub title for the column graph
+        private ColumnChartSubTitleEnum columnChartSubTitle;
         public ColumnChartSubTitleEnum ColumnChartSubTitleProperty
         {
             get { return columnChartSubTitle; }
@@ -146,6 +156,7 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
+        //Property that represent the which graph the client wants to see now
         private StatisticsOptionListEnum selectedValueOfStatisticsOptionList = StatisticsOptionListEnum.Nothing;
         public StatisticsOptionListEnum SelectedValueOfStatisticsOptionListProperty
         {
@@ -157,19 +168,23 @@ namespace CovidKeeperFrontend.Model
                     selectedValueOfStatisticsOptionList = value;
                     switch (value)
                     {
+                        //If the client wants the graph per week
                         case StatisticsOptionListEnum.AGE_PER_WEEK:
                             GetAvgEventsPerWeek();
                             ColumnChartTitleProperty = ColumnChartTitleEnum.Average_Per_Week;
                             ColumnChartSubTitleProperty = ColumnChartSubTitleEnum.Each_column_represent_one_week_in_a_specific_year;
                             break;
+                        //If the client wants the graph per month
                         case StatisticsOptionListEnum.AGE_PER_MONTH:
                             GetAvgEventsPerMonth();
                             ColumnChartTitleProperty = ColumnChartTitleEnum.Average_Per_Month;
                             ColumnChartSubTitleProperty = ColumnChartSubTitleEnum.Each_column_represent_one_month_in_a_specific_year;
                             break;
+                        //If the client wants the graph per weekday
                         case StatisticsOptionListEnum.AGE_PER_WEEKDAY:
                             GetAvgEventsPerWeekday();
                             break;
+                        //If the client wants the datatable that represent the amount events for each worker
                         case StatisticsOptionListEnum.TOTAL_EVENTS:
                             GetAmountEventsByWorker();
                             break;
@@ -181,6 +196,7 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
+        //Enum for representing the month as string instead of numbers
         public enum MonthEnumForGraphs
         {
             Jan = 1,
@@ -197,6 +213,7 @@ namespace CovidKeeperFrontend.Model
             Dec = 12
         }
 
+        //Enum for representing the weekday as string instead of numbers
         public enum DayEnumForGraphs
         {
             Sunday = 1,
@@ -207,8 +224,9 @@ namespace CovidKeeperFrontend.Model
             Friday = 6,
             Saturday = 7
         }
-        private List<GraphContent> columnGraph;
 
+        //Property that represent the values of the column graph
+        private List<GraphContent> columnGraph;
         public List<GraphContent> ColumnGraphProperty
         {
             get { return columnGraph; }
@@ -223,6 +241,7 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
+        //Enum for representing if the graph is for week or month
         public enum WeekOrMonth
         {
             Week = 1,
@@ -230,39 +249,26 @@ namespace CovidKeeperFrontend.Model
             Nothing = 0
         }
 
-
-        private WeekOrMonth titleOfLineChartOfWorker = WeekOrMonth.Nothing;
-
-        public WeekOrMonth TitleOfLineChartOfWorkerProperty
-        {
-            get { return titleOfLineChartOfWorker; }
-            set
-            {
-                if (titleOfLineChartOfWorker != value)
-                {
-                    titleOfLineChartOfWorker = value;
-                    NotifyPropertyChanged("TitleOfLineChartOfWorkerProperty");
-                }
-            }
-        }
-
-        public NotifyTaskCompletion<int> RefreshData { get; private set; }
         public StatisticalDataModel()
         {
             RefreshData = new NotifyTaskCompletion<int>(RefreshDataAsync());
         }
 
+        //Refresh data of StatisticalDataUserControl
+        public NotifyTaskCompletion<int> RefreshData { get; private set; }
         public override async Task<int> RefreshDataAsync()
         {
             await GetMinDateInHistoryEvents();
             return default;
         }
 
+        //Function that check if the given datatables are the same
         public static bool AreTablesTheSame(DataTable tbl1, DataTable tbl2)
         {
+            //If the amount of the rows or columns in each datatable are equal
             if (tbl1.Rows.Count != tbl2.Rows.Count || tbl1.Columns.Count != tbl2.Columns.Count)
                 return false;
-
+            //make loop over the datatable to check if they are equal
             for (int i = 0; i < tbl1.Rows.Count; i++)
             {
                 for (int c = 0; c < tbl1.Columns.Count; c++)
@@ -274,61 +280,73 @@ namespace CovidKeeperFrontend.Model
             return true;
         }
 
-
+        //Function that initializes the dictionary of work week as keys and amount events as values
         private void InitialWorkWeekAndAmountEventsDict()
         {
-            // Gets the Calendar instance associated with a CultureInfo.
+            //Gets the Calendar instance associated with a CultureInfo.
             CultureInfo myCI = new CultureInfo("en-US");
             Calendar myCal = myCI.Calendar;
 
-            // Gets the DTFI properties required by GetWeekOfYear.
+            //Gets the DTFI properties required by GetWeekOfYear.
             CalendarWeekRule myCWR = myCI.DateTimeFormat.CalendarWeekRule;
             DayOfWeek myFirstDOW = myCI.DateTimeFormat.FirstDayOfWeek;
             int firstWorkWeekWithEvents = myCal.GetWeekOfYear(StartDateInDatePickerProperty, myCWR, myFirstDOW);
             int lastWorkWeek = myCal.GetWeekOfYear(DateTime.Now, myCWR, myFirstDOW);
+            //Iterate over the years while starting to iterate from the year of start date of StartDatePicker
             for (int i = StartDateInDatePickerProperty.Year; i <= DateTime.Now.Year; i++)
             {
                 DateTime LastDay = new System.DateTime(i, 12, 31);
                 int weekAmount = myCal.GetWeekOfYear(LastDay, myCWR, myFirstDOW);
                 int firstWorkWeek = 1;
+                //If we are in the first iteration, so define firstWorkWeek to be the work week of the start date
                 if (i == StartDateInDatePickerProperty.Year)
                 {
                     firstWorkWeek = firstWorkWeekWithEvents;
                 }
+                //If i is this year, so define weekAmount to be the work week now
                 if (i == DateTime.Now.Year)
                 {
                     weekAmount = lastWorkWeek;
                 }
+                //Iterate over the work weeks
                 for (; firstWorkWeek <= weekAmount; firstWorkWeek++)
                 {
                     workWeekAndAmountEventsDict.Add(firstWorkWeek + "-" + i, 0);
                 }
             }
         }
+
+        //Function that initializes the dictionary of month as keys and amount events as values
         private void InitialMonthAndAmountEventsDict()
         {
             // Uses the default calendar of the InvariantCulture.
             Calendar myCal = CultureInfo.InvariantCulture.Calendar;
             int firstMonthWithEvents = myCal.GetMonth(StartDateInDatePickerProperty);
             int lastMonth = myCal.GetMonth(DateTime.Now);
+            //Iterate over the years while starting to iterate from the year of start date of StartDatePicker
             for (int i = StartDateInDatePickerProperty.Year; i <= DateTime.Now.Year; i++)
             {
                 int monthAmount = myCal.GetMonthsInYear(i);
                 int firstMonth = 1;
+                //If we are in the first iteration, so define firstMonth to be the month of the start date
                 if (i == StartDateInDatePickerProperty.Year)
                 {
                     firstMonth = firstMonthWithEvents;
                 }
+                //If i is this year, so define monthAmount to be the month now
                 if (i == DateTime.Now.Year)
                 {
                     monthAmount = lastMonth;
                 }
+                //Iterate over the months
                 for (; firstMonth <= monthAmount; firstMonth++)
                 {
                     monthAndAmountEventsDict.Add(((MonthEnumForGraphs)firstMonth).ToString() + "-" + i, 0);
                 }
             }
         }
+
+        //Function that gets the minimum date in History_events table in SQL and updates the StartDateInDatePickerProperty
         private async Task GetMinDateInHistoryEvents()
         {
             await Task.Run(() =>
@@ -337,15 +355,23 @@ namespace CovidKeeperFrontend.Model
                 {
                     string minDateQuery = "select min(Time_of_event) from [dbo].[History_Events]";
                     object[] minDate = QuerySelectOfOneRow(minDateQuery);
+                    //If we have events, so we want to define the StartDateInDatePickerProperty to be the minimum date
                     if (minDate != null)
                     {
                         StartDateInDatePickerProperty = Convert.ToDateTime(minDate[0]);
+                    }
+                    //We do not have events, so we want to define the StartDateInDatePickerProperty to be the date of today
+                    else
+                    {
+                        StartDateInDatePickerProperty = DateTime.Now;
                     }
                     InitialWorkWeekAndAmountEventsDict();
                     InitialMonthAndAmountEventsDict();
                 }
             });
         }
+
+        //Function that using the given dictionary that contains the values to the graph and returns a converted list of GraphContent
         private List<GraphContent> ConvertDictToListGraphContent(Dictionary<string, double> dictToListGraphContent)
         {
             List<GraphContent> avgEvents = new List<GraphContent>();
@@ -356,6 +382,7 @@ namespace CovidKeeperFrontend.Model
             return avgEvents;
         }
 
+        //Function that gets the average of the events per week and updates the ColumnGraphProperty for representing the graph to the client
         public void GetAvgEventsPerWeek()
         {
             string avgEventsPerWeekQuery = "Select DISTINCT DATEPART(WEEK, Time_of_event) AS WW, DATEPART(year, Time_of_event) AS Year, " +
@@ -366,6 +393,7 @@ namespace CovidKeeperFrontend.Model
 
             if (avgEventsPerWeekList != null)
             {
+                //Set the values in workWeekAndAmountEventsDict to zero for initializing
                 SetValuesInDictToZero(this.workWeekAndAmountEventsDict);
                 foreach (var item in avgEventsPerWeekList)
                 {
@@ -375,6 +403,8 @@ namespace CovidKeeperFrontend.Model
                 ColumnGraphProperty = ConvertDictToListGraphContent(this.workWeekAndAmountEventsDict);
             }
         }
+
+
         public void GetAvgEventsPerWeekWithRange(DateTime startDate, DateTime endDate)
         {
             string avgEventsPerWeekQuery = "Select DISTINCT DATEPART(WEEK, Time_of_event) AS WW, DATEPART(year, Time_of_event) AS Year, " +

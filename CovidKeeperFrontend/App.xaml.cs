@@ -22,18 +22,14 @@ namespace CovidKeeperFrontend
         public ManageWorkersModel ManageWorkers = new ManageWorkersModel();
         public StatisticalDataModel StatisticalData = new StatisticalDataModel();
         public HomeVM HomeViewModel { get; internal set; }
-        public WorkersTableVM WorkersTableViewModel { get; internal set; }
+        public ManageWorkersVM ManageWorkersViewModel { get; internal set; }
         public MainMenuVM MainMenuViewModel { get; internal set; }
         public StatisticalDataVM StatisticalDataViewModel { get; internal set; }
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            /*HomeViewModel = new HomeVM(WpfDatabaseObject);
-            WorkersTableViewModel = new WorkersTableVM(WpfDatabaseObject);
-            MainMenuViewModel = new MainMenuVM(WpfDatabaseObject);
-            StatisticalDataViewModel = new StatisticalDataVM(WpfDatabaseObject);*/
             HomeViewModel = new HomeVM(Home);
-            WorkersTableViewModel = new WorkersTableVM(ManageWorkers);
+            ManageWorkersViewModel = new ManageWorkersVM(ManageWorkers);
             MainMenuViewModel = new MainMenuVM(MainMenu);
             StatisticalDataViewModel = new StatisticalDataVM(StatisticalData);
         }

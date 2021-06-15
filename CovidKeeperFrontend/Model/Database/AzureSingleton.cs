@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -13,30 +14,52 @@ namespace CovidKeeperFrontend.Model.Database
 {
     public sealed class AzureSingleton
     {
-        private readonly string connectionString;
         private readonly SqlConnection sqlConnection;
         private static readonly Lazy<AzureSingleton> lazy = new Lazy<AzureSingleton>(() => new AzureSingleton());
-        private readonly CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse("DefaultEndpointsProtocol=https;" +
-                "AccountName=faceimages2;" +
-                "AccountKey=vlaKfbwxn8eU1kZGo3KjuFIsgQ0BGot1MRCvs6x0mB923Yx2FOXv4XQ82Hgi/l4iKb4iM/DSNcAeezmYYxxFxw==;" +
-                "EndpointSuffix=core.windows.net");
+        private readonly CloudStorageAccount cloudStorageAccount;
+        private readonly string configFileName = "configAzure.json";
+        private readonly string databaseKey = "Database";
+        private readonly string storageKey = "Storage";
+        private readonly string endOfFile = ".jpg";
+        private readonly string containerName = "pictures";
+
+        
         private AzureSingleton()
         {
-            connectionString = "Server=tcp:mysqlservercovid.database.windows.net,1433;" +
-                "Initial Catalog=myCovidKeeper;" +
-                "Persist Security Info=False;" +
-                "User ID=azureuser;" +
-                "Password=Amitai5925;" +
-                "MultipleActiveResultSets=True;" +
-                "Encrypt=True;" +
-                "TrustServerCertificate=False;Connection Timeout=30;";
+            string path = AppDomain.CurrentDomain.BaseDirectory + configFileName;
+            Dictionary<string, string> configDict = new Dictionary<string, string>();
+            using (StreamReader r = new StreamReader(path))
+            {
+                string json = r.ReadToEnd();
+                configDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+            }
+            //Check if we succeed to read from the file or not
+            if (configDict == null || configDict.Count == 0)
+            {
+                throw new Exception("The file is not exists or it is empty");
+            }
+            //After we succeed to read from the file we want to check if the databaseKey is exists there
+            if (!configDict.ContainsKey(databaseKey))
+            {
+                throw new Exception("The key " + databaseKey + " is not exists in " + configFileName + " file");
+            }
+            //After we succeed to read from the file we want to check if the storageKey is exists there
+            if (!configDict.ContainsKey(storageKey))
+            {
+                throw new Exception("The key " + storageKey + " is not exists in " + configFileName + " file");
+            }
+            string connectionString = configDict[databaseKey];
             sqlConnection = new SqlConnection(connectionString);
+            //Connect to the Azure SQL daabase
             sqlConnection.Open();
+            //Define our CloudStorageAccount
+            cloudStorageAccount = CloudStorageAccount.Parse(configDict[storageKey]);
         }
         
-
+        //Instance for implementation of Singleton class
         public static AzureSingleton Instance { get { return lazy.Value; } }
 
+        //Function that return list of object[] according to the given query
         public List<object[]> QuerySelectOfMultiRows(string selectQuery)
         {
             List<object[]> result_list = new List<object[]>();
@@ -45,6 +68,7 @@ namespace CovidKeeperFrontend.Model.Database
                 command.CommandText = selectQuery;
                 using (var reader = command.ExecuteReader())
                 {
+                    //Loop on the results from SQL
                     while (reader.Read())
                     {
                         object[] lineInformationFromSQL = new object[reader.FieldCount];
@@ -55,7 +79,7 @@ namespace CovidKeeperFrontend.Model.Database
             }
             return result_list;
         }
-
+        //Function that return object[] which represent one row from the given query
         public object[] QuerySelectOfOneRow(string selectQuery)
         {
             object[] lineInformationFromSQL;
@@ -64,6 +88,7 @@ namespace CovidKeeperFrontend.Model.Database
                 command.CommandText = selectQuery;
                 using (var reader = command.ExecuteReader())
                 {
+                    //Get the result from the SQL
                     lineInformationFromSQL = new object[reader.FieldCount];
                     if (reader.Read())
                     {
@@ -77,7 +102,7 @@ namespace CovidKeeperFrontend.Model.Database
             }
             return CheckIfNull<object[]>(lineInformationFromSQL);
         }
-
+        //Function that checks if generic T is null or not
         private T CheckIfNull<T>(T valueToCheck)
         {
             if (valueToCheck == null)
@@ -86,43 +111,43 @@ namespace CovidKeeperFrontend.Model.Database
             }
             return valueToCheck;
         }
+
+        //Function that returns the cloudBlobContainer for upload or download images from storage
         private CloudBlobContainer GetCloudBlobContainer()
         {
             CloudBlobClient cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
-            CloudBlobContainer cloudBlobContainer = cloudBlobClient.GetContainerReference("pictures");
+            CloudBlobContainer cloudBlobContainer = cloudBlobClient.GetContainerReference(containerName);
             cloudBlobContainer.CreateIfNotExists();
+            //It is a Blob Storage
             cloudBlobContainer.SetPermissions(new BlobContainerPermissions() { PublicAccess = BlobContainerPublicAccessType.Blob });
             return cloudBlobContainer;
         }
 
+        //Function that upload image to the azure storage
         public async Task UploadImageToStorage(string idWorker, byte[] imageToByte)
         {
             CloudBlobContainer cloudBlobContainer = GetCloudBlobContainer();
-            CloudBlockBlob blockBlob = cloudBlobContainer.GetBlockBlobReference(idWorker + ".jpg");
+            CloudBlockBlob blockBlob = cloudBlobContainer.GetBlockBlobReference(idWorker + endOfFile);
             using (var stream = new MemoryStream(imageToByte, writable: false))
             {
+                //Upload async
                 await blockBlob.UploadFromStreamAsync(stream);
             }
         }
+        //Function that returns worker's image according to the given idWorker
         public byte[] GetImageWorker(string idWorker)
         {
             CloudBlobContainer cloudBlobContainer = GetCloudBlobContainer();
-            CloudBlockBlob blockBlob = cloudBlobContainer.GetBlockBlobReference(idWorker + ".jpg");
+            CloudBlockBlob blockBlob = cloudBlobContainer.GetBlockBlobReference(idWorker + endOfFile);
             using (var memoryStream = new MemoryStream())
             {
                 blockBlob.DownloadToStream(memoryStream);
                 return memoryStream.ToArray();
             }
         }
-        public async Task UpdateWithOneParameter(string updateQuery, string nameFieldToUpdate, string valueToUpdate)
-        {
-            using (var command = sqlConnection.CreateCommand())
-            {
-                command.CommandText = updateQuery;
-                command.Parameters.AddWithValue(nameFieldToUpdate, valueToUpdate);
-                await command.ExecuteNonQueryAsync();
-            }
-        }
+        //Function that responsible to the queries like insert, upload and delete in azure SQL.
+        //fieldNameToValueDict is a dictionary with the field names of the table that we want to change
+        //with their values.
         public async Task QueryDatabaseWithDict(string updateQuery, Dictionary<string,string> fieldNameToValueDict)
         {
             using (var command = sqlConnection.CreateCommand())
@@ -135,14 +160,7 @@ namespace CovidKeeperFrontend.Model.Database
                 await command.ExecuteNonQueryAsync();
             }
         }
-        public async Task DeleteQuery(string deleteQuery)
-        {
-            using (var command = sqlConnection.CreateCommand())
-            {
-                command.CommandText = deleteQuery;
-                await command.ExecuteNonQueryAsync();
-            }
-        }
+        //Function that returns a datatable according to the given query
         public DataTable GetDataTableByQuery(string selectQuery, string tableName)
         {
             SqlCommand command = new SqlCommand
@@ -152,9 +170,11 @@ namespace CovidKeeperFrontend.Model.Database
             };
             SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command);
             DataTable dataTable = new DataTable(tableName);
+            //Fill the datatable with the values from the query result
             sqlDataAdapter.Fill(dataTable);
             return dataTable;
         }
+        //Function that update the time break between mails while using the given minutes
         public async Task UpdateTimeBreakForMails(int minutesBreakToChange)
         {
             using (var command = sqlConnection.CreateCommand())

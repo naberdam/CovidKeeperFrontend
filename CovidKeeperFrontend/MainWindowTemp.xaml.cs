@@ -33,7 +33,7 @@ namespace CovidKeeperFrontend
             DataContext = (Application.Current as App).MainMenuViewModel;
             homeUserControl.DataContext = (Application.Current as App).HomeViewModel;
             statisticalDataUserControl.DataContext = (Application.Current as App).StatisticalDataViewModel;
-            manageWorkersUserControl.DataContext = (Application.Current as App).WorkersTableViewModel;
+            manageWorkersUserControl.DataContext = (Application.Current as App).ManageWorkersViewModel;
             ListViewMenu.SelectedIndex = 0;
             manageWorkersUserControl.SetMainWindow(this);
             statisticalDataUserControl.SetMainWindow(this);
@@ -63,7 +63,7 @@ namespace CovidKeeperFrontend
                     GridPrincipal.Children.Add(homeUserControl);                    
                     break;
                 case 1:
-                    (Application.Current as App).WorkersTableViewModel.RefreshData();
+                    (Application.Current as App).ManageWorkersViewModel.RefreshData();
                     manageWorkersUserControl.ClearFields();
                     GridPrincipal.Children.Clear();
                     GridPrincipal.Children.Add(manageWorkersUserControl);

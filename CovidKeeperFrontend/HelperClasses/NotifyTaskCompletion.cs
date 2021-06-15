@@ -3,6 +3,8 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 public sealed class NotifyTaskCompletion<TResult> : INotifyPropertyChanged
 {
+    //Class that we use to async task but without await and that is why we can use async task functions in 
+    //properties and in constructors
     public NotifyTaskCompletion(Task<TResult> task)
     {
         Task = task;

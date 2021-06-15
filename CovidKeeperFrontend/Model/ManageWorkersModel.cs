@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 
 namespace CovidKeeperFrontend.Model
 {
+    //This class is the model of HomeUserControl
     public class ManageWorkersModel : AbstractModel
     {
         public NotifyTaskCompletion<int> UpdateHandleInAnalayzerConfigAsync { get; private set; }

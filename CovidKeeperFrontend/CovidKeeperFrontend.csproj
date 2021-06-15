@@ -216,7 +216,7 @@
     <Compile Include="ViewModel\HomeVM.cs" />
     <Compile Include="ViewModel\MainMenuVM.cs" />
     <Compile Include="ViewModel\StatisticalDataVM.cs" />
-    <Compile Include="ViewModel\WorkersTableVM.cs" />
+    <Compile Include="ViewModel\ManageWorkersVM.cs" />
     <Compile Include="Views\HomeUserControl.xaml.cs">
       <DependentUpon>HomeUserControl.xaml</DependentUpon>
     </Compile>

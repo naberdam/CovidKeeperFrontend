@@ -6,15 +6,13 @@ using System.Threading.Tasks;
 
 namespace CovidKeeperFrontend.Model
 {
+    //This class is the model of HomeUserControl
     public class HomeModel : AbstractModel
     {
         private string howManyWorkersWithoutMask = "";
         public string HowManyWorkersWithoutMaskProperty
         {
-            get
-            {
-                return howManyWorkersWithoutMask;
-            }
+            get { return howManyWorkersWithoutMask; }
             set
             {
                 if (howManyWorkersWithoutMask != value)
@@ -52,7 +50,7 @@ namespace CovidKeeperFrontend.Model
                 }
             }
         }
-
+        //Enum that represents the status of the back of the program if it is closed or not
         public enum HandleFlag
         {
             Close = 1,
@@ -77,10 +75,11 @@ namespace CovidKeeperFrontend.Model
 
         public HomeModel()
         {
+            //Refresh data
             RefreshData = new NotifyTaskCompletion<int>(RefreshDataAsync());
         }
 
-
+        //Function that gets the counter of the workers without mask today and updates the HowManyWorkersWithoutMaskProperty
         private async Task CountWorkersWithoutMaskToday()
         {
             string countAllWorkers = await CountWorkers();
@@ -97,6 +96,7 @@ namespace CovidKeeperFrontend.Model
                 }
             });
         }
+        //Function that gets the status of the back of the program and updates the ActiveButtonContentProperty
         private async Task GetActiveButtonContent()
         {
             await Task.Run(() =>
@@ -110,6 +110,7 @@ namespace CovidKeeperFrontend.Model
                 }
             });
         }
+        //Function that gets the amount events today and updates the HowManyEventsTodayProperty
         private async Task GetAmountEventsToday()
         {
             await Task.Run(() =>
@@ -122,6 +123,7 @@ namespace CovidKeeperFrontend.Model
                 }
             });
         }
+        //Function that returns how many workers
         private async Task<string> CountWorkers()
         {
             return await Task.Run(() =>
@@ -136,6 +138,7 @@ namespace CovidKeeperFrontend.Model
             });
 
         }
+        //Function that gets the percentage workers without mask today per yesterday and updates the PercentageWorkersWithoutMaskTodayPerYesterdayProperty
         public async Task PercentageWorkersWithoutMaskTodayPerYesterday()
         {
             await Task.Run(() =>
@@ -159,7 +162,7 @@ namespace CovidKeeperFrontend.Model
                 }
             });
         }
-
+        //Override function for refreshing HomeUserControl
         public override async Task<int> RefreshDataAsync()
         {
             await CountWorkersWithoutMaskToday();
@@ -168,19 +171,23 @@ namespace CovidKeeperFrontend.Model
             await GetAmountEventsToday();
             return default;
         }
+        //Function that changes the flag of start or close that responsible of starting/closing the backend of the program
         public async Task StartOrCloseProgram()
         {
             if (ActiveButtonContentProperty == HandleFlag.Start)
             {
+                //change the value from 0 to 1
                 await UpdateHandleInStarter("0", "1");
                 ActiveButtonContentProperty = HandleFlag.Close;
             }
             else
             {
+                //change the value from 1 to 0
                 await UpdateHandleInStarter("1", "0");
                 ActiveButtonContentProperty = HandleFlag.Start;
             }
         }
+        //Function that updates the flag in Starter table
         private async Task UpdateHandleInStarter(string valueInTable, string valueToUpdate)
         {
             string updateQuery = @"UPDATE [dbo].[Starter] SET Handle = @Handle where Handle = " + valueInTable;
@@ -188,7 +195,6 @@ namespace CovidKeeperFrontend.Model
             { 
                 { "@Handle", valueToUpdate } 
             };
-            //await UpdateWithOneParameter(updateQuery, "@Handle", valueToUpdate);
             await QueryDatabaseWithDict(updateQuery, fieldNameToValueDict);
         }
     }
