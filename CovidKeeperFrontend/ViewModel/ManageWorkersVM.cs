@@ -75,6 +75,40 @@ namespace CovidKeeperFrontend.ViewModel
             }
         }
 
+        private string idWorkerUpdateRule;
+
+        public string IdWorkerUpdateRuleProperty
+        {
+            get { return idWorkerUpdateRule; }
+            set
+            {
+                idWorkerUpdateRule = value;
+                NotifyPropertyChanged("IdWorkerUpdateRuleProperty");
+            }
+        }
+        private string fullNameUpdateRule;
+
+        public string FullNameUpdateRuleProperty
+        {
+            get { return fullNameUpdateRule; }
+            set
+            {
+                fullNameUpdateRule = value;
+                NotifyPropertyChanged("FullNameUpdateRuleProperty");
+            }
+        }
+
+        private string emailAddressUpdateRule;
+
+        public string EmailAddressUpdateRuleProperty
+        {
+            get { return emailAddressUpdateRule; }
+            set
+            {
+                emailAddressUpdateRule = value;
+                NotifyPropertyChanged("EmailAddressUpdateRuleProperty");
+            }
+        }
 
         public void NotifyPropertyChanged(string propName)
         {

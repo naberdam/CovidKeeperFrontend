@@ -48,7 +48,7 @@ namespace CovidKeeperFrontend.ViewModel
                 else if (model.PercentageWorkersWithoutMaskTodayPerYesterdayProperty < 0)
                 {
                     ForegroundColorPercentageWorkersProperty = System.Windows.Media.Brushes.Green;
-                    return GetFormatPercentageWorkers(model.PercentageWorkersWithoutMaskTodayPerYesterdayProperty, "-");
+                    return GetFormatPercentageWorkers(model.PercentageWorkersWithoutMaskTodayPerYesterdayProperty * (-1), "-");
                 }
                 else
                 {

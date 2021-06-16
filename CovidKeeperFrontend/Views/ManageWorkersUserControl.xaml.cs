@@ -68,13 +68,10 @@ namespace CovidKeeperFrontend.Views
             await (Application.Current as App).ManageWorkersViewModel.DeleteWorker(idWorker, indexOfSelectedRow);
             ClearFields();
         }
-        private void WorkerDetailsTable_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        
+        private void SetImageFromTableToBitmapImage(DataRowView row)
         {
-            CheckChangeOfSelection(sender);
-        }
-        private void SetImageFromTableToBitmapImage()
-        {
-            byte[] imageArray = (byte[])rowViewSelected["Image"];
+            byte[] imageArray = (byte[])row["Image"];
             if (imageArray.Length == 0)
             {
                 bitmapImage = default;
@@ -111,7 +108,6 @@ namespace CovidKeeperFrontend.Views
             {
                 await (Application.Current as App).ManageWorkersViewModel.InsertWorker(idWorker, fullName, emailAddress, bitmapImage);
                 ClearFields();
-                MessageBox.Show("The worker " + idWorker + " " + fullName + " uploaded successfully.\nThe email is: " + emailAddress);
                 this.IsEnabled = true;
                 SetIsEnabled(true);
                 DialogHost.CloseDialogCommand.Execute(null, null);
@@ -150,11 +146,6 @@ namespace CovidKeeperFrontend.Views
                 }
             }
         }
-
-        private void WorkerDetailsTable_CurrentCellChanged(object sender, EventArgs e)
-        {
-            CheckChangeOfSelection(sender);
-        }
         private void CheckChangeOfSelection(object sender)
         {
             DataGrid gd = (DataGrid)sender;
@@ -175,11 +166,14 @@ namespace CovidKeeperFrontend.Views
                 string idWorker = rowViewSelected["Id"].ToString();
                 string emailAddress = rowViewSelected["Email_address"].ToString();
                 string fullName = rowViewSelected["Fullname"].ToString();
-                SetImageFromTableToBitmapImage();
+                SetImageFromTableToBitmapImage(rowViewSelected);
                 (Application.Current as App).ManageWorkersViewModel.UpdateWorkerDetails(idWorker, fullName, emailAddress, bitmapImage, indexOfSelectedRow);
                 indexOfSelectedRow = gd.Items.IndexOf(gd.CurrentItem);
-                ClearFields();
+                //ClearFields();
                 rowViewSelected = rowSelectedNow;
+                this.IsEnabled = true;
+                SetIsEnabled(true);
+                DialogHost.CloseDialogCommand.Execute(null, null);
             }
         }
 
@@ -304,45 +298,107 @@ namespace CovidKeeperFrontend.Views
         {
             TextBox textBox = sender as TextBox;
             UpdateIsEnabledAddButton((Application.Current as App).ManageWorkersViewModel.IdWorkerRuleProperty, textBox.Text,
-                ref idWorkerIsGood, fullNameIsGood, emailAddressIsGood, imageIsGood);
+                ref idWorkerIsGood, fullNameIsGood, emailAddressIsGood, imageIsGood, ref AddButton);
         }
 
         private void FullName_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textBox = sender as TextBox;
             UpdateIsEnabledAddButton((Application.Current as App).ManageWorkersViewModel.FullNameRuleProperty, textBox.Text,
-                ref fullNameIsGood, emailAddressIsGood, idWorkerIsGood, imageIsGood);
+                ref fullNameIsGood, emailAddressIsGood, idWorkerIsGood, imageIsGood, ref AddButton);
         }
 
         private void EmailAddress_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textBox = sender as TextBox;
             UpdateIsEnabledAddButton((Application.Current as App).ManageWorkersViewModel.EmailAddressRuleProperty, textBox.Text, 
-                ref emailAddressIsGood, fullNameIsGood, idWorkerIsGood, imageIsGood);
+                ref emailAddressIsGood, fullNameIsGood, idWorkerIsGood, imageIsGood, ref AddButton);
         }
         private void UpdateIsEnabledAddButton(string userDetailsProperty, string textBox, ref bool myValue, bool oneValue, 
-            bool secondValue, bool thirdValue)
+            bool secondValue, bool thirdValue, ref Button buttonToEnable)
         {
             if (userDetailsProperty == null)
             {
-                AddButton.IsEnabled = false;
+                buttonToEnable.IsEnabled = false;
             }
             else if (userDetailsProperty.Length != textBox.Length)
             {
-                AddButton.IsEnabled = false;
+                buttonToEnable.IsEnabled = false;
             }
             else
             {
                 myValue = true;
                 if (oneValue && secondValue && thirdValue)
                 {
-                    AddButton.IsEnabled = true;
+                    buttonToEnable.IsEnabled = true;
                 }
                 else
                 {
-                    AddButton.IsEnabled = false;
+                    buttonToEnable.IsEnabled = false;
                 }
             }
+        }
+
+        private void EditImageButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void SaveUpdateButton_Click(object sender, RoutedEventArgs e)
+        {
+            string idWorker = rowViewSelected["Id"].ToString();
+            string emailAddress = rowViewSelected["Email_address"].ToString();
+            string fullName = rowViewSelected["Fullname"].ToString();
+            SetImageFromTableToBitmapImage(rowViewSelected);
+            (Application.Current as App).ManageWorkersViewModel.UpdateWorkerDetails(idWorker, fullName, emailAddress, bitmapImage, indexOfSelectedRow);
+            ClearFields();
+            this.IsEnabled = true;
+            SetIsEnabled(true);
+            DialogHost.CloseDialogCommand.Execute(null, null);
+        }
+
+        private void CancelSaveUpdateButton_Click(object sender, RoutedEventArgs e)
+        {
+            DialogHost.CloseDialogCommand.Execute(null, null);
+            this.IsEnabled = true;
+            SetIsEnabled(true);
+        }
+
+        private void EditButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.IsEnabled = false;
+            SetIsEnabled(false);
+            DataRowView rowSelectedNow = WorkerDetailsTable.CurrentCell.Item as DataRowView;
+            idWorkerIsGood = false;
+            fullNameIsGood = false;
+            emailAddressIsGood = false;
+            SetImageFromTableToBitmapImage(rowSelectedNow);
+            imageIsGood = true;
+            IdWorkerUpdate.Text = rowSelectedNow["Id"].ToString();
+            FullNameUpdate.Text = rowSelectedNow["Fullname"].ToString();
+            EmailAddressUpdate.Text = rowSelectedNow["Email_address"].ToString();            
+            ImageWorkerUpdate.Source = bitmapImage;
+        }
+
+        private void EmailAddressUpdate_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            UpdateIsEnabledAddButton((Application.Current as App).ManageWorkersViewModel.EmailAddressUpdateRuleProperty, textBox.Text,
+                ref emailAddressIsGood, fullNameIsGood, idWorkerIsGood, imageIsGood, ref SaveUpdateButton);
+        }
+
+        private void FullNameUpdate_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            UpdateIsEnabledAddButton((Application.Current as App).ManageWorkersViewModel.FullNameUpdateRuleProperty, textBox.Text,
+                ref fullNameIsGood, emailAddressIsGood, idWorkerIsGood, imageIsGood, ref SaveUpdateButton);
+        }
+
+        private void IdWorkerUpdate_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            UpdateIsEnabledAddButton((Application.Current as App).ManageWorkersViewModel.IdWorkerUpdateRuleProperty, textBox.Text,
+                ref idWorkerIsGood, fullNameIsGood, emailAddressIsGood, imageIsGood, ref SaveUpdateButton);
         }
     }
 }
