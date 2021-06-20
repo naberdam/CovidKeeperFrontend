@@ -170,16 +170,8 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
-        public async Task<int> UpdateWorkerDetails(string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
+        public async Task<int> UpdateWorkerDetails(string idWorkerInDataTable, string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
         {
-            string updateQuery = @"UPDATE [dbo].[Workers] SET FullName = @FullName, Email_address = @Email_address Where Id = @Id;";
-            Dictionary<string, string> fieldNameToValueDict = new Dictionary<string, string>
-            {
-                { "@Id", idWorker },
-                { "@FullName", fullname },
-                { "@Email_address", emailAddress }
-            };
-            await QueryDatabaseWithDict(updateQuery, fieldNameToValueDict);
             byte[] imageToByte = ImagePathToByteArray(imagePath);
             DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
             var rowToChange = workerDetailsTableTemp.Rows[indexOfSelectedRow];
@@ -189,17 +181,62 @@ namespace CovidKeeperFrontend.Model
             rowToChange["Email_address"] = emailAddress;
             rowToChange["Image"] = imageToByte;
             WorkerDetailsTableProperty = workerDetailsTableTemp;
+            //The id has changed
+            if (idWorkerInDataTable != idWorker)
+            {
+                await UpdateWorkerId(idWorkerInDataTable, idWorker, fullname, emailAddress, imagePath);
+            }
+            else
+            {
+                string updateQuery = @"UPDATE [dbo].[Workers] SET FullName = @FullName, Email_address = @Email_address Where Id = @Id;";
+                Dictionary<string, string> fieldNameToValueDict = new Dictionary<string, string>
+                {
+                    { "@Id", idWorker },
+                    { "@FullName", fullname },
+                    { "@Email_address", emailAddress }
+                };
+                await QueryDatabaseWithDict(updateQuery, fieldNameToValueDict);                
+            }
+            
             return default;
         }
 
-        public async Task DeleteWorker(string idWorker, int indexOfSelectedRow)
+        private async Task UpdateWorkerIdToNewId(string newIdWorker, string idWorkerToUpdate)
+        {
+            string updateQuery = @"UPDATE [dbo].[Workers] SET Id = @Id Where Id = " + idWorkerToUpdate;
+            Dictionary<string, string> fieldNameToValueDict = new Dictionary<string, string>
+            {
+                { "@Id", newIdWorker }
+            };
+            await QueryDatabaseWithDict(updateQuery, fieldNameToValueDict);
+        }
+
+        private async Task UpdateWorkerId(string idWorkerInDataTable, string idWorker, string fullname, string emailAddress, BitmapImage imagePath)
+        {
+            List<object[]> eventsByIdList = QuerySelectOfMultiRows("select * from [dbo].[History_Events] where Id_worker = '" + idWorkerInDataTable + "'");
+            if (eventsByIdList != null)
+            {
+                string deleteQuery = @"DELETE FROM [dbo].[History_Events] WHERE Id_worker = '" + idWorkerInDataTable + "';";
+                await QueryDatabaseWithDict(deleteQuery);
+            }
+            await UpdateWorkerIdToNewId(idWorker, idWorkerInDataTable);
+            if (eventsByIdList != null)
+            {
+                await InsertEventsListById(eventsByIdList, idWorker);
+            }
+        }
+
+        public async Task DeleteWorker(string idWorker, int indexOfSelectedRow=-1)
         {
             string deleteQuery = @"DELETE FROM [dbo].[Workers] WHERE Id = " + idWorker + ";";
             await QueryDatabaseWithDict(deleteQuery);
             DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
-            var rowToChange = workerDetailsTableTemp.Rows[indexOfSelectedRow];
-            rowToChange.Delete();
-            WorkerDetailsTableProperty = workerDetailsTableTemp;
+            if (indexOfSelectedRow != -1)
+            {
+                var rowToChange = workerDetailsTableTemp.Rows[indexOfSelectedRow];
+                rowToChange.Delete();
+                WorkerDetailsTableProperty = workerDetailsTableTemp;
+            }            
         }
         public void GetWorkersDetailsAfterRefresh()
         {

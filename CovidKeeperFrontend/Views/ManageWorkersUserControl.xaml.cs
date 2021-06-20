@@ -38,6 +38,7 @@ namespace CovidKeeperFrontend.Views
         bool fullNameIsGood = false;
         bool emailAddressIsGood = false;
         bool imageIsGood = false;
+        string idWorkerInDataTable = default;
 
         public ManageWorkersUserControl()
         {
@@ -146,7 +147,7 @@ namespace CovidKeeperFrontend.Views
                 }
             }
         }
-        private void CheckChangeOfSelection(object sender)
+        /*private void CheckChangeOfSelection(object sender)
         {
             DataGrid gd = (DataGrid)sender;
 
@@ -175,7 +176,7 @@ namespace CovidKeeperFrontend.Views
                 SetIsEnabled(true);
                 DialogHost.CloseDialogCommand.Execute(null, null);
             }
-        }
+        }*/
 
         private void PlusButton_Click(object sender, RoutedEventArgs e)
         {
@@ -346,11 +347,11 @@ namespace CovidKeeperFrontend.Views
 
         private void SaveUpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            string idWorker = rowViewSelected["Id"].ToString();
-            string emailAddress = rowViewSelected["Email_address"].ToString();
-            string fullName = rowViewSelected["Fullname"].ToString();
+            string idWorker = IdWorkerUpdate.Text;
+            string emailAddress = EmailAddressUpdate.Text;
+            string fullName = FullNameUpdate.Text;
             SetImageFromTableToBitmapImage(rowViewSelected);
-            (Application.Current as App).ManageWorkersViewModel.UpdateWorkerDetails(idWorker, fullName, emailAddress, bitmapImage, indexOfSelectedRow);
+            (Application.Current as App).ManageWorkersViewModel.UpdateWorkerDetails(idWorkerInDataTable, idWorker, fullName, emailAddress, bitmapImage, indexOfSelectedRow);
             ClearFields();
             this.IsEnabled = true;
             SetIsEnabled(true);
@@ -362,22 +363,27 @@ namespace CovidKeeperFrontend.Views
             DialogHost.CloseDialogCommand.Execute(null, null);
             this.IsEnabled = true;
             SetIsEnabled(true);
+            IdWorkerUpdate.Text = default;
+            FullNameUpdate.Text = default;
+            EmailAddressUpdate.Text = default;
         }
 
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
             this.IsEnabled = false;
             SetIsEnabled(false);
-            DataRowView rowSelectedNow = WorkerDetailsTable.CurrentCell.Item as DataRowView;
+            rowViewSelected = WorkerDetailsTable.CurrentCell.Item as DataRowView;
+            indexOfSelectedRow = WorkerDetailsTable.Items.IndexOf(WorkerDetailsTable.CurrentItem);
             idWorkerIsGood = false;
             fullNameIsGood = false;
             emailAddressIsGood = false;
-            SetImageFromTableToBitmapImage(rowSelectedNow);
+            SetImageFromTableToBitmapImage(rowViewSelected);
             imageIsGood = true;
-            IdWorkerUpdate.Text = rowSelectedNow["Id"].ToString();
-            FullNameUpdate.Text = rowSelectedNow["Fullname"].ToString();
-            EmailAddressUpdate.Text = rowSelectedNow["Email_address"].ToString();            
+            IdWorkerUpdate.Text = rowViewSelected["Id"].ToString();
+            FullNameUpdate.Text = rowViewSelected["Fullname"].ToString();
+            EmailAddressUpdate.Text = rowViewSelected["Email_address"].ToString();            
             ImageWorkerUpdate.Source = bitmapImage;
+            idWorkerInDataTable = rowViewSelected["Id"].ToString();
         }
 
         private void EmailAddressUpdate_TextChanged(object sender, TextChangedEventArgs e)

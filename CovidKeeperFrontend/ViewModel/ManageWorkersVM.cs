@@ -122,9 +122,9 @@ namespace CovidKeeperFrontend.ViewModel
 
         
 
-        public void UpdateWorkerDetails(string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
+        public void UpdateWorkerDetails(string idWorkerInDataTable, string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
         {
-            UpdateWorkerDetailsAsync = new NotifyTaskCompletion<int>(this.model.UpdateWorkerDetails(idWorker, fullname, emailAddress, imagePath, indexOfSelectedRow));
+            UpdateWorkerDetailsAsync = new NotifyTaskCompletion<int>(this.model.UpdateWorkerDetails(idWorkerInDataTable, idWorker, fullname, emailAddress, imagePath, indexOfSelectedRow));
         }
         public async Task DeleteWorker(string idWorker, int indexOfSelectedRow)
         {

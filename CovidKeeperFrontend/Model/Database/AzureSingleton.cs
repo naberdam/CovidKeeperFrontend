@@ -153,10 +153,14 @@ namespace CovidKeeperFrontend.Model.Database
             using (var command = sqlConnection.CreateCommand())
             {
                 command.CommandText = updateQuery;
-                foreach(var item in fieldNameToValueDict)
+                if (fieldNameToValueDict != null)
                 {
-                    command.Parameters.AddWithValue(item.Key, item.Value);
-                }                
+                    foreach (var item in fieldNameToValueDict)
+                    {
+                        command.Parameters.AddWithValue(item.Key, item.Value);
+                    }
+                }
+                                
                 await command.ExecuteNonQueryAsync();
             }
         }
@@ -184,6 +188,23 @@ namespace CovidKeeperFrontend.Model.Database
                 command.Parameters.AddWithValue("@Minutes_between_mails", minutesBreakToChange);
                 command.Parameters.AddWithValue("@Handle", 1);
                 await command.ExecuteNonQueryAsync();
+            }
+        }
+
+        public async Task InsertEventsListById(List<object[]> eventsList, string idWorker)
+        {
+            string insertStmt = "INSERT INTO [dbo].[History_Events] VALUES(@Id_worker, @Time_of_event)";
+            using (var cmd = sqlConnection.CreateCommand())
+            {
+                cmd.CommandText = insertStmt;
+                cmd.Parameters.Add("@Id_worker", SqlDbType.VarChar).Value = idWorker;
+                cmd.Parameters.Add("@Time_of_event", SqlDbType.DateTime);
+                // iterate over all RoleID's and execute the INSERT statement for each of them
+                foreach (var item in eventsList)
+                {
+                    cmd.Parameters["@Time_of_event"].Value = Convert.ToDateTime(item[1]);
+                    await cmd.ExecuteNonQueryAsync();
+                }
             }
         }
     }

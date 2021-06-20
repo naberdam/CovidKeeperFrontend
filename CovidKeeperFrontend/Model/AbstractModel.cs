@@ -58,5 +58,9 @@ namespace CovidKeeperFrontend.Model
         {
             return azureSingleton.GetDataTableByQuery(selectQuery, tableName);
         }
+        public async Task InsertEventsListById(List<object[]> eventsList, string idWorker)
+        {
+            await azureSingleton.InsertEventsListById(eventsList, idWorker);
+        }
     }
 }
