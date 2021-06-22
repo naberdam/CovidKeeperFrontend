@@ -23,7 +23,10 @@ namespace CovidKeeperFrontend.Views
         public HomeUserControl()
         {
             InitializeComponent();
-            var x = ActiveButton.Background;
+            string path = AppDomain.CurrentDomain.BaseDirectory;
+            path = path.Substring(0, path.Length - 4);
+            path += "CovidKeeperFrontend\\people_with_mask.jpg";
+            PeopleClickOnButton.Source = new BitmapImage(new Uri(path));
         }
 
         private async void ActiveButton_Click(object sender, RoutedEventArgs e)

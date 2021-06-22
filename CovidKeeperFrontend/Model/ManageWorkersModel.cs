@@ -215,7 +215,7 @@ namespace CovidKeeperFrontend.Model
             //The id has changed
             if (idWorkerInDataTable != idWorker)
             {
-                await UpdateWorkerId(idWorkerInDataTable, idWorker, fullname, emailAddress, imagePath);
+                await UpdateWorkerId(idWorkerInDataTable, idWorker, fullname, emailAddress);
             }
             //The id has not changed
             else
@@ -247,7 +247,7 @@ namespace CovidKeeperFrontend.Model
 
         //Function that resposible for updating worker's details in case the worker's id has been changed,
         //so we need to delete and save all the worker's events, updating worker's id and then insert the events with the new id
-        private async Task UpdateWorkerId(string idWorkerInDataTable, string idWorker, string fullname, string emailAddress, BitmapImage imagePath)
+        private async Task UpdateWorkerId(string idWorkerInDataTable, string idWorker, string fullname, string emailAddress)
         {
             List<object[]> eventsByIdList = QuerySelectOfMultiRows("select * from [dbo].[History_Events] where Id_worker = '" + idWorkerInDataTable + "'");
             if (eventsByIdList != null)
