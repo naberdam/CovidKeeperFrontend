@@ -17,7 +17,7 @@ namespace CovidKeeperFrontend.Model.Database
         private readonly SqlConnection sqlConnection;
         private static readonly Lazy<AzureSingleton> lazy = new Lazy<AzureSingleton>(() => new AzureSingleton());
         private readonly CloudStorageAccount cloudStorageAccount;
-        private readonly string configFileName = "configAzure.json";
+        private readonly string configFileName = "CovidKeeperFrontend\\configAzure.json";
         private readonly string databaseKey = "Database";
         private readonly string storageKey = "Storage";
         private readonly string endOfFile = ".jpg";
@@ -26,7 +26,9 @@ namespace CovidKeeperFrontend.Model.Database
         
         private AzureSingleton()
         {
-            string path = AppDomain.CurrentDomain.BaseDirectory + configFileName;
+            string path = AppDomain.CurrentDomain.BaseDirectory;
+            path = path.Substring(0, path.Length - 4);
+            path += configFileName;
             Dictionary<string, string> configDict = new Dictionary<string, string>();
             using (StreamReader r = new StreamReader(path))
             {
@@ -134,6 +136,13 @@ namespace CovidKeeperFrontend.Model.Database
                 await blockBlob.UploadFromStreamAsync(stream);
             }
         }
+        //Function that deletes image from storage according to given id
+        public async Task DeleteImageFromStorage(string idWorker)
+        {
+            CloudBlobContainer cloudBlobContainer = GetCloudBlobContainer();
+            CloudBlockBlob blockBlob = cloudBlobContainer.GetBlockBlobReference(idWorker + endOfFile);
+            await blockBlob.DeleteIfExistsAsync();
+        }
         //Function that returns worker's image according to the given idWorker
         public byte[] GetImageWorker(string idWorker)
         {
@@ -191,6 +200,7 @@ namespace CovidKeeperFrontend.Model.Database
             }
         }
 
+        //Function that insert events by id according to the given id in case that the client wanted to edit the worker's id
         public async Task InsertEventsListById(List<object[]> eventsList, string idWorker)
         {
             string insertStmt = "INSERT INTO [dbo].[History_Events] VALUES(@Id_worker, @Time_of_event)";
@@ -199,7 +209,7 @@ namespace CovidKeeperFrontend.Model.Database
                 cmd.CommandText = insertStmt;
                 cmd.Parameters.Add("@Id_worker", SqlDbType.VarChar).Value = idWorker;
                 cmd.Parameters.Add("@Time_of_event", SqlDbType.DateTime);
-                // iterate over all RoleID's and execute the INSERT statement for each of them
+                //Iterate over all Time_of_event's and execute the INSERT statement for each of them
                 foreach (var item in eventsList)
                 {
                     cmd.Parameters["@Time_of_event"].Value = Convert.ToDateTime(item[1]);

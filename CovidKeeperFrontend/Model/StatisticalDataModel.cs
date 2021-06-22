@@ -251,6 +251,7 @@ namespace CovidKeeperFrontend.Model
 
         public StatisticalDataModel()
         {
+            //Refresh data
             RefreshData = new NotifyTaskCompletion<int>(RefreshDataAsync());
         }
 
@@ -404,7 +405,8 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
-
+        //Function that gets the average of the events per week with date range
+        //and updates the ColumnGraphProperty for representing the graph to the client
         public void GetAvgEventsPerWeekWithRange(DateTime startDate, DateTime endDate)
         {
             string avgEventsPerWeekQuery = "Select DISTINCT DATEPART(WEEK, Time_of_event) AS WW, DATEPART(year, Time_of_event) AS Year, " +
@@ -419,34 +421,49 @@ namespace CovidKeeperFrontend.Model
                 Calendar myCal = myCI.Calendar;
                 int firstWorkWeekWithEvents = myCal.GetWeekOfYear(startDate, myCI.DateTimeFormat.CalendarWeekRule, myCI.DateTimeFormat.FirstDayOfWeek);
                 int lastWorkWeek = myCal.GetWeekOfYear(endDate, myCI.DateTimeFormat.CalendarWeekRule, myCI.DateTimeFormat.FirstDayOfWeek);
-                Dictionary<string, double> workWeekAndAmountEventsDictForRange = GetWorkWeekAndAmountEventsDictForRange(firstWorkWeekWithEvents,
+                //Initiaize the workWeekAndAmountEventsDictForRange from startDate to endDate
+                Dictionary<string, double> workWeekAndAmountEventsDictWithRange = InitializeWorkWeekAndAmountEventsDictWithRange(firstWorkWeekWithEvents,
                     lastWorkWeek, myCI, startDate.Year, endDate.Year);
-                if (startDate.DayOfWeek != DayOfWeek.Sunday)
-                {
-                    int daysOffset = DayOfWeek.Saturday - startDate.DayOfWeek;
-                    startDate = startDate.AddDays((6 - daysOffset) * -1);
-                }
-                if (endDate.DayOfWeek != DayOfWeek.Saturday)
-                {
-                    int daysOffset = DayOfWeek.Saturday - endDate.DayOfWeek;
-                    endDate = endDate.AddDays(daysOffset);
-                }
-                foreach (var item in avgEventsPerWeekList)
-                {
-                    DateTime temp = new DateTime(Convert.ToInt32(item[1]), 1, 1);
-                    temp = temp.AddDays(Convert.ToInt32(item[0]) * 7 + 1);
-                    if (startDate.Ticks > temp.Ticks || endDate.Ticks < temp.Ticks)
-                    {
-                        continue;
-                    }
-                    string weekStr = item[0].ToString() + "-" + item[1].ToString();
-                    workWeekAndAmountEventsDictForRange[weekStr] = Convert.ToDouble(item[2]);
-                }
+                //Updating the amount events for each week that is in avgEventsPerWeekList
+                workWeekAndAmountEventsDictWithRange = UpdateTheAmountOfWorkWeekAndAmountEventsDictWithRange(startDate, endDate, 
+                    avgEventsPerWeekList, workWeekAndAmountEventsDictWithRange);
                 WeekOrMonthForDateRangeTextProperty = "weeks";
-                ColumnGraphProperty = ConvertDictToListGraphContent(workWeekAndAmountEventsDictForRange);
+                ColumnGraphProperty = ConvertDictToListGraphContent(workWeekAndAmountEventsDictWithRange);
             }
         }
 
+        //Function that returns the workWeekAndAmountEventsDictWithRange with the amount of updated events per week
+        private Dictionary<string, double> UpdateTheAmountOfWorkWeekAndAmountEventsDictWithRange(DateTime startDate, DateTime endDate, List<object[]> avgEventsPerWeekList, 
+            Dictionary<string, double> workWeekAndAmountEventsDictWithRange)
+        {
+            //Initialize the first work week
+            if (startDate.DayOfWeek != DayOfWeek.Sunday)
+            {
+                int daysOffset = DayOfWeek.Saturday - startDate.DayOfWeek;
+                startDate = startDate.AddDays((6 - daysOffset) * -1);
+            }
+            //Initialize the last work week
+            if (endDate.DayOfWeek != DayOfWeek.Saturday)
+            {
+                int daysOffset = DayOfWeek.Saturday - endDate.DayOfWeek;
+                endDate = endDate.AddDays(daysOffset);
+            }
+            //Iterate over the avgEventsPerWeekList for updating the amount events
+            foreach (var item in avgEventsPerWeekList)
+            {
+                DateTime temp = new DateTime(Convert.ToInt32(item[1]), 1, 1);
+                temp = temp.AddDays(Convert.ToInt32(item[0]) * 7 + 1);
+                if (startDate.Ticks > temp.Ticks || endDate.Ticks < temp.Ticks)
+                {
+                    continue;
+                }
+                string weekStr = item[0].ToString() + "-" + item[1].ToString();
+                workWeekAndAmountEventsDictWithRange[weekStr] = Convert.ToDouble(item[2]);
+            }
+            return workWeekAndAmountEventsDictWithRange;
+        }
+
+        //Function that gets the average events per month and updating the ColumnGraphProperty property
         public void GetAvgEventsPerMonth()
         {
             string avgEventsPerMonthQuery = "Select DISTINCT DATEPART(month, Time_of_event) AS Month, DATEPART(year, Time_of_event) AS Year, " +
@@ -468,7 +485,7 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
-
+        //Function that gets the average events per month with range and updating the ColumnGraphProperty property
         public void GetAvgEventsPerMonthWithRange(DateTime startDate, DateTime endDate)
         {
             string avgEventsPerMonthQuery = "Select DISTINCT DATEPART(month, Time_of_event) AS Month, DATEPART(year, Time_of_event) AS Year, " +
@@ -485,7 +502,8 @@ namespace CovidKeeperFrontend.Model
                 int maxYear = endDate.Year;
                 DateTime minDate = new DateTime(minYear, minMonth, 1);
                 DateTime maxDate = new DateTime(maxYear, maxMonth, DateTime.DaysInMonth(maxYear, maxMonth));
-                Dictionary<string, double> monthAndAmountEventsDictForRange = GetMonthAndAmountEventsDictForRange(minMonth, maxMonth, minYear, maxYear);
+                //Initialize the monthAndAmountEventsDictWithRange
+                Dictionary<string, double> monthAndAmountEventsDictWithRange = InitializeMonthAndAmountEventsDictWithRange(minMonth, maxMonth, minYear, maxYear);
                 foreach (var item in avgEventsPerMonthList)
                 {
                     DateTime temp = new DateTime(Convert.ToInt32(item[1]), Convert.ToInt32(item[0]), 15);
@@ -495,13 +513,16 @@ namespace CovidKeeperFrontend.Model
                     }
                     MonthEnumForGraphs monthEnum = (MonthEnumForGraphs)Enum.Parse(typeof(MonthEnumForGraphs), item[0].ToString());
                     string monthStr = monthEnum.ToString() + "-" + item[1].ToString();
-                    monthAndAmountEventsDictForRange[monthStr] = Convert.ToDouble(item[2]);
+                    monthAndAmountEventsDictWithRange[monthStr] = Convert.ToDouble(item[2]);
                 }
                 WeekOrMonthForDateRangeTextProperty = "months";
-                ColumnGraphProperty = ConvertDictToListGraphContent(monthAndAmountEventsDictForRange);
+                ColumnGraphProperty = ConvertDictToListGraphContent(monthAndAmountEventsDictWithRange);
             }
         }
-        private Dictionary<string, double> GetMonthAndAmountEventsDictForRange(int minMonth, int maxMonth, int minYear, int maxYear)
+
+        //Function that initializes dictionary with month range from minMonth and minYear to maxMonth and MaxYear as keys
+        //and the amount events as values
+        private Dictionary<string, double> InitializeMonthAndAmountEventsDictWithRange(int minMonth, int maxMonth, int minYear, int maxYear)
         {
             Dictionary<string, double> monthAndAmountEventsDictForRange = new Dictionary<string, double>();
             Calendar myCal = CultureInfo.InvariantCulture.Calendar;
@@ -524,7 +545,10 @@ namespace CovidKeeperFrontend.Model
             }
             return monthAndAmountEventsDictForRange;
         }
-        private Dictionary<string, double> GetWorkWeekAndAmountEventsDictForRange(int firstWorkWeekWithEvents, int lastWorkWeek, CultureInfo myCI, int minYear, int maxYear)
+
+        //Function that initializes dictionary with work week range from firstWorkWeekWithEvents and minYear to lastWorkWeek and MaxYear as keys
+        //and the amount events as values
+        private Dictionary<string, double> InitializeWorkWeekAndAmountEventsDictWithRange(int firstWorkWeekWithEvents, int lastWorkWeek, CultureInfo myCI, int minYear, int maxYear)
         {
             Dictionary<string, double> workWeekAndAmountEventsDictForRange = new Dictionary<string, double>();
             Calendar myCal = myCI.Calendar;
@@ -549,6 +573,7 @@ namespace CovidKeeperFrontend.Model
             return workWeekAndAmountEventsDictForRange;
         }
 
+        //Function that gets the average events per week day and updating the ColumnGraphProperty
         public void GetAvgEventsPerWeekday()
         {
             string avgEventsPerWeekdayQuery = "Select DISTINCT DATEPART(weekday, Time_of_event) AS Weekday, " +
@@ -556,7 +581,7 @@ namespace CovidKeeperFrontend.Model
                 "from[dbo].[History_Events] " +
                 "group by DATEPART(weekday, Time_of_event); ";
             List<object[]> avgEventsPerWeekdayList = QuerySelectOfMultiRows(avgEventsPerWeekdayQuery);
-
+            //Check if avgEventsPerWeekdayList is not null
             if (avgEventsPerWeekdayList != null)
             {
                 List<GraphContent> avgEventsPerWeekday = new List<GraphContent>();
@@ -568,6 +593,8 @@ namespace CovidKeeperFrontend.Model
                 ColumnGraphProperty = avgEventsPerWeekday;
             }
         }
+
+        //Function that gets the average events per week day with range from startDate to endDate and updating the ColumnGraphProperty
         public void GetAvgEventsPerWeekdayWithRange(DateTime startDate, DateTime endDate)
         {
             string avgEventsPerWeekdayQuery = "Select DISTINCT DATEPART(weekday, Time_of_event) AS Weekday, " +
@@ -589,6 +616,8 @@ namespace CovidKeeperFrontend.Model
                 ColumnGraphProperty = avgEventsPerWeekday;
             }
         }
+
+        //Function that gets the amount events for each worker and updating the AmountEventsByWorkerTableProperty
         public void GetAmountEventsByWorker()
         {
             string amountEventsPerWorkerQuery = "Select DISTINCT Id_worker, FullName, " +
@@ -597,25 +626,22 @@ namespace CovidKeeperFrontend.Model
                 "INNER JOIN [dbo].[Workers] ON [dbo].[History_Events].Id_worker=[dbo].[Workers].Id " +
                 "group by Id_worker, FullName " +
                 "order by count desc; ";
-            /*SqlCommand command = new SqlCommand();
-            command.CommandText = amountEventsPerWorkerQuery;
-            command.Connection = sqlConnection;
-            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command);
-            DataTable dataTableAmountEventsPerWorker = new DataTable("History_Events");
-            sqlDataAdapter.Fill(dataTableAmountEventsPerWorker);*/
             DataTable dataTableAmountEventsPerWorker = GetDataTableByQuery(amountEventsPerWorkerQuery, "History_Events");
-            dataTableAmountEventsPerWorker.Columns.Add("LineSeriesGraph", typeof(SeriesCollection));
+            dataTableAmountEventsPerWorker = InitialGraphColumnsToDefault(dataTableAmountEventsPerWorker);
+            /*dataTableAmountEventsPerWorker.Columns.Add("LineSeriesGraph", typeof(SeriesCollection));
             dataTableAmountEventsPerWorker.Columns.Add("LabelsGraph", typeof(string[]));
             dataTableAmountEventsPerWorker.Columns.Add("TitleGraph", typeof(string));
+            //Initialize the new columns to be default value
             foreach (DataRow row in dataTableAmountEventsPerWorker.Rows)
             {
                 row["LineSeriesGraph"] = default;
                 row["LabelsGraph"] = default;
                 row["TitleGraph"] = default;
-            }
+            }*/
             AmountEventsByWorkerTableProperty = dataTableAmountEventsPerWorker;
         }
 
+        //Function that gets the amount events for each worker with range from startDate to endDate and updating the AmountEventsByWorkerTableProperty
         public void GetAmountEventsByWorkerWithRange(DateTime startDate, DateTime endDate)
         {
             string amountEventsPerWorkerQuery = "Select DISTINCT Id_worker, FullName, " +
@@ -626,7 +652,8 @@ namespace CovidKeeperFrontend.Model
                 "group by Id_worker, FullName " +
                 "order by count desc; ";
             DataTable dataTableAmountEventsPerWorker = GetDataTableByQuery(amountEventsPerWorkerQuery, "History_Events");
-            dataTableAmountEventsPerWorker.Columns.Add("LineSeriesGraph", typeof(SeriesCollection));
+            dataTableAmountEventsPerWorker = InitialGraphColumnsToDefault(dataTableAmountEventsPerWorker);
+            /*dataTableAmountEventsPerWorker.Columns.Add("LineSeriesGraph", typeof(SeriesCollection));
             dataTableAmountEventsPerWorker.Columns.Add("LabelsGraph", typeof(string[]));
             dataTableAmountEventsPerWorker.Columns.Add("TitleGraph", typeof(string));
             foreach (DataRow row in dataTableAmountEventsPerWorker.Rows)
@@ -634,11 +661,28 @@ namespace CovidKeeperFrontend.Model
                 row["LineSeriesGraph"] = default;
                 row["LabelsGraph"] = default;
                 row["TitleGraph"] = default;
-            }
+            }*/
             WeekOrMonthForDateRangeTextProperty = "days";
             AmountEventsByWorkerTableProperty = dataTableAmountEventsPerWorker;
         }
 
+        //Funtion that reutrns the dataTableAmountEventsPerWorker with default values in graph's columns
+        private DataTable InitialGraphColumnsToDefault(DataTable dataTableAmountEventsPerWorker)
+        {
+            dataTableAmountEventsPerWorker.Columns.Add("LineSeriesGraph", typeof(SeriesCollection));
+            dataTableAmountEventsPerWorker.Columns.Add("LabelsGraph", typeof(string[]));
+            dataTableAmountEventsPerWorker.Columns.Add("TitleGraph", typeof(string));
+            //Initialize the new columns to be default value
+            foreach (DataRow row in dataTableAmountEventsPerWorker.Rows)
+            {
+                row["LineSeriesGraph"] = default;
+                row["LabelsGraph"] = default;
+                row["TitleGraph"] = default;
+            }
+            return dataTableAmountEventsPerWorker;
+        }
+
+        //Function that gets the average events per week with range from startDate to endDate for each worker and updating the AmountEventsByWorkerTableProperty
         public void GetAvgEventsPerWeekPerWorker(string idWorker)
         {
             string avgEventsPerWeekPerWorkerQuery = "Select DISTINCT DATEPART(WEEK, Time_of_event) AS WW, DATEPART(year, Time_of_event) AS Year, " +
@@ -657,12 +701,15 @@ namespace CovidKeeperFrontend.Model
                 }
                 DataTable tempAmountEventsByWorkerTableProperty = AmountEventsByWorkerTableProperty;
                 DataRow[] foundRows = tempAmountEventsByWorkerTableProperty.Select("Id_worker = " + idWorker);
+                //Set the graph that the client wanted to see
                 foundRows[0]["LineSeriesGraph"] = GetLineSeriesGraph("Total Events Per Week Of " + foundRows[0]["FullName"].ToString());
                 foundRows[0]["LabelsGraph"] = (new List<string>(this.workWeekAndAmountEventsDict.Keys)).ToArray();
                 foundRows[0]["TitleGraph"] = WeekOrMonth.Week;
                 AmountEventsByWorkerTableProperty = tempAmountEventsByWorkerTableProperty;
             }
         }
+
+        //Function that returns SeriesCollection that contains the content of the graph that we want
         private SeriesCollection GetLineSeriesGraph(string titleForLegend)
         {
             ChartValues<double> values = new ChartValues<double>();
@@ -679,6 +726,8 @@ namespace CovidKeeperFrontend.Model
                         }
                     };
         }
+
+        //Function that returns dictionary in which the values are reset
         private Dictionary<string, double> SetValuesInDictToZero(Dictionary<string, double> dictToSet)
         {
             foreach (var key in dictToSet.Keys.ToList())

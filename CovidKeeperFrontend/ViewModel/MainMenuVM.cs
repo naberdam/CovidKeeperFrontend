@@ -22,16 +22,13 @@ namespace CovidKeeperFrontend.ViewModel
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
-
+        //Property of binding MinutesBreakForMailsProperty to view
         public int VM_MinutesBreakForMailsProperty
         {
-            set 
-            { 
-                model.MinutesBreakForMailsProperty = value;
-            }
+            set { model.MinutesBreakForMailsProperty = value; }
         }
+        //Property of binding MinutesBreakForMailsProperty to view for checking the rules
         private string minutesBreakForMails;
-
         public string MinutesBreakForMailsProperty
         {
             get { return minutesBreakForMails; }

@@ -46,6 +46,10 @@ namespace CovidKeeperFrontend.Model
         {
             await azureSingleton.UploadImageToStorage(idWorker, imageToByte);
         }
+        public async Task DeleteImageFromStorage(string idWorker)
+        {
+            await azureSingleton.DeleteImageFromStorage(idWorker);
+        }
         //Function that responsible to the queries like insert, upload and delete in azure SQL.
         //fieldNameToValueDict is a dictionary with the field names of the table that we want to change
         //with their values. 
@@ -58,6 +62,7 @@ namespace CovidKeeperFrontend.Model
         {
             return azureSingleton.GetDataTableByQuery(selectQuery, tableName);
         }
+        //Function that insert events by id according to the given id in case that the client wanted to edit the worker's id
         public async Task InsertEventsListById(List<object[]> eventsList, string idWorker)
         {
             await azureSingleton.InsertEventsListById(eventsList, idWorker);

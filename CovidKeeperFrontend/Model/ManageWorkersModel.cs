@@ -13,7 +13,9 @@ namespace CovidKeeperFrontend.Model
     //This class is the model of HomeUserControl
     public class ManageWorkersModel : AbstractModel
     {
+        
         public NotifyTaskCompletion<int> UpdateHandleInAnalayzerConfigAsync { get; private set; }
+        //Property that defines the workers details table
         private DataTable workerDetailsTable = default;
         public DataTable WorkerDetailsTableProperty
         {
@@ -23,13 +25,19 @@ namespace CovidKeeperFrontend.Model
                 if (workerDetailsTable != value)
                 {
                     workerDetailsTable = value;
+                    //CountWorkersInWorkersDetailsTableProperty = value.Rows.Count.ToString();
+                    //Update the CountWorkersInWorkersDetailsTableProperty with the number of rows of this dataTable
                     CountWorkersInWorkersDetailsTableProperty = value.Rows.Count.ToString();
+                    //Update the flag of UpdateHandleInAnalayzerConfig
                     UpdateHandleInAnalayzerConfigAsync = new NotifyTaskCompletion<int>(UpdateHandleInAnalayzerConfig());
+                    //This is WorkersDetailsTableProperty and not SearchWorkerDetailsTableProperty
                     SearchOrWorkersTableProperty = false;
                     NotifyPropertyChanged("WorkerDetailsTableProperty");
                 }
             }
         }
+
+        //Property that defines the SearchWorkerDetailsTableProperty when the client wants to search workers
         private DataTable searchWorkerDetailsTable = default;
         public DataTable SearchWorkerDetailsTableProperty
         {
@@ -39,22 +47,25 @@ namespace CovidKeeperFrontend.Model
                 if (searchWorkerDetailsTable != value)
                 {
                     searchWorkerDetailsTable = value;
+                    //Update the CountWorkersInWorkersDetailsTableProperty with the number of rows of this dataTable
                     CountWorkersInWorkersDetailsTableProperty = value.Rows.Count.ToString();
+                    //This is SearchWorkerDetailsTableProperty and not WorkersDetailsTableProperty
                     SearchOrWorkersTableProperty = true;
                     NotifyPropertyChanged("WorkerDetailsTableProperty");
                 }
             }
         }
-        private bool searchOrWorkersTable = false;
 
+        //Property that defines if we need to show the client the SerachTable or the WorkersDetailsTable
+        private bool searchOrWorkersTable = false;
         public bool SearchOrWorkersTableProperty
         {
             get { return searchOrWorkersTable; }
             set { searchOrWorkersTable = value; }
         }
 
+        //Property that defines the count workers in WorkersDetailsTable
         private string countWorkersInWorkersDetailsTable;
-
         public string CountWorkersInWorkersDetailsTableProperty
         {
             get { return countWorkersInWorkersDetailsTable; }
@@ -67,18 +78,22 @@ namespace CovidKeeperFrontend.Model
                 }
             }
         }
+
         public NotifyTaskCompletion<int> RefreshData { get; private set; }
         public ManageWorkersModel()
         {
+            //Refresh data
             RefreshData = new NotifyTaskCompletion<int>(RefreshDataAsync());
         }
 
+        //Override this function to refresh the data in the ManageWorkersUserControl
         public override async Task<int> RefreshDataAsync()
         {
-            await GetWorkersDetailsTemp();
+            await GetWorkersDetailsTable();
             return 1;
         }
 
+        //Function that return DataTable that is part of WorkerDetailsTableProperty according to the given query
         private DataTable SearchTableByQuery(string query)
         {
             WorkerDetailsTableProperty.CaseSensitive = false;
@@ -95,19 +110,27 @@ namespace CovidKeeperFrontend.Model
             }
             return dataTable;
         }
+
+        //Function that reponsible for searching worker by the given id
         public void SearchById(string idWorker)
         {
             SearchWorkerDetailsTableProperty = SearchTableByQuery("Id like '%" + idWorker + "%'");
         }
+
+        //Function that reponsible for searching worker by the given fullName
         public void SearchByFullName(string fullName)
         {
             SearchWorkerDetailsTableProperty = SearchTableByQuery("FullName like '%" + fullName + "%'");
         }
+
+        //Function that reponsible for searching worker by the given email address
         public void SearchByEmail(string emailAddress)
         {
             SearchWorkerDetailsTableProperty = SearchTableByQuery("Email_address like '%" + emailAddress + "%'");
         }
-        public async Task GetWorkersDetailsTemp()
+
+        //Function that gets the the workers details table
+        public async Task GetWorkersDetailsTable()
         {
             await Task.Run(() =>
             {
@@ -123,6 +146,8 @@ namespace CovidKeeperFrontend.Model
                 WorkerDetailsTableProperty = dataTableImages;
             });            
         }
+
+        //Function that updates to 1 the Analayzer's flag in the azure database
         private async Task<int> UpdateHandleInAnalayzerConfig()
         {
             string updateQuery = @"UPDATE [dbo].[Analayzer_config] SET Handle = @Handle";
@@ -133,6 +158,8 @@ namespace CovidKeeperFrontend.Model
             await QueryDatabaseWithDict(updateQuery, fieldNameToValueDict);
             return default;
         }
+
+        //Function that insert worker to azure database and updating the WorkerDetailsTableProperty
         public async Task InsertWorker(string idWorker, string fullname, string emailAddress, BitmapImage imagePath)
         {
             string insertQuery = @"INSERT INTO [dbo].[Workers] VALUES (@Id, @Fullname, @Email_address);";
@@ -150,6 +177,7 @@ namespace CovidKeeperFrontend.Model
             WorkerDetailsTableProperty = workerDetailsTableTemp;
         }
 
+        //Function that converts BitmapImage to byte array
         private byte[] ImagePathToByteArray(BitmapImage imagePath)
         {
             Image temp = BitmapImage2Bitmap(imagePath);
@@ -157,6 +185,8 @@ namespace CovidKeeperFrontend.Model
             temp.Save(strm, System.Drawing.Imaging.ImageFormat.Jpeg);
             return strm.ToArray();
         }
+
+        //Function that converts BitmapImage to Bitmap
         private Bitmap BitmapImage2Bitmap(BitmapImage bitmapImage)
         {
             using (MemoryStream outStream = new MemoryStream())
@@ -170,6 +200,7 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
+        //Function that updates the worker's details and updates the WorkerDetalisTable
         public async Task<int> UpdateWorkerDetails(string idWorkerInDataTable, string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
         {
             byte[] imageToByte = ImagePathToByteArray(imagePath);
@@ -186,6 +217,7 @@ namespace CovidKeeperFrontend.Model
             {
                 await UpdateWorkerId(idWorkerInDataTable, idWorker, fullname, emailAddress, imagePath);
             }
+            //The id has not changed
             else
             {
                 string updateQuery = @"UPDATE [dbo].[Workers] SET FullName = @FullName, Email_address = @Email_address Where Id = @Id;";
@@ -196,21 +228,25 @@ namespace CovidKeeperFrontend.Model
                     { "@Email_address", emailAddress }
                 };
                 await QueryDatabaseWithDict(updateQuery, fieldNameToValueDict);                
-            }
-            
+            }            
             return default;
         }
 
-        private async Task UpdateWorkerIdToNewId(string newIdWorker, string idWorkerToUpdate)
+        //Function that updates worker's details in case the worker's id has been changed
+        private async Task UpdateWorkerIdToNewId(string newIdWorker, string idWorkerToUpdate, string fullname, string emailAddress)
         {
-            string updateQuery = @"UPDATE [dbo].[Workers] SET Id = @Id Where Id = " + idWorkerToUpdate;
+            string updateQuery = @"UPDATE [dbo].[Workers] SET Id = @Id, FullName = @FullName, Email_address = @Email_address Where Id = " + idWorkerToUpdate;
             Dictionary<string, string> fieldNameToValueDict = new Dictionary<string, string>
             {
-                { "@Id", newIdWorker }
+                { "@Id", newIdWorker },
+                { "@FullName", fullname },
+                { "@Email_address", emailAddress }
             };
             await QueryDatabaseWithDict(updateQuery, fieldNameToValueDict);
         }
 
+        //Function that resposible for updating worker's details in case the worker's id has been changed,
+        //so we need to delete and save all the worker's events, updating worker's id and then insert the events with the new id
         private async Task UpdateWorkerId(string idWorkerInDataTable, string idWorker, string fullname, string emailAddress, BitmapImage imagePath)
         {
             List<object[]> eventsByIdList = QuerySelectOfMultiRows("select * from [dbo].[History_Events] where Id_worker = '" + idWorkerInDataTable + "'");
@@ -219,13 +255,15 @@ namespace CovidKeeperFrontend.Model
                 string deleteQuery = @"DELETE FROM [dbo].[History_Events] WHERE Id_worker = '" + idWorkerInDataTable + "';";
                 await QueryDatabaseWithDict(deleteQuery);
             }
-            await UpdateWorkerIdToNewId(idWorker, idWorkerInDataTable);
+            await UpdateWorkerIdToNewId(idWorker, idWorkerInDataTable, fullname, emailAddress);
+            await DeleteImageFromStorage(idWorkerInDataTable);
             if (eventsByIdList != null)
             {
                 await InsertEventsListById(eventsByIdList, idWorker);
             }
         }
 
+        //Function that deletes worker and updating the WorkerDetailsTableProperty
         public async Task DeleteWorker(string idWorker, int indexOfSelectedRow=-1)
         {
             string deleteQuery = @"DELETE FROM [dbo].[Workers] WHERE Id = " + idWorker + ";";
@@ -238,6 +276,8 @@ namespace CovidKeeperFrontend.Model
                 WorkerDetailsTableProperty = workerDetailsTableTemp;
             }            
         }
+
+        //Function that refresh WorkerDetailsTableProperty and returns it to the ManageWorkersUserControl
         public void GetWorkersDetailsAfterRefresh()
         {
             SearchOrWorkersTableProperty = false;

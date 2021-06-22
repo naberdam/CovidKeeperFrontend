@@ -22,44 +22,51 @@ namespace CovidKeeperFrontend.ViewModel
                 NotifyPropertyChanged("VM_" + e.PropertyName);
             };
         }
+
+        //Function that reponsible for what happen when the client click on the active button
         public async Task ActiveButtonClicked()
         {
             await this .model.StartOrCloseProgram();
         }
 
-        public string VM_HowManyWorkersWithoutMaskProperty
+        //Property of binding HowManyWorkersWithoutMaskTodayProperty to view
+        public string VM_HowManyWorkersWithoutMaskTodayProperty
         {
-            get { return model.HowManyWorkersWithoutMaskProperty; }
+            get { return model.HowManyWorkersWithoutMaskTodayProperty; }
         }
+        //Property of binding HowManyEventsTodayProperty to view
         public string VM_HowManyEventsTodayProperty
         {
             get { return model.HowManyEventsTodayProperty; }
         }
-
+        //Property of binding PercentageWorkersWithoutMaskTodayPerYesterdayProperty to view
         public string VM_PercentageWorkersWithoutMaskTodayPerYesterdayProperty
         {
             get 
             {
                 if (model.PercentageWorkersWithoutMaskTodayPerYesterdayProperty > 0)
                 {
+                    //Set the ForegroundColorPercentageWorkersProperty to be red
                     ForegroundColorPercentageWorkersProperty = System.Windows.Media.Brushes.Red;
                     return GetFormatPercentageWorkers(model.PercentageWorkersWithoutMaskTodayPerYesterdayProperty, "+");
                 }
                 else if (model.PercentageWorkersWithoutMaskTodayPerYesterdayProperty < 0)
                 {
+                    //Set the ForegroundColorPercentageWorkersProperty to be green
                     ForegroundColorPercentageWorkersProperty = System.Windows.Media.Brushes.Green;
                     return GetFormatPercentageWorkers(model.PercentageWorkersWithoutMaskTodayPerYesterdayProperty * (-1), "-");
                 }
                 else
                 {
+                    //Set the ForegroundColorPercentageWorkersProperty to be orange
                     ForegroundColorPercentageWorkersProperty = System.Windows.Media.Brushes.Orange;
                     return String.Format("{0:0}%", model.PercentageWorkersWithoutMaskTodayPerYesterdayProperty);
                 }
                 
             }
         }
+        //Property of binding ForegroundColorPercentageWorkersProperty to view
         private System.Windows.Media.Brush foregroundColorPercentageWorkers = System.Windows.Media.Brushes.DarkSeaGreen;
-
         public System.Windows.Media.Brush ForegroundColorPercentageWorkersProperty
         {
             get { return foregroundColorPercentageWorkers; }
@@ -69,6 +76,7 @@ namespace CovidKeeperFrontend.ViewModel
                 NotifyPropertyChanged("ForegroundColorPercentageWorkersProperty");
             }
         }
+        //Property that defines the format of percentage workers
         private string GetFormatPercentageWorkers(float percentageWorkers, string signPercentage)
         {
             if (percentageWorkers > 0 && percentageWorkers < 10)
@@ -89,12 +97,14 @@ namespace CovidKeeperFrontend.ViewModel
             }
             return String.Format(signPercentage + "{0:00000}%", percentageWorkers);
         }
+        //Property of binding ActiveButtonContentProperty to view
         public string VM_ActiveButtonContentProperty
         {
             get
             {
                 if (this.model.ActiveButtonContentProperty == HomeModel.HandleFlag.Start)
                 {
+                    //Set the ActiveButton to green
                     BackgroundColorActiveButtonProperty = System.Windows.Media.Color.FromRgb(0, 93, 21);
                     BackgroundColorActiveButtonSecondProperty = System.Windows.Media.Color.FromRgb( 0, 170, 39);
                     BackgroundColorActiveButtonThirdProperty = System.Windows.Media.Color.FromRgb(0, 245, 11);
@@ -102,6 +112,7 @@ namespace CovidKeeperFrontend.ViewModel
                 }
                 else
                 {
+                    //Set the ActiveButton to red
                     BackgroundColorActiveButtonProperty = System.Windows.Media.Color.FromRgb(245, 0, 0);
                     BackgroundColorActiveButtonSecondProperty = System.Windows.Media.Color.FromRgb(170, 0, 0);
                     BackgroundColorActiveButtonThirdProperty = System.Windows.Media.Color.FromRgb(93, 0, 0);
@@ -109,6 +120,7 @@ namespace CovidKeeperFrontend.ViewModel
                 return this.model.ActiveButtonContentProperty.ToString();
             }
         }
+        //Property that defines the background the first color of th ActiveButton
         private System.Windows.Media.Color backgroundColorActiveButton = System.Windows.Media.Color.FromRgb(0, 93, 21);
         public System.Windows.Media.Color BackgroundColorActiveButtonProperty
         {
@@ -119,6 +131,7 @@ namespace CovidKeeperFrontend.ViewModel
                 NotifyPropertyChanged("BackgroundColorActiveButtonProperty");
             }
         }
+        //Property that defines the background the second color of th ActiveButton
         private System.Windows.Media.Color backgroundColorActiveButtonSecond = System.Windows.Media.Color.FromRgb(0, 170, 39);
         public System.Windows.Media.Color BackgroundColorActiveButtonSecondProperty
         {
@@ -129,6 +142,7 @@ namespace CovidKeeperFrontend.ViewModel
                 NotifyPropertyChanged("BackgroundColorActiveButtonSecondProperty");
             }
         }
+        //Property that defines the background the third color of th ActiveButton
         private System.Windows.Media.Color backgroundColorActiveButtonThird = System.Windows.Media.Color.FromRgb(0, 245, 11);
         public System.Windows.Media.Color BackgroundColorActiveButtonThirdProperty
         {

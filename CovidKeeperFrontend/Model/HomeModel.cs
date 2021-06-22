@@ -9,21 +9,23 @@ namespace CovidKeeperFrontend.Model
     //This class is the model of HomeUserControl
     public class HomeModel : AbstractModel
     {
-        private string howManyWorkersWithoutMask = "";
-        public string HowManyWorkersWithoutMaskProperty
+        //Property that defines how many workers without mask today out of all workers
+        private string howManyWorkersWithoutTodayMask = "";
+        public string HowManyWorkersWithoutMaskTodayProperty
         {
-            get { return howManyWorkersWithoutMask; }
+            get { return howManyWorkersWithoutTodayMask; }
             set
             {
-                if (howManyWorkersWithoutMask != value)
+                if (howManyWorkersWithoutTodayMask != value)
                 {
-                    howManyWorkersWithoutMask = value;
+                    howManyWorkersWithoutTodayMask = value;
                     NotifyPropertyChanged("HowManyWorkersWithoutMaskProperty");
                 }
             }
         }
-        private string howManyEventsToday;
 
+        //Property that defines how many events were today
+        private string howManyEventsToday;
         public string HowManyEventsTodayProperty
         {
             get { return howManyEventsToday; }
@@ -36,8 +38,9 @@ namespace CovidKeeperFrontend.Model
                 }
             }
         }
-        private float percentageWorkersWithoutMaskTodayPerYesterday = 0;
 
+        //Property that defines the percentage workers without mask today per yesterday
+        private float percentageWorkersWithoutMaskTodayPerYesterday = 0;
         public float PercentageWorkersWithoutMaskTodayPerYesterdayProperty
         {
             get { return percentageWorkersWithoutMaskTodayPerYesterday; }
@@ -50,15 +53,16 @@ namespace CovidKeeperFrontend.Model
                 }
             }
         }
+
         //Enum that represents the status of the back of the program if it is closed or not
         public enum HandleFlag
         {
-            Close = 1,
+            Stop = 1,
             Start = 0
         }
 
+        //Property that defines the status of the active button content to be "close" or "start"
         private HandleFlag activeButtonContent;
-
         public HandleFlag ActiveButtonContentProperty
         {
             get { return activeButtonContent; }
@@ -91,7 +95,7 @@ namespace CovidKeeperFrontend.Model
                 {
                     if (countAllWorkers != null)
                     {
-                        HowManyWorkersWithoutMaskProperty = counter[0].ToString() + "/" + countAllWorkers;
+                        HowManyWorkersWithoutMaskTodayProperty = counter[0].ToString() + "/" + countAllWorkers;
                     }
                 }
             });
@@ -178,7 +182,7 @@ namespace CovidKeeperFrontend.Model
             {
                 //change the value from 0 to 1
                 await UpdateHandleInStarter("0", "1");
-                ActiveButtonContentProperty = HandleFlag.Close;
+                ActiveButtonContentProperty = HandleFlag.Stop;
             }
             else
             {

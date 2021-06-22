@@ -35,62 +35,72 @@ namespace CovidKeeperFrontend.ViewModel
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
 
-
+        //Property of binding SelectedValueOfStatisticsOptionListProperty to view
         public StatisticsOptionListEnum VM_SelectedValueOfStatisticsOptionListProperty
         {
-            set
-            {
-                this.model.SelectedValueOfStatisticsOptionListProperty = value;
-            }
+            set { this.model.SelectedValueOfStatisticsOptionListProperty = value; }
         }
+        //Property of binding AmountEventsByWorkerTableProperty to view
         public DataTable VM_AmountEventsByWorkerTableProperty
         {
             get { return model.AmountEventsByWorkerTableProperty; }
         }
+        //Property of binding ColumnGraphProperty to view
         public List<GraphContent> VM_ColumnGraphProperty
         {
             get { return this.model.ColumnGraphProperty; }
         }
+        //Property of binding StartDateInDatePickerProperty to view
         public DateTime VM_StartDateInDatePickerProperty
         {
             get { return this.model.StartDateInDatePickerProperty.Date; }
         }
+        //Property of binding SelectedDateStartInDatePickerProperty to view
         public DateTime VM_SelectedDateStartInDatePickerProperty
         {
             set { this.model.SelectedDateStartInDatePickerProperty = value; }
         }
+        //Property of binding StartDateInDatePickerAfterPickProperty to view
         public DateTime VM_StartDateInDatePickerAfterPickProperty
         {
             get { return this.model.StartDateInDatePickerAfterPickProperty; }
         }
+        //Property of binding ColumnChartTitleProperty to view and delete '_'
         public string VM_ColumnChartTitleProperty
         {
             get { return this.model.ColumnChartTitleProperty.ToString().Replace("_", " "); }
         }
+        //Property of binding ColumnChartSubTitleProperty to view and delete '_'
         public string VM_ColumnChartSubTitleProperty
         {
             get { return this.model.ColumnChartSubTitleProperty.ToString().Replace("_", " "); }
         }
+        //Property of binding WeekOrMonthForDateRangeTextProperty to view
         public string VM_WeekOrMonthForDateRangeTextProperty
         {
             get { return this.model.WeekOrMonthForDateRangeTextProperty; }
         }
+        //Property of binding IdWorkerForLineGraphProperty to view
         public string VM_IdWorkerForLineGraphProperty 
         {
             set { this.model.IdWorkerForLineGraphProperty = value; }
         }
+        //Function that calls to model function for getting the average events per month with date range
         public void GetAvgEventsPerMonthWithRange(DateTime startDate, DateTime endDate)
         {
             this.model.GetAvgEventsPerMonthWithRange(startDate, endDate);
         }
+        //Function that calls to model function for getting the average events per week with date range
         public void GetAvgEventsPerWeekWithRange(DateTime startDate, DateTime endDate)
         {
             this.model.GetAvgEventsPerWeekWithRange(startDate, endDate);
         }
+        //Function that calls to model function for getting the average events per weekday with date range
         public void GetAvgEventsPerWeekdayWithRange(DateTime startDate, DateTime endDate)
         {
             this.model.GetAvgEventsPerWeekdayWithRange(startDate, endDate);
         }
+        //Function that calls to model function for getting the amount events for each worker with date range
         public void GetAmountEventsByWorkerWithRange(DateTime startDate, DateTime endDate)
         {
             this.model.GetAmountEventsByWorkerWithRange(startDate, endDate);

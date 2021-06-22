@@ -1,0 +1,4 @@
+{
+"Database":"Server=tcp:mysqlservercovid.database.windows.net,1433;Initial Catalog=myCovidKeeper;Persist Security Info=False;User ID=azureuser;Password=Amitai5925;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
+"Storage":"DefaultEndpointsProtocol=https;AccountName=faceimages2;AccountKey=vlaKfbwxn8eU1kZGo3KjuFIsgQ0BGot1MRCvs6x0mB923Yx2FOXv4XQ82Hgi/l4iKb4iM/DSNcAeezmYYxxFxw==;EndpointSuffix=core.windows.net"
+}

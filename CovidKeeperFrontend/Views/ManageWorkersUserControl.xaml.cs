@@ -147,37 +147,6 @@ namespace CovidKeeperFrontend.Views
                 }
             }
         }
-        /*private void CheckChangeOfSelection(object sender)
-        {
-            DataGrid gd = (DataGrid)sender;
-
-            DataRowView rowSelectedNow = gd.CurrentItem as DataRowView;
-            //DataRowView rowSelectedNow = gd.SelectedItem as DataRowView;
-            if (rowViewSelected == rowSelectedNow)
-            {
-                return;
-            }
-            else if (rowSelectedNow != null && rowViewSelected == default)
-            {
-                rowViewSelected = rowSelectedNow;
-                indexOfSelectedRow = gd.Items.IndexOf(gd.CurrentItem);
-            }
-            else if (rowSelectedNow != null && rowViewSelected != default)
-            {
-                string idWorker = rowViewSelected["Id"].ToString();
-                string emailAddress = rowViewSelected["Email_address"].ToString();
-                string fullName = rowViewSelected["Fullname"].ToString();
-                SetImageFromTableToBitmapImage(rowViewSelected);
-                (Application.Current as App).ManageWorkersViewModel.UpdateWorkerDetails(idWorker, fullName, emailAddress, bitmapImage, indexOfSelectedRow);
-                indexOfSelectedRow = gd.Items.IndexOf(gd.CurrentItem);
-                //ClearFields();
-                rowViewSelected = rowSelectedNow;
-                this.IsEnabled = true;
-                SetIsEnabled(true);
-                DialogHost.CloseDialogCommand.Execute(null, null);
-            }
-        }*/
-
         private void PlusButton_Click(object sender, RoutedEventArgs e)
         {
             this.IsEnabled = false;

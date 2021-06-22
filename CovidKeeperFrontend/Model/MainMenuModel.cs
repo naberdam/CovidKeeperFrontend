@@ -10,6 +10,7 @@ namespace CovidKeeperFrontend.Model
     public class MainMenuModel : AbstractModel
     {
         public NotifyTaskCompletion<int> UpdateTimeBreakForMailsAsync { get; private set; }
+        //Property that defines that minutes break between sending mails to the workers in case the workers has some events in the same day
         private int minutesBreakForMails;
         public int MinutesBreakForMailsProperty
         {
