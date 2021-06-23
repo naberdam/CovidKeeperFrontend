@@ -26,15 +26,15 @@ namespace CovidKeeperFrontend.Views
     public partial class StatisticalDataUserControl : UserControl
     {
         DataGridRow lastSelectedRow = default;
-        MainWindowTemp mainWindowTemp = default;
+        MainMenu mainWindowTemp = default;
         StatisticsOptionListEnum statisticsOptionListEnum = StatisticsOptionListEnum.Nothing;
         Button detailsBtn = default;
         DataGridRow gridRowSelected = default;
         public enum StatisticsOptionListEnum
         {
-            AGE_PER_WEEK = 0,
-            AGE_PER_MONTH = 1,
-            AGE_PER_WEEKDAY = 2,
+            AVG_PER_WEEK = 0,
+            AVG_PER_MONTH = 1,
+            AVG_PER_WEEKDAY = 2,
             TOTAL_EVENTS = 3,
             Nothing = 4
         }
@@ -45,8 +45,8 @@ namespace CovidKeeperFrontend.Views
 
         public void ClearFields()
         {
-            List<StatisticsOptionListEnum> buttonContentList = new List<StatisticsOptionListEnum>() { StatisticsOptionListEnum.AGE_PER_WEEK, 
-                StatisticsOptionListEnum.AGE_PER_MONTH, StatisticsOptionListEnum.AGE_PER_WEEKDAY, StatisticsOptionListEnum.TOTAL_EVENTS };
+            List<StatisticsOptionListEnum> buttonContentList = new List<StatisticsOptionListEnum>() { StatisticsOptionListEnum.AVG_PER_WEEK, 
+                StatisticsOptionListEnum.AVG_PER_MONTH, StatisticsOptionListEnum.AVG_PER_WEEKDAY, StatisticsOptionListEnum.TOTAL_EVENTS };
             List<MyButton> buttons = new List<MyButton>();
             int buttonId = 1;
             foreach (var content in buttonContentList)
@@ -65,13 +65,14 @@ namespace CovidKeeperFrontend.Views
             }
             AmountEventPerWeekTable.SelectedIndex = -1;
             lastSelectedRow = default;
-            ColumnGraph.Visibility = Visibility.Hidden;
+            ColumnGraph.Visibility = Visibility.Visible;
             PieGraph.Visibility = Visibility.Hidden;
             ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
-            ShowGraphInThisRange.Visibility = Visibility.Hidden;
+            /*ShowGraphInThisRange.Visibility = Visibility.Hidden;*/
             GridCursor.Visibility = Visibility.Hidden;
-            ShowGraphInThisRangeText.Visibility = Visibility.Hidden;
+            /*ShowGraphInThisRangeText.Visibility = Visibility.Visible;*/
             statisticsOptionListEnum = StatisticsOptionListEnum.Nothing;
+            (Application.Current as App).StatisticalDataViewModel.GraphInRangeOrNotProperty = false;
             detailsBtn = default;
             gridRowSelected = default;
         }
@@ -94,8 +95,8 @@ namespace CovidKeeperFrontend.Views
             GridCursor.Visibility = Visibility.Visible;
             switch (statisticsOptionListEnum)
             {
-                case StatisticsOptionListEnum.AGE_PER_WEEK:
-                    (Application.Current as App).StatisticalDataViewModel.VM_SelectedValueOfStatisticsOptionListProperty = StatisticsOptionListEnum.AGE_PER_WEEK;
+                case StatisticsOptionListEnum.AVG_PER_WEEK:
+                    (Application.Current as App).StatisticalDataViewModel.VM_SelectedValueOfStatisticsOptionListProperty = StatisticsOptionListEnum.AVG_PER_WEEK;
                     ColumnGraph.Visibility = Visibility.Visible;
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
@@ -103,8 +104,8 @@ namespace CovidKeeperFrontend.Views
                     ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
                     break;
-                case StatisticsOptionListEnum.AGE_PER_MONTH:
-                    (Application.Current as App).StatisticalDataViewModel.VM_SelectedValueOfStatisticsOptionListProperty = StatisticsOptionListEnum.AGE_PER_MONTH;
+                case StatisticsOptionListEnum.AVG_PER_MONTH:
+                    (Application.Current as App).StatisticalDataViewModel.VM_SelectedValueOfStatisticsOptionListProperty = StatisticsOptionListEnum.AVG_PER_MONTH;
                     ColumnGraph.Visibility = Visibility.Visible;
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
@@ -112,8 +113,8 @@ namespace CovidKeeperFrontend.Views
                     ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
                     break;
-                case StatisticsOptionListEnum.AGE_PER_WEEKDAY:
-                    (Application.Current as App).StatisticalDataViewModel.VM_SelectedValueOfStatisticsOptionListProperty = StatisticsOptionListEnum.AGE_PER_WEEKDAY;
+                case StatisticsOptionListEnum.AVG_PER_WEEKDAY:
+                    (Application.Current as App).StatisticalDataViewModel.VM_SelectedValueOfStatisticsOptionListProperty = StatisticsOptionListEnum.AVG_PER_WEEKDAY;
                     ColumnGraph.Visibility = Visibility.Hidden;
                     PieGraph.Visibility = Visibility.Visible;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
@@ -122,6 +123,7 @@ namespace CovidKeeperFrontend.Views
                     CommentText.Visibility = Visibility.Visible;
                     break;
                 case StatisticsOptionListEnum.TOTAL_EVENTS:
+                    (Application.Current as App).StatisticalDataViewModel.GraphInRangeOrNotProperty = false;
                     (Application.Current as App).StatisticalDataViewModel.VM_SelectedValueOfStatisticsOptionListProperty = StatisticsOptionListEnum.TOTAL_EVENTS;
                     ColumnGraph.Visibility = Visibility.Hidden;
                     PieGraph.Visibility = Visibility.Hidden;
@@ -147,7 +149,7 @@ namespace CovidKeeperFrontend.Views
                 mainWindowTemp.IsEnabled = isEnable;
             }
         }
-        public void SetMainWindow(MainWindowTemp mainWindowTemp)
+        public void SetMainWindow(MainMenu mainWindowTemp)
         {
             this.mainWindowTemp = mainWindowTemp;
         }
@@ -175,16 +177,17 @@ namespace CovidKeeperFrontend.Views
             }
             switch (statisticsOptionListEnum)
             {
-                case StatisticsOptionListEnum.AGE_PER_WEEK:
+                case StatisticsOptionListEnum.AVG_PER_WEEK:
                     (Application.Current as App).StatisticalDataViewModel.GetAvgEventsPerWeekWithRange(startDate, endDate);
                     break;
-                case StatisticsOptionListEnum.AGE_PER_MONTH:
+                case StatisticsOptionListEnum.AVG_PER_MONTH:
                     (Application.Current as App).StatisticalDataViewModel.GetAvgEventsPerMonthWithRange(startDate, endDate);
                     break;
-                case StatisticsOptionListEnum.AGE_PER_WEEKDAY:
+                case StatisticsOptionListEnum.AVG_PER_WEEKDAY:
                     (Application.Current as App).StatisticalDataViewModel.GetAvgEventsPerWeekdayWithRange(startDate, endDate);
                     break;
                 case StatisticsOptionListEnum.TOTAL_EVENTS:
+                    (Application.Current as App).StatisticalDataViewModel.GraphInRangeOrNotProperty = true;
                     (Application.Current as App).StatisticalDataViewModel.GetAmountEventsByWorkerWithRange(startDate, endDate);
                     break;
                 case StatisticsOptionListEnum.Nothing:

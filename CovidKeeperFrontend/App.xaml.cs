@@ -1,6 +1,7 @@
 ﻿using CovidKeeperFrontend.Model;
 using CovidKeeperFrontend.Model.Database;
 using CovidKeeperFrontend.ViewModel;
+using CovidKeeperFrontend.Views;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -63,7 +64,7 @@ namespace CovidKeeperFrontend
                 {
                     //initialize the main window, set it as the application main window
                     //and close the splash screen
-                    var mainWindow = new MainWindowTemp();
+                    var mainWindow = new MainMenu();
                     this.MainWindow = mainWindow;
                     
                     splashScreen.Close();

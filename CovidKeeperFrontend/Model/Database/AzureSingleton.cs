@@ -17,7 +17,7 @@ namespace CovidKeeperFrontend.Model.Database
         private readonly SqlConnection sqlConnection;
         private static readonly Lazy<AzureSingleton> lazy = new Lazy<AzureSingleton>(() => new AzureSingleton());
         private readonly CloudStorageAccount cloudStorageAccount;
-        private readonly string configFileName = "CovidKeeperFrontend\\configAzure.json";
+        private readonly string configFileName = "CovidKeeperFrontend\\Files\\configAzure.json";
         private readonly string databaseKey = "Database";
         private readonly string storageKey = "Storage";
         private readonly string endOfFile = ".jpg";

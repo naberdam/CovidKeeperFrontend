@@ -40,6 +40,10 @@ namespace CovidKeeperFrontend.ViewModel
         {
             set { this.model.SelectedValueOfStatisticsOptionListProperty = value; }
         }
+        public bool GraphInRangeOrNotProperty
+        {
+            set { this.model.GraphInRangeOrNotProperty = value; }
+        }
         //Property of binding AmountEventsByWorkerTableProperty to view
         public DataTable VM_AmountEventsByWorkerTableProperty
         {
@@ -60,6 +64,11 @@ namespace CovidKeeperFrontend.ViewModel
         {
             set { this.model.SelectedDateStartInDatePickerProperty = value; }
         }
+        //Property of binding SelectedDateEndInDatePickerProperty to view
+        public DateTime VM_SelectedDateEndInDatePickerProperty
+        {
+            set { this.model.SelectedDateEndInDatePickerProperty = value; }
+        }
         //Property of binding StartDateInDatePickerAfterPickProperty to view
         public DateTime VM_StartDateInDatePickerAfterPickProperty
         {
@@ -69,6 +78,11 @@ namespace CovidKeeperFrontend.ViewModel
         public string VM_ColumnChartTitleProperty
         {
             get { return this.model.ColumnChartTitleProperty.ToString().Replace("_", " "); }
+        }
+        //Property of binding ColumnChartBelowTitleProperty to view and delete '_'
+        public string VM_ColumnChartBelowTitleProperty
+        {
+            get { return this.model.ColumnChartBelowTitleProperty; }
         }
         //Property of binding ColumnChartSubTitleProperty to view and delete '_'
         public string VM_ColumnChartSubTitleProperty

@@ -31,7 +31,7 @@ namespace CovidKeeperFrontend.Views
         int indexOfSelectedRow = -1;
         BitmapImage bitmapImage = default;
         DataRowView rowViewSelected = default;
-        MainWindowTemp mainWindowTemp = default;
+        MainMenu mainWindowTemp = default;
         DataGridRow gridRowSelected = default;
         Button detailsBtn = default;
         bool idWorkerIsGood = false;
@@ -62,9 +62,8 @@ namespace CovidKeeperFrontend.Views
         }
         private async void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            DataGrid gd = (DataGrid)sender;
-            indexOfSelectedRow = gd.Items.IndexOf(gd.CurrentItem);
-            DataRowView rowSelectedNow = gd.SelectedItem as DataRowView;
+            indexOfSelectedRow = WorkerDetailsTable.Items.IndexOf(WorkerDetailsTable.CurrentItem);
+            DataRowView rowSelectedNow = WorkerDetailsTable.CurrentCell.Item as DataRowView;
             string idWorker = rowSelectedNow["Id"].ToString();
             await (Application.Current as App).ManageWorkersViewModel.DeleteWorker(idWorker, indexOfSelectedRow);
             ClearFields();
@@ -152,7 +151,7 @@ namespace CovidKeeperFrontend.Views
             this.IsEnabled = false;
             SetIsEnabled(false);
         }
-        public void SetMainWindow(MainWindowTemp mainWindowTemp)
+        public void SetMainWindow(MainMenu mainWindowTemp)
         {
             this.mainWindowTemp = mainWindowTemp;
         }

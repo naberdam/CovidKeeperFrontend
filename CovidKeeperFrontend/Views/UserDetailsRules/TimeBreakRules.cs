@@ -14,19 +14,25 @@ namespace CovidKeeperFrontend.Views.UserDetailsRules
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
             string timeBreakString = value as string;
+            //Check if it is null or just white space
             if (string.IsNullOrWhiteSpace(timeBreakString))
             {
                 return new ValidationResult(false, $"Minutes can not be empty");
             }
+            //Check if the only characters are digits
             if (Regex.IsMatch(timeBreakString, "[a-zA-Z ,`~!@#$%^&*)(\\+\\-\\/}{\\[\\]\\.\\?|]"))
             {
                 return new ValidationResult(false, $"Only digits are allowed");
             }
-            int timeBreak = Int32.Parse(timeBreakString);
+            if (Regex.IsMatch(timeBreakString, "^0"))
+            {
+                return new ValidationResult(false, $"Minutes can't start with 0");
+            }
+            /*int timeBreak = Int32.Parse(timeBreakString);
             if (timeBreak < 0)
             {
                 return new ValidationResult(false, $"Only a positive number is allowed");
-            }
+            }*/
             return new ValidationResult(true, null);
         }
     }

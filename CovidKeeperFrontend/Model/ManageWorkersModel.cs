@@ -162,6 +162,11 @@ namespace CovidKeeperFrontend.Model
         //Function that insert worker to azure database and updating the WorkerDetailsTableProperty
         public async Task InsertWorker(string idWorker, string fullname, string emailAddress, BitmapImage imagePath)
         {
+            byte[] imageToByte = ImagePathToByteArray(imagePath);
+            await UploadImageToStorage(idWorker, imageToByte);
+            DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
+            workerDetailsTableTemp.Rows.Add(idWorker, fullname, emailAddress, imageToByte);
+            WorkerDetailsTableProperty = workerDetailsTableTemp;
             string insertQuery = @"INSERT INTO [dbo].[Workers] VALUES (@Id, @Fullname, @Email_address);";
             Dictionary<string, string> fieldNameToValueDict = new Dictionary<string, string>
             {
@@ -169,12 +174,7 @@ namespace CovidKeeperFrontend.Model
                 { "@FullName", fullname },
                 { "@Email_address", emailAddress }
             };
-            await QueryDatabaseWithDict(insertQuery, fieldNameToValueDict);
-            byte[] imageToByte = ImagePathToByteArray(imagePath);
-            await UploadImageToStorage(idWorker, imageToByte);
-            DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
-            workerDetailsTableTemp.Rows.Add(idWorker, fullname, emailAddress, imageToByte);
-            WorkerDetailsTableProperty = workerDetailsTableTemp;
+            await QueryDatabaseWithDict(insertQuery, fieldNameToValueDict);            
         }
 
         //Function that converts BitmapImage to byte array
@@ -268,6 +268,7 @@ namespace CovidKeeperFrontend.Model
         {
             string deleteQuery = @"DELETE FROM [dbo].[Workers] WHERE Id = " + idWorker + ";";
             await QueryDatabaseWithDict(deleteQuery);
+            await DeleteImageFromStorage(idWorker);
             DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
             if (indexOfSelectedRow != -1)
             {

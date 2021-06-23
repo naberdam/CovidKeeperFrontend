@@ -155,9 +155,6 @@
     </ApplicationDefinition>
     <Compile Include="HelperClasses\GraphContent.cs" />
     <Compile Include="HelperClasses\NotifyTaskCompletion.cs" />
-    <Compile Include="MainWindowTemp.xaml.cs">
-      <DependentUpon>MainWindowTemp.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Model\AbstractModel.cs" />
     <Compile Include="Model\Database\AzureSingleton.cs" />
     <Compile Include="Model\HomeModel.cs" />
@@ -171,8 +168,14 @@
     <Compile Include="ViewModel\MainMenuVM.cs" />
     <Compile Include="ViewModel\StatisticalDataVM.cs" />
     <Compile Include="ViewModel\ManageWorkersVM.cs" />
+    <Compile Include="Views\HelpUserControl.xaml.cs">
+      <DependentUpon>HelpUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\HomeUserControl.xaml.cs">
       <DependentUpon>HomeUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MainMenu.xaml.cs">
+      <DependentUpon>MainMenu.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ManageWorkersUserControl.xaml.cs">
       <DependentUpon>ManageWorkersUserControl.xaml</DependentUpon>
@@ -188,15 +191,19 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="MainWindowTemp.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="SplashScreenWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\HelpUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\HomeUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MainMenu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -227,7 +234,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="configAzure.json" />
+    <None Include="Files\configAzure.json" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -238,10 +245,14 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="load_screen_image.jpeg" />
+    <Resource Include="Files\load_screen_image.jpeg" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="people_with_mask.jpg" />
+    <Resource Include="Files\people_with_mask.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Files\help_video.mp4" />
+    <Resource Include="Files\help_image.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\MaterialDesignThemes.4.0.0\build\MaterialDesignThemes.targets" Condition="Exists('..\packages\MaterialDesignThemes.4.0.0\build\MaterialDesignThemes.targets')" />

@@ -52,6 +52,20 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
+        private DateTime selectedDateEndInDatePicker = default;
+        public DateTime SelectedDateEndInDatePickerProperty
+        {
+            get { return selectedDateEndInDatePicker; }
+            set
+            {
+                if (!selectedDateEndInDatePicker.Date.Equals(value.Date))
+                {
+                    selectedDateEndInDatePicker = value;
+                    selectedDateEndInDatePicker = value;
+                }
+            }
+        }
+
         //Property that represent the selection of StartDatePicker and updates the start date of EndDatePicker
         private DateTime startDateInDatePickerAfterPick = default;
         public DateTime StartDateInDatePickerAfterPickProperty
@@ -77,7 +91,28 @@ namespace CovidKeeperFrontend.Model
                 if (idWorkerForLineGraph != value && value != default)
                 {
                     idWorkerForLineGraph = value;
-                    GetAvgEventsPerWeekPerWorker(idWorkerForLineGraph);
+                    if (GraphInRangeOrNotProperty == true)
+                    {
+                        GetAvgEventsPerWeekPerWorkerWithRange(idWorkerForLineGraph, SelectedDateStartInDatePickerProperty, SelectedDateEndInDatePickerProperty);
+                    }
+                    else
+                    {
+                        GetAvgEventsPerWeekPerWorker(idWorkerForLineGraph);
+                    }                    
+                }
+            }
+        }
+
+        //Property that defines if the graph in total events is in data range or not
+        private bool graphInRangeOrNot = false;
+        public bool GraphInRangeOrNotProperty
+        {
+            get { return graphInRangeOrNot; }
+            set
+            {
+                if (graphInRangeOrNot != value)
+                {
+                    graphInRangeOrNot = value;
                 }
             }
         }
@@ -134,6 +169,21 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
+        //Property that represent the column chart title
+        private string columnChartBelowTitle;
+        public string ColumnChartBelowTitleProperty
+        {
+            get { return columnChartBelowTitle; }
+            set
+            {
+                if (columnChartBelowTitle != value)
+                {
+                    columnChartBelowTitle = value;
+                    NotifyPropertyChanged("ColumnChartBelowTitleProperty");
+                }
+            }
+        }
+
         //Enum for sub title for the column graph
         public enum ColumnChartSubTitleEnum
         {
@@ -155,6 +205,8 @@ namespace CovidKeeperFrontend.Model
                 }
             }
         }
+        
+
 
         //Property that represent the which graph the client wants to see now
         private StatisticsOptionListEnum selectedValueOfStatisticsOptionList = StatisticsOptionListEnum.Nothing;
@@ -166,22 +218,25 @@ namespace CovidKeeperFrontend.Model
                 if (selectedValueOfStatisticsOptionList != value)
                 {
                     selectedValueOfStatisticsOptionList = value;
+                    GraphInRangeOrNotProperty = false;
                     switch (value)
                     {
                         //If the client wants the graph per week
-                        case StatisticsOptionListEnum.AGE_PER_WEEK:
+                        case StatisticsOptionListEnum.AVG_PER_WEEK:
                             GetAvgEventsPerWeek();
                             ColumnChartTitleProperty = ColumnChartTitleEnum.Average_Per_Week;
+                            ColumnChartBelowTitleProperty = "Week";
                             ColumnChartSubTitleProperty = ColumnChartSubTitleEnum.Each_column_represent_one_week_in_a_specific_year;
                             break;
                         //If the client wants the graph per month
-                        case StatisticsOptionListEnum.AGE_PER_MONTH:
+                        case StatisticsOptionListEnum.AVG_PER_MONTH:
                             GetAvgEventsPerMonth();
                             ColumnChartTitleProperty = ColumnChartTitleEnum.Average_Per_Month;
+                            ColumnChartBelowTitleProperty = "Month";
                             ColumnChartSubTitleProperty = ColumnChartSubTitleEnum.Each_column_represent_one_month_in_a_specific_year;
                             break;
                         //If the client wants the graph per weekday
-                        case StatisticsOptionListEnum.AGE_PER_WEEKDAY:
+                        case StatisticsOptionListEnum.AVG_PER_WEEKDAY:
                             GetAvgEventsPerWeekday();
                             break;
                         //If the client wants the datatable that represent the amount events for each worker
@@ -260,6 +315,10 @@ namespace CovidKeeperFrontend.Model
         public override async Task<int> RefreshDataAsync()
         {
             await GetMinDateInHistoryEvents();
+            GetAvgEventsPerWeek();
+            ColumnChartTitleProperty = ColumnChartTitleEnum.Average_Per_Week;
+            ColumnChartBelowTitleProperty = "Week";
+            ColumnChartSubTitleProperty = ColumnChartSubTitleEnum.Each_column_represent_one_week_in_a_specific_year;
             return default;
         }
 
@@ -688,6 +747,32 @@ namespace CovidKeeperFrontend.Model
             string avgEventsPerWeekPerWorkerQuery = "Select DISTINCT DATEPART(WEEK, Time_of_event) AS WW, DATEPART(year, Time_of_event) AS Year, " +
                 "COUNT(CONVERT(date, Time_of_event)) AS Avg " +
                 "from[dbo].[History_Events] where Id_worker = " + idWorker +
+                " group by DATEPART(WEEK, Time_of_event), DATEPART(year, Time_of_event); ";
+            List<object[]> avgEventsPerWeekPerWorkerList = QuerySelectOfMultiRows(avgEventsPerWeekPerWorkerQuery);
+
+            if (avgEventsPerWeekPerWorkerList != null)
+            {
+                SetValuesInDictToZero(this.workWeekAndAmountEventsDict);
+                foreach (var item in avgEventsPerWeekPerWorkerList)
+                {
+                    string weekStr = item[0].ToString() + "-" + item[1].ToString();
+                    this.workWeekAndAmountEventsDict[weekStr] = Convert.ToDouble(item[2]);
+                }
+                DataTable tempAmountEventsByWorkerTableProperty = AmountEventsByWorkerTableProperty;
+                DataRow[] foundRows = tempAmountEventsByWorkerTableProperty.Select("Id_worker = " + idWorker);
+                //Set the graph that the client wanted to see
+                foundRows[0]["LineSeriesGraph"] = GetLineSeriesGraph("Total Events Per Week Of " + foundRows[0]["FullName"].ToString());
+                foundRows[0]["LabelsGraph"] = (new List<string>(this.workWeekAndAmountEventsDict.Keys)).ToArray();
+                foundRows[0]["TitleGraph"] = WeekOrMonth.Week;
+                AmountEventsByWorkerTableProperty = tempAmountEventsByWorkerTableProperty;
+            }
+        }
+        public void GetAvgEventsPerWeekPerWorkerWithRange(string idWorker, DateTime startDate, DateTime endDate)
+        {
+            string avgEventsPerWeekPerWorkerQuery = "Select DISTINCT DATEPART(WEEK, Time_of_event) AS WW, DATEPART(year, Time_of_event) AS Year, " +
+                "COUNT(CONVERT(date, Time_of_event)) AS Avg " +
+                "from[dbo].[History_Events] " +
+                "where Id_worker = " + idWorker + " and (Time_of_event > '" + startDate.ToString("MM/dd/yyyy") + "' and Time_of_event < '" + endDate.ToString("MM/dd/yyyy") + "') " +
                 " group by DATEPART(WEEK, Time_of_event), DATEPART(year, Time_of_event); ";
             List<object[]> avgEventsPerWeekPerWorkerList = QuerySelectOfMultiRows(avgEventsPerWeekPerWorkerQuery);
 

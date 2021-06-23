@@ -15,14 +15,17 @@ namespace CovidKeeperFrontend.Views.UserDetailsRules
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
             string id = value as string;
+            //Check if it is null or just white space
             if (string.IsNullOrWhiteSpace(id))
             {
                 return new ValidationResult(false, $"Id can not be empty");
             }
+            //Check if the only characters are digits
             if (Regex.IsMatch(id, "[a-zA-Z ,`~!@#$%^&*)(\\+\\-\\/}{\\[\\]\\.\\?|]"))
             {
                 return new ValidationResult(false, $"Only digits are allowed");
             }
+            //Check if this string has the minimum length
             if (id.Length < MinimumDigits)
             {
                 return new ValidationResult(false, $"Id at least {MinimumDigits} digits");

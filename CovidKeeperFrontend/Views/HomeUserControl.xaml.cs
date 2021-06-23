@@ -25,7 +25,7 @@ namespace CovidKeeperFrontend.Views
             InitializeComponent();
             string path = AppDomain.CurrentDomain.BaseDirectory;
             path = path.Substring(0, path.Length - 4);
-            path += "CovidKeeperFrontend\\people_with_mask.jpg";
+            path += "CovidKeeperFrontend\\Files\\people_with_mask.jpg";
             PeopleClickOnButton.Source = new BitmapImage(new Uri(path));
         }
 

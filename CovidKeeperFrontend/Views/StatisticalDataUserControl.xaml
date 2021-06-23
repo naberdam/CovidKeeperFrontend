@@ -93,7 +93,7 @@
                 <MetroChart:ClusteredColumnChart x:Name="ColumnGraph" Background="{x:Null}" ChartTitle="{Binding Path=VM_ColumnChartTitleProperty, Mode=OneWay}"
                                                  ChartSubTitle="{Binding Path=VM_ColumnChartSubTitleProperty, Mode=OneWay}" >
                     <MetroChart:ClusteredColumnChart.Series>
-                        <MetroChart:ChartSeries SeriesTitle="{Binding Path=VM_ColumnChartTitleProperty, Mode=OneWay}" 
+                        <MetroChart:ChartSeries SeriesTitle="Average" 
                                                 ItemsSource="{Binding Path=VM_ColumnGraphProperty}" DisplayMember="WorkWeek" ValueMember="AvgValue" />
                     </MetroChart:ClusteredColumnChart.Series>
                 </MetroChart:ClusteredColumnChart>
@@ -108,6 +108,7 @@
                                    Text="{Binding Path=VM_WeekOrMonthForDateRangeTextProperty, StringFormat='Please select a start and end date, with each of the dates you select representing the {0} you are interested in:'}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Label Content="Start Date:" Foreground="Gray" FontFamily="Champagne &amp; Limousines" Height="30" FontSize="18"/>
                         <DatePicker x:Name="StartDatePicker" DisplayDate="{x:Static sys:DateTime.Now}" 
                             DisplayDateStart="{Binding Path=VM_StartDateInDatePickerProperty, Mode=OneWay}" 
                             DisplayDateEnd="{x:Static sys:DateTime.Now}"
@@ -120,9 +121,13 @@
                                 </Style>
                             </DatePicker.Resources>
                         </DatePicker>
+                        
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Label Content="End Date:" Foreground="Gray" FontFamily="Champagne &amp; Limousines" Height="30" FontSize="18"/>
                         <DatePicker x:Name="EndDatePicker" DisplayDate="{x:Static sys:DateTime.Now}" 
                             DisplayDateStart="{Binding Path=VM_StartDateInDatePickerAfterPickProperty, Mode=OneWay}"
-                            DisplayDateEnd="{x:Static sys:DateTime.Now}"
+                            DisplayDateEnd="{x:Static sys:DateTime.Now}" SelectedDate="{Binding Path=VM_SelectedDateEndInDatePickerProperty, Mode=OneWayToSource}"
                             FirstDayOfWeek="Sunday" IsTodayHighlighted="True" VerticalAlignment="Center" 
                             HorizontalAlignment="Center" Width="120" Margin="15, 5">
                             <DatePicker.Resources>
@@ -137,7 +142,7 @@
                         <Button x:Name="AddButton"
                                     Style="{DynamicResource MaterialDesignFlatButton}" Margin="4" 
                                     VerticalAlignment="Center" Click="AddButton_Click">
-                            Add
+                            Update
                         </Button>
                         <Button x:Name="CancelAddWorkerButton" HorizontalAlignment="Center"  
                                     Style="{DynamicResource MaterialDesignFlatButton}" Margin="4" 

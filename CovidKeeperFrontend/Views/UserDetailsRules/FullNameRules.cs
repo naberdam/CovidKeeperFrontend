@@ -15,24 +15,34 @@ namespace CovidKeeperFrontend.Views.UserDetailsRules
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
             string fullName = value as string;
+            //Check if it is null or just white space
             if (string.IsNullOrWhiteSpace(fullName))
             {
                 return new ValidationResult(false, $"Full name can not be empty");
             }
+            //Check if the only characters are letters
             if (Regex.IsMatch(fullName, "[0-9,`~!@#$%^&*)(\\+\\-\\/}{\\[\\]\\.\\?|]"))
             {
                 return new ValidationResult(false, $"Only letters are allowed");
             }
+            //Check if full name contains space
             if (!fullName.Contains(' '))
             {
                 return new ValidationResult(false, $"Full name must have at least two words");
-            }            
+            }           
+            //Check if each word in this string has the minimum length
             string[] fullNameArray = fullName.Split();
-            if (fullNameArray[0].Length < MinimumCharactersForEachWord || fullNameArray[1].Length < MinimumCharactersForEachWord)
+            foreach (string word in fullNameArray)
+            {
+                if (word.Length < MinimumCharactersForEachWord)
+                {
+                    return new ValidationResult(false, $"At least {MinimumCharactersForEachWord} characters for each word");
+                }
+            }
+            /*if (fullNameArray[0].Length < MinimumCharactersForEachWord || fullNameArray[1].Length < MinimumCharactersForEachWord)
             {
                 return new ValidationResult(false, $"At least {MinimumCharactersForEachWord} characters for each word");
-            }
-
+            }*/
             return new ValidationResult(true, null);
         }
     }
