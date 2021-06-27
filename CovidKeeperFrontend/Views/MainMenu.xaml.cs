@@ -31,6 +31,7 @@ namespace CovidKeeperFrontend.Views
             homeUserControl.DataContext = (Application.Current as App).HomeViewModel;
             statisticalDataUserControl.DataContext = (Application.Current as App).StatisticalDataViewModel;
             manageWorkersUserControl.DataContext = (Application.Current as App).ManageWorkersViewModel;
+            //Initial ListViewMenu to be HomeUserControl
             ListViewMenu.SelectedIndex = 0;
             manageWorkersUserControl.SetMainWindow(this);
             statisticalDataUserControl.SetMainWindow(this);
@@ -44,6 +45,7 @@ namespace CovidKeeperFrontend.Views
 
         private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            //Check if client press on left button
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 DragMove();
@@ -54,7 +56,7 @@ namespace CovidKeeperFrontend.Views
         {
             int index = ListViewMenu.SelectedIndex;
             MoveCursorMenu(index);
-
+            //Handling the client's choise in ListViewBox
             switch (index)
             {
                 case 0:
@@ -63,7 +65,6 @@ namespace CovidKeeperFrontend.Views
                     GridPrincipal.Children.Add(homeUserControl);
                     break;
                 case 1:
-                    (Application.Current as App).ManageWorkersViewModel.RefreshData();
                     manageWorkersUserControl.ClearFields();
                     GridPrincipal.Children.Clear();
                     GridPrincipal.Children.Add(manageWorkersUserControl);
@@ -84,15 +85,18 @@ namespace CovidKeeperFrontend.Views
             }
         }
 
+        //Function that moves the GridCursor to the client's choise
         private void MoveCursorMenu(int index)
         {
             TransitioningContentSlide.OnApplyTemplate();
             GridCursor.Margin = new Thickness(0, (140 + (60 * index)), 0, 0);
         }
 
+        //Function that responsible for the updating break time
         private void UpdateBreakTimeForSendMailButton_Click(object sender, RoutedEventArgs e)
         {
             var isNumeric = int.TryParse(BreakTimeForSendMailText.Text, out int minutes);
+            //Check if the BreakTimeForSendMailText is numeric and not empty
             if (BreakTimeForSendMailText.Text != "" && isNumeric && minutes >= 0)
             {
                 (Application.Current as App).MainMenuViewModel.VM_MinutesBreakForMailsProperty = minutes;
@@ -107,6 +111,7 @@ namespace CovidKeeperFrontend.Views
 
         private void CancelBreakTimeForSendMailButton_Click(object sender, RoutedEventArgs e)
         {
+            //Exit from DialogHost
             DialogHost.CloseDialogCommand.Execute(null, null);
             this.IsEnabled = true;
         }
@@ -119,10 +124,12 @@ namespace CovidKeeperFrontend.Views
         private void BreakTimeForSendMailText_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textBox = sender as TextBox;
+            //If MinutesBreakForMailsProperty is null so IsEnabled is set to be false
             if ((Application.Current as App).MainMenuViewModel.MinutesBreakForMailsProperty == null)
             {
                 UpdateBreakTimeForSendMailButton.IsEnabled = false;
             }
+            //If MinutesBreakForMailsProperty is null so IsEnabled is set to be false
             else if ((Application.Current as App).MainMenuViewModel.MinutesBreakForMailsProperty.Length != textBox.Text.Length)
             {
                 UpdateBreakTimeForSendMailButton.IsEnabled = false;

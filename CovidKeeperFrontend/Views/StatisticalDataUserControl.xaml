@@ -113,7 +113,7 @@
                             DisplayDateStart="{Binding Path=VM_StartDateInDatePickerProperty, Mode=OneWay}" 
                             DisplayDateEnd="{x:Static sys:DateTime.Now}"
                             FirstDayOfWeek="Sunday" IsTodayHighlighted="True" VerticalAlignment="Center" 
-                            HorizontalAlignment="Center" Width="120" Margin="15, 5"
+                            HorizontalAlignment="Center" Width="120" Margin="15, 5" 
                             SelectedDate="{Binding Path=VM_SelectedDateStartInDatePickerProperty, Mode=OneWayToSource}">
                             <DatePicker.Resources>
                                 <Style TargetType="DatePickerTextBox">
@@ -135,13 +135,14 @@
                                     <Setter Property="IsReadOnly" Value="True"/>
                                 </Style>
                             </DatePicker.Resources>
+                            
                         </DatePicker>
                     </StackPanel>
                     
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="15">
-                        <Button x:Name="AddButton"
+                        <Button x:Name="UpdateButton"
                                     Style="{DynamicResource MaterialDesignFlatButton}" Margin="4" 
-                                    VerticalAlignment="Center" Click="AddButton_Click">
+                                    VerticalAlignment="Center" Click="UpdateButton_Click">
                             Update
                         </Button>
                         <Button x:Name="CancelAddWorkerButton" HorizontalAlignment="Center"  
@@ -152,16 +153,28 @@
                     </StackPanel>
                 </StackPanel>
             </materialDesign:DialogHost.DialogContent>
-            <Grid Height="35" Margin="20, 390, 20, 25">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock x:Name="ShowGraphInThisRangeText" Text="If you are intrested in date range, please click on the calendar - "
+            <Grid Height="65" VerticalAlignment="Bottom">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock x:Name="DateRangeRepresentText"
+                               Foreground="Gray" FontSize="18" Height="30">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}This graph is from {0} to {1}.">
+                                <Binding Path="VM_StartDateForTextRepresentationProperty" Mode="OneWay"/>
+                                <Binding Path="VM_EndDateForTextRepresentationProperty" Mode="OneWay"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="ShowGraphInThisRangeText" Text="If you are intrested in date range, please click on the calendar - "
                                Foreground="Gray" FontSize="18" Height="30"/>
-                    <Button x:Name="ShowGraphInThisRange" VerticalAlignment="Bottom" Click="ShowGraphInThisRange_Click" Foreground="Gray"
+                        <Button x:Name="ShowGraphInThisRange" VerticalAlignment="Bottom" Click="ShowGraphInThisRange_Click" Foreground="Gray"
                                 HorizontalAlignment="Center" Width="30" Height="35" Padding="0" Margin="10, 0" Background="{x:Null}"
                                 Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}" BorderBrush="{x:Null}">
-                        <materialDesign:PackIcon Kind="CalendarRange"/>
-                    </Button>
-                </StackPanel>                
+                            <materialDesign:PackIcon Kind="CalendarRange"/>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+                               
             </Grid>
         </materialDesign:DialogHost>
     </Grid>

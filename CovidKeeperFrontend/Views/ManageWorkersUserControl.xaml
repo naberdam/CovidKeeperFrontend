@@ -167,7 +167,7 @@
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                             <Button x:Name="SaveUpdateButton" Margin="4" Style="{DynamicResource MaterialDesignFlatButton}"
                                     VerticalAlignment="Center" Click="SaveUpdateButton_Click">
-                                Add
+                                Update
                             </Button>
                             <Button x:Name="CancelSaveUpdateButton"  
                                     Style="{DynamicResource MaterialDesignFlatButton}" Margin="4" 

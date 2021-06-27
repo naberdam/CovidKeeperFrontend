@@ -20,17 +20,24 @@ namespace CovidKeeperFrontend.Views
     /// </summary>
     public partial class HelpUserControl : UserControl
     {
+        //Const variables for the location of the files
+        private const string fileLocation = "CovidKeeperFrontend\\Files\\";
+        private const string helpVideoName = "help_video.mp4";
+        private const string helpImageName = "help_image.jpg";
         public HelpUserControl()
         {
             InitializeComponent();
             string path = AppDomain.CurrentDomain.BaseDirectory;
             path = path.Substring(0, path.Length - 4);
-            string videoPath = path + "CovidKeeperFrontend\\Files\\help_video.mp4";
-            string imagePath = path + "CovidKeeperFrontend\\Files\\help_image.jpg";
-            HelpVideo.Source = new Uri(videoPath);
+            string videoPath = path + fileLocation + helpVideoName;
+            string imagePath = path + fileLocation + helpImageName;
             var image = new BitmapImage(new Uri(imagePath));
+            //Initial QuestionMarkImage and HelpVideo
+            HelpVideo.Source = new Uri(videoPath);
             QuestionMarkImage.Source = image;
         }
+
+        //Function that reset the values 
         public void ClearFields()
         {
             try
@@ -41,9 +48,8 @@ namespace CovidKeeperFrontend.Views
             
             QuestionMarkImage.Visibility = Visibility.Visible;
             HelpVideo.Visibility = Visibility.Hidden;
-            PlayButton.IsEnabled = true;
-            PauseButton.IsEnabled = false;
-            StopButton.IsEnabled = false;
+            //Set PlayButton the IsEnabled to true and the others to false
+            UpdateIsEnabledButtons(true, false, false);
         }
 
         private void PlayButton_Click(object sender, RoutedEventArgs e)
@@ -51,25 +57,28 @@ namespace CovidKeeperFrontend.Views
             QuestionMarkImage.Visibility = Visibility.Hidden;
             HelpVideo.Visibility = Visibility.Visible;
             HelpVideo.Play();
-            PlayButton.IsEnabled = false;
-            PauseButton.IsEnabled = true;
-            StopButton.IsEnabled = true;
+            //Set PlayButton the IsEnabled to false and the others to true
+            UpdateIsEnabledButtons(false, true, true);
         }
 
         private void StopButton_Click(object sender, RoutedEventArgs e)
         {
             HelpVideo.Stop();
-            PlayButton.IsEnabled = true;
-            PauseButton.IsEnabled = false;
-            StopButton.IsEnabled = false;
+            //Set PlayButton the IsEnabled to true and the others to false
+            UpdateIsEnabledButtons(true, false, false);
         }
 
         private void PauseButton_Click(object sender, RoutedEventArgs e)
         {
             HelpVideo.Pause();
-            PlayButton.IsEnabled = true;
-            PauseButton.IsEnabled = false;
-            StopButton.IsEnabled = true;
+            //Set PauseButton the IsEnabled to false and the others to true
+            UpdateIsEnabledButtons(true, false, true);
+        }
+        private void UpdateIsEnabledButtons(bool playBool, bool pauseBool, bool stopBool)
+        {
+            PlayButton.IsEnabled = playBool;
+            PauseButton.IsEnabled = pauseBool;
+            StopButton.IsEnabled = stopBool;
         }
     }
 }

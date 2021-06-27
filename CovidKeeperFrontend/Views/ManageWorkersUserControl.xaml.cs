@@ -28,22 +28,32 @@ namespace CovidKeeperFrontend.Views
     /// </summary>
     public partial class ManageWorkersUserControl : UserControl
     {
+        //Varaible that representing the index of the selected row
         int indexOfSelectedRow = -1;
+        //Variable that representing the image that client choose
         BitmapImage bitmapImage = default;
+        //Variable that representing the row of datagrid as DataRowView for getting the information from the row
         DataRowView rowViewSelected = default;
-        MainMenu mainWindowTemp = default;
+        //Variable that representing the MainWindow
+        MainMenu mainWindow = default;
+        //Variable that representing the row of the datagrid as DataGridRow for getting the details for the DataTemplate
         DataGridRow gridRowSelected = default;
+        //Variable that representing the last detailsBtn that the client chose
         Button detailsBtn = default;
+        //Bool variables that are used for set IsEnabled of AddButton
         bool idWorkerIsGood = false;
         bool fullNameIsGood = false;
         bool emailAddressIsGood = false;
         bool imageIsGood = false;
+        //Variable that representing the id before the client changes it
         string idWorkerInDataTable = default;
 
         public ManageWorkersUserControl()
         {
             InitializeComponent();
         }
+
+        //Function that reset the values 
         public void ClearFields()
         {
             indexOfSelectedRow = -1;
@@ -62,6 +72,7 @@ namespace CovidKeeperFrontend.Views
         }
         private async void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
+            //Get the index of the selected row
             indexOfSelectedRow = WorkerDetailsTable.Items.IndexOf(WorkerDetailsTable.CurrentItem);
             DataRowView rowSelectedNow = WorkerDetailsTable.CurrentCell.Item as DataRowView;
             string idWorker = rowSelectedNow["Id"].ToString();
@@ -69,6 +80,7 @@ namespace CovidKeeperFrontend.Views
             ClearFields();
         }
         
+        //Function that convert the image from the table to BitmapImage
         private void SetImageFromTableToBitmapImage(DataRowView row)
         {
             byte[] imageArray = (byte[])row["Image"];
@@ -78,6 +90,8 @@ namespace CovidKeeperFrontend.Views
             }
             bitmapImage = LoadImage(imageArray);
         }
+
+        //Function that loads image
         private static BitmapImage LoadImage(byte[] imageData)
         {
             if (imageData == null || imageData.Length == 0) return null;
@@ -95,7 +109,7 @@ namespace CovidKeeperFrontend.Views
             image.Freeze();
             return image;
         }
-        private async void AddButton_Click(object sender, RoutedEventArgs e)
+        private void AddButton_Click(object sender, RoutedEventArgs e)
         {
             string idWorker = IdWorker.Text;
             string emailAddress = EmailAddress.Text;
@@ -103,19 +117,22 @@ namespace CovidKeeperFrontend.Views
             if (idWorker.Equals("") || fullName.Equals("") || emailAddress.Equals("") || bitmapImage == default)
             {
                 MessageBox.Show("You have to insert name, email and image");
+                return;
             }
-            else
+            bool checkIfInsertionSecceed = (Application.Current as App).ManageWorkersViewModel.InsertWorker(idWorker, fullName, emailAddress, bitmapImage);
+            if (checkIfInsertionSecceed)
             {
-                await (Application.Current as App).ManageWorkersViewModel.InsertWorker(idWorker, fullName, emailAddress, bitmapImage);
                 ClearFields();
                 this.IsEnabled = true;
                 SetIsEnabled(true);
+                //Close DialoHost
                 DialogHost.CloseDialogCommand.Execute(null, null);
-            }
+            }            
         }
 
         private void CancelAddWorkerButton_Click(object sender, RoutedEventArgs e)
         {
+            //Close DialoHost
             DialogHost.CloseDialogCommand.Execute(null, null);
             this.IsEnabled = true;
             SetIsEnabled(true);
@@ -133,6 +150,7 @@ namespace CovidKeeperFrontend.Views
             };
             if (openFileDialog.ShowDialog() == true)
             {
+                //Set the image that worker's image
                 bitmapImage = new BitmapImage(new Uri(openFileDialog.FileName));
                 ImageWorker.Source = bitmapImage;
                 imageIsGood = true;
@@ -151,15 +169,19 @@ namespace CovidKeeperFrontend.Views
             this.IsEnabled = false;
             SetIsEnabled(false);
         }
+
+        //Function that sets the mainWindow
         public void SetMainWindow(MainMenu mainWindowTemp)
         {
-            this.mainWindowTemp = mainWindowTemp;
+            this.mainWindow = mainWindowTemp;
         }
+        
+        //Function that changes the IsEnabled according to the given isEnable
         private void SetIsEnabled(bool isEnable)
         {
-            if (mainWindowTemp != default)
+            if (mainWindow != default)
             {
-                mainWindowTemp.IsEnabled = isEnable;
+                mainWindow.IsEnabled = isEnable;
             }
         }
 
@@ -171,7 +193,7 @@ namespace CovidKeeperFrontend.Views
                 MessageBox.Show("Please enter a word for the search");
                 return;
             }
-            //CodeDomProvider provider = CodeDomProvider.CreateProvider("C#");
+            //Check what exactly the client search
             if (Regex.IsMatch(searchString, @"^[a-zA-Z ]+$"))
             {
                 (Application.Current as App).ManageWorkersViewModel.SearchByFullName(searchString);
@@ -190,6 +212,8 @@ namespace CovidKeeperFrontend.Views
                     "\nPlease re-enter the word you are looking for.");
             }
         }
+
+        //Function that checks if the email is valid
         bool IsValidEmail(string email)
         {
             try
@@ -206,23 +230,24 @@ namespace CovidKeeperFrontend.Views
         {
             try
             {
-                // the original source is what was clicked.  For example 
-                // a button.
+                //The original source is what was clicked.  For example 
+                //A button.
                 DependencyObject dep = (DependencyObject)e.OriginalSource;
 
-                // iteratively traverse the visual tree upwards looking for
-                // the clicked row.
+                //Iteratively traverse the visual tree upwards looking for
+                //The clicked row.
                 while ((dep != null) && !(dep is DataGridRow))
                 {
                     dep = VisualTreeHelper.GetParent(dep);
                 }
 
-                // if we found the clicked row
+                //If we found the clicked row
                 if (dep != null && dep is DataGridRow)
                 {
-                    // get the row
+                    //Get the row
                     DataGridRow gridRowSelectedNow = (DataGridRow)dep;
                     Button detailsBtnNow = (Button)sender;
+                    //Check if the clients clicked on the same he clicked in the last time
                     if (gridRowSelected == gridRowSelectedNow)
                     {
                         detailsBtn.Content = new MaterialDesignThemes.Wpf.PackIcon
@@ -232,6 +257,7 @@ namespace CovidKeeperFrontend.Views
                         detailsBtn = default;
                         return;
                     }
+                    //Check if it is the first time that the client clicked
                     else if (gridRowSelectedNow != null && gridRowSelected == default)
                     {
                         detailsBtnNow.Content = new MaterialDesignThemes.Wpf.PackIcon
@@ -240,6 +266,7 @@ namespace CovidKeeperFrontend.Views
                         gridRowSelected = gridRowSelectedNow;
                         gridRowSelected.DetailsVisibility = Visibility.Visible;
                     }
+                    //Check if the client clicked on a new row not like the last one
                     else if (gridRowSelectedNow != null && gridRowSelected != default)
                     {
                         detailsBtn.Content = new MaterialDesignThemes.Wpf.PackIcon
@@ -263,6 +290,7 @@ namespace CovidKeeperFrontend.Views
             (Application.Current as App).ManageWorkersViewModel.GetWorkersDetailsAfterRefresh();
         }
 
+        //Function that handling the text changing in IdWorker
         private void IdWorker_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textBox = sender as TextBox;
@@ -270,6 +298,7 @@ namespace CovidKeeperFrontend.Views
                 ref idWorkerIsGood, fullNameIsGood, emailAddressIsGood, imageIsGood, ref AddButton);
         }
 
+        //Function that handling the text changing in FullName
         private void FullName_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textBox = sender as TextBox;
@@ -277,12 +306,15 @@ namespace CovidKeeperFrontend.Views
                 ref fullNameIsGood, emailAddressIsGood, idWorkerIsGood, imageIsGood, ref AddButton);
         }
 
+        //Function that handling the text changing in EmailAddress
         private void EmailAddress_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textBox = sender as TextBox;
             UpdateIsEnabledAddButton((Application.Current as App).ManageWorkersViewModel.EmailAddressRuleProperty, textBox.Text, 
                 ref emailAddressIsGood, fullNameIsGood, idWorkerIsGood, imageIsGood, ref AddButton);
         }
+
+        //Function that updates tje IsEnabled of the AddButton only after all boolean variables are true
         private void UpdateIsEnabledAddButton(string userDetailsProperty, string textBox, ref bool myValue, bool oneValue, 
             bool secondValue, bool thirdValue, ref Button buttonToEnable)
         {
@@ -297,6 +329,7 @@ namespace CovidKeeperFrontend.Views
             else
             {
                 myValue = true;
+                //Check if all boolean variables are true
                 if (oneValue && secondValue && thirdValue)
                 {
                     buttonToEnable.IsEnabled = true;
@@ -308,29 +341,39 @@ namespace CovidKeeperFrontend.Views
             }
         }
 
-        private void EditImageButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void SaveUpdateButton_Click(object sender, RoutedEventArgs e)
         {
             string idWorker = IdWorkerUpdate.Text;
             string emailAddress = EmailAddressUpdate.Text;
             string fullName = FullNameUpdate.Text;
             SetImageFromTableToBitmapImage(rowViewSelected);
-            (Application.Current as App).ManageWorkersViewModel.UpdateWorkerDetails(idWorkerInDataTable, idWorker, fullName, emailAddress, bitmapImage, indexOfSelectedRow);
-            ClearFields();
-            this.IsEnabled = true;
-            SetIsEnabled(true);
-            DialogHost.CloseDialogCommand.Execute(null, null);
+            bool checkIfUpdateSucceed;
+            //Call update function from view model
+            if (idWorker != idWorkerInDataTable)
+            {
+                checkIfUpdateSucceed = (Application.Current as App).ManageWorkersViewModel.UpdateWorkerDetailsWithNewId(idWorkerInDataTable, idWorker, fullName, emailAddress, bitmapImage, indexOfSelectedRow);
+            }
+            else
+            {
+                checkIfUpdateSucceed = (Application.Current as App).ManageWorkersViewModel.UpdateWorkerDetails(idWorker, fullName, emailAddress, bitmapImage, indexOfSelectedRow);
+            }
+            if (checkIfUpdateSucceed)
+            {
+                ClearFields();
+                this.IsEnabled = true;
+                SetIsEnabled(true);
+                //Close DialogHost
+                DialogHost.CloseDialogCommand.Execute(null, null);
+            }            
         }
 
         private void CancelSaveUpdateButton_Click(object sender, RoutedEventArgs e)
         {
+            //Close DialogHost
             DialogHost.CloseDialogCommand.Execute(null, null);
             this.IsEnabled = true;
             SetIsEnabled(true);
+            //Reset textboxes
             IdWorkerUpdate.Text = default;
             FullNameUpdate.Text = default;
             EmailAddressUpdate.Text = default;
@@ -340,8 +383,11 @@ namespace CovidKeeperFrontend.Views
         {
             this.IsEnabled = false;
             SetIsEnabled(false);
+            //Get the row
             rowViewSelected = WorkerDetailsTable.CurrentCell.Item as DataRowView;
+            //Get the index of the row that the client choose
             indexOfSelectedRow = WorkerDetailsTable.Items.IndexOf(WorkerDetailsTable.CurrentItem);
+            //Reset boolean values for IsEnabled of UpdateButton
             idWorkerIsGood = false;
             fullNameIsGood = false;
             emailAddressIsGood = false;
@@ -354,6 +400,7 @@ namespace CovidKeeperFrontend.Views
             idWorkerInDataTable = rowViewSelected["Id"].ToString();
         }
 
+        //Function that handling the text changing in EmailAddress
         private void EmailAddressUpdate_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textBox = sender as TextBox;
@@ -361,6 +408,7 @@ namespace CovidKeeperFrontend.Views
                 ref emailAddressIsGood, fullNameIsGood, idWorkerIsGood, imageIsGood, ref SaveUpdateButton);
         }
 
+        //Function that handling the text changing in FullNameUpdate
         private void FullNameUpdate_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textBox = sender as TextBox;
@@ -368,6 +416,7 @@ namespace CovidKeeperFrontend.Views
                 ref fullNameIsGood, emailAddressIsGood, idWorkerIsGood, imageIsGood, ref SaveUpdateButton);
         }
 
+        //Function that handling the text changing in IdWorkerUpdate
         private void IdWorkerUpdate_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textBox = sender as TextBox;

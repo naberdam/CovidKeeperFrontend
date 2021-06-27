@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace CovidKeeperFrontend.Model.Database
 {
@@ -17,11 +18,11 @@ namespace CovidKeeperFrontend.Model.Database
         private readonly SqlConnection sqlConnection;
         private static readonly Lazy<AzureSingleton> lazy = new Lazy<AzureSingleton>(() => new AzureSingleton());
         private readonly CloudStorageAccount cloudStorageAccount;
-        private readonly string configFileName = "CovidKeeperFrontend\\Files\\configAzure.json";
-        private readonly string databaseKey = "Database";
-        private readonly string storageKey = "Storage";
-        private readonly string endOfFile = ".jpg";
-        private readonly string containerName = "pictures";
+        private const string configFileName = "CovidKeeperFrontend\\Files\\configAzure.json";
+        private const string databaseKey = "Database";
+        private const string storageKey = "Storage";
+        private const string endOfFile = ".jpg";
+        private const string containerName = "pictures";
 
         
         private AzureSingleton()
@@ -52,8 +53,16 @@ namespace CovidKeeperFrontend.Model.Database
             }
             string connectionString = configDict[databaseKey];
             sqlConnection = new SqlConnection(connectionString);
-            //Connect to the Azure SQL daabase
-            sqlConnection.Open();
+            //Connect to the Azure SQL database
+            try
+            {
+                sqlConnection.Open();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("There is a problem with the connection to database.\nPlease try again");
+                System.Environment.Exit(0);
+            }            
             //Define our CloudStorageAccount
             cloudStorageAccount = CloudStorageAccount.Parse(configDict[storageKey]);
         }

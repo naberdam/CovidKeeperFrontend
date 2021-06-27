@@ -74,6 +74,16 @@ namespace CovidKeeperFrontend.ViewModel
         {
             get { return this.model.StartDateInDatePickerAfterPickProperty; }
         }
+        //Property of binding EndDateForTextRepresentationProperty to view
+        public string VM_EndDateForTextRepresentationProperty
+        {
+            get { return this.model.EndDateForTextRepresentationProperty.ToString("dd/MM/yy"); }
+        }
+        //Property of binding StartDateForTextRepresentationProperty to view
+        public string VM_StartDateForTextRepresentationProperty
+        {
+            get { return this.model.StartDateForTextRepresentationProperty.ToString("dd/MM/yy"); }
+        }
         //Property of binding ColumnChartTitleProperty to view and delete '_'
         public string VM_ColumnChartTitleProperty
         {

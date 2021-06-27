@@ -20,12 +20,15 @@ namespace CovidKeeperFrontend.Views
     /// </summary>
     public partial class HomeUserControl : UserControl
     {
+        //Const variables for the location of the files
+        private const string fileLocation = "CovidKeeperFrontend\\Files\\people_with_mask.jpg";
+
         public HomeUserControl()
         {
             InitializeComponent();
             string path = AppDomain.CurrentDomain.BaseDirectory;
             path = path.Substring(0, path.Length - 4);
-            path += "CovidKeeperFrontend\\Files\\people_with_mask.jpg";
+            path += fileLocation;
             PeopleClickOnButton.Source = new BitmapImage(new Uri(path));
         }
 

@@ -25,11 +25,12 @@ namespace CovidKeeperFrontend.Views
     /// </summary>
     public partial class StatisticalDataUserControl : UserControl
     {
-        DataGridRow lastSelectedRow = default;
+        //Variable that represent the last selected row by client
+        DataGridRow gridRowSelected = default;
         MainMenu mainWindowTemp = default;
         StatisticsOptionListEnum statisticsOptionListEnum = StatisticsOptionListEnum.Nothing;
         Button detailsBtn = default;
-        DataGridRow gridRowSelected = default;
+        
         public enum StatisticsOptionListEnum
         {
             AVG_PER_WEEK = 0,
@@ -40,7 +41,7 @@ namespace CovidKeeperFrontend.Views
         }
         public StatisticalDataUserControl()
         {
-            InitializeComponent();
+            InitializeComponent();            
         }
 
         public void ClearFields()
@@ -59,18 +60,14 @@ namespace CovidKeeperFrontend.Views
                 buttonId++;
             }
             StatisticButtonList.ItemsSource = buttons;
-            if (lastSelectedRow != default)
+            if (gridRowSelected != default)
             {
-                lastSelectedRow.DetailsVisibility = Visibility.Collapsed;
+                gridRowSelected.DetailsVisibility = Visibility.Collapsed;
             }
             AmountEventPerWeekTable.SelectedIndex = -1;
-            lastSelectedRow = default;
             ColumnGraph.Visibility = Visibility.Visible;
             PieGraph.Visibility = Visibility.Hidden;
             ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
-            /*ShowGraphInThisRange.Visibility = Visibility.Hidden;*/
-            GridCursor.Visibility = Visibility.Hidden;
-            /*ShowGraphInThisRangeText.Visibility = Visibility.Visible;*/
             statisticsOptionListEnum = StatisticsOptionListEnum.Nothing;
             (Application.Current as App).StatisticalDataViewModel.GraphInRangeOrNotProperty = false;
             detailsBtn = default;
@@ -100,8 +97,6 @@ namespace CovidKeeperFrontend.Views
                     ColumnGraph.Visibility = Visibility.Visible;
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
-                    ShowGraphInThisRange.Visibility = Visibility.Visible;
-                    ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
                     break;
                 case StatisticsOptionListEnum.AVG_PER_MONTH:
@@ -109,8 +104,6 @@ namespace CovidKeeperFrontend.Views
                     ColumnGraph.Visibility = Visibility.Visible;
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
-                    ShowGraphInThisRange.Visibility = Visibility.Visible;
-                    ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
                     break;
                 case StatisticsOptionListEnum.AVG_PER_WEEKDAY:
@@ -118,8 +111,6 @@ namespace CovidKeeperFrontend.Views
                     ColumnGraph.Visibility = Visibility.Hidden;
                     PieGraph.Visibility = Visibility.Visible;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
-                    ShowGraphInThisRange.Visibility = Visibility.Visible;
-                    ShowGraphInThisRangeText.Visibility = Visibility.Visible;
                     CommentText.Visibility = Visibility.Visible;
                     break;
                 case StatisticsOptionListEnum.TOTAL_EVENTS:
@@ -128,9 +119,10 @@ namespace CovidKeeperFrontend.Views
                     ColumnGraph.Visibility = Visibility.Hidden;
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Visible;
-                    ShowGraphInThisRange.Visibility = Visibility.Visible;
-                    ShowGraphInThisRangeText.Visibility = Visibility.Visible;
+                    /*ShowGraphInThisRange.Visibility = Visibility.Visible;
+                    ShowGraphInThisRangeText.Visibility = Visibility.Visible;*/
                     CommentText.Visibility = Visibility.Visible;
+                    gridRowSelected = default;
                     break;
                 default:
                     break;
@@ -161,44 +153,6 @@ namespace CovidKeeperFrontend.Views
             SetIsEnabled(true);
         }
 
-        private void AddButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (StartDatePicker.SelectedDate == default && EndDatePicker.SelectedDate == default)
-            {
-                MessageBox.Show("You have to insert start date and end date");
-                return;
-            }
-            DateTime startDate = Convert.ToDateTime((StartDatePicker.SelectedDate).ToString());
-            DateTime endDate = Convert.ToDateTime((EndDatePicker.SelectedDate).ToString());
-            if (startDate > endDate)
-            {
-                MessageBox.Show("The start date can not be bigger than end date.\nPlease insert another dates.");
-                return;
-            }
-            switch (statisticsOptionListEnum)
-            {
-                case StatisticsOptionListEnum.AVG_PER_WEEK:
-                    (Application.Current as App).StatisticalDataViewModel.GetAvgEventsPerWeekWithRange(startDate, endDate);
-                    break;
-                case StatisticsOptionListEnum.AVG_PER_MONTH:
-                    (Application.Current as App).StatisticalDataViewModel.GetAvgEventsPerMonthWithRange(startDate, endDate);
-                    break;
-                case StatisticsOptionListEnum.AVG_PER_WEEKDAY:
-                    (Application.Current as App).StatisticalDataViewModel.GetAvgEventsPerWeekdayWithRange(startDate, endDate);
-                    break;
-                case StatisticsOptionListEnum.TOTAL_EVENTS:
-                    (Application.Current as App).StatisticalDataViewModel.GraphInRangeOrNotProperty = true;
-                    (Application.Current as App).StatisticalDataViewModel.GetAmountEventsByWorkerWithRange(startDate, endDate);
-                    break;
-                case StatisticsOptionListEnum.Nothing:
-                    break;
-                default:
-                    break;
-            }
-            DialogHost.CloseDialogCommand.Execute(null, null);
-            this.IsEnabled = true;
-            SetIsEnabled(true);
-        }
         private void DetailsButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -253,6 +207,44 @@ namespace CovidKeeperFrontend.Views
             }
         }
 
+        private void UpdateButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (StartDatePicker.SelectedDate == default && EndDatePicker.SelectedDate == default)
+            {
+                MessageBox.Show("You have to insert start date and end date");
+                return;
+            }
+            DateTime startDate = Convert.ToDateTime((StartDatePicker.SelectedDate).ToString());
+            DateTime endDate = Convert.ToDateTime((EndDatePicker.SelectedDate).ToString());
+            if (startDate > endDate)
+            {
+                MessageBox.Show("The start date can not be bigger than end date.\nPlease insert another dates.");
+                return;
+            }
+            switch (statisticsOptionListEnum)
+            {
+                case StatisticsOptionListEnum.AVG_PER_WEEK:
+                    (Application.Current as App).StatisticalDataViewModel.GetAvgEventsPerWeekWithRange(startDate, endDate);
+                    break;
+                case StatisticsOptionListEnum.AVG_PER_MONTH:
+                    (Application.Current as App).StatisticalDataViewModel.GetAvgEventsPerMonthWithRange(startDate, endDate);
+                    break;
+                case StatisticsOptionListEnum.AVG_PER_WEEKDAY:
+                    (Application.Current as App).StatisticalDataViewModel.GetAvgEventsPerWeekdayWithRange(startDate, endDate);
+                    break;
+                case StatisticsOptionListEnum.TOTAL_EVENTS:
+                    (Application.Current as App).StatisticalDataViewModel.GraphInRangeOrNotProperty = true;
+                    (Application.Current as App).StatisticalDataViewModel.GetAmountEventsByWorkerWithRange(startDate, endDate);
+                    break;
+                case StatisticsOptionListEnum.Nothing:
+                    break;
+                default:
+                    break;
+            }
+            DialogHost.CloseDialogCommand.Execute(null, null);
+            this.IsEnabled = true;
+            SetIsEnabled(true);
+        }
     }
     class MyButton
     {

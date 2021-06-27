@@ -61,7 +61,34 @@ namespace CovidKeeperFrontend.Model
                 if (!selectedDateEndInDatePicker.Date.Equals(value.Date))
                 {
                     selectedDateEndInDatePicker = value;
-                    selectedDateEndInDatePicker = value;
+                }
+            }
+        }
+
+        private DateTime startDateForTextRepresentation = default;
+        public DateTime StartDateForTextRepresentationProperty
+        {
+            get { return startDateForTextRepresentation; }
+            set
+            {
+                if (!startDateForTextRepresentation.Date.Equals(value.Date))
+                {
+                    startDateForTextRepresentation = value;
+                    NotifyPropertyChanged("StartDateForTextRepresentationProperty");
+                }
+            }
+        }
+
+        private DateTime endDateForTextRepresentation = default;
+        public DateTime EndDateForTextRepresentationProperty
+        {
+            get { return endDateForTextRepresentation; }
+            set
+            {
+                if (!endDateForTextRepresentation.Date.Equals(value.Date))
+                {
+                    endDateForTextRepresentation = value;
+                    NotifyPropertyChanged("EndDateForTextRepresentationProperty");
                 }
             }
         }
@@ -219,6 +246,8 @@ namespace CovidKeeperFrontend.Model
                 {
                     selectedValueOfStatisticsOptionList = value;
                     GraphInRangeOrNotProperty = false;
+                    EndDateForTextRepresentationProperty = DateTime.Now;
+                    StartDateForTextRepresentationProperty = StartDateInDatePickerProperty;
                     switch (value)
                     {
                         //If the client wants the graph per week
@@ -319,6 +348,8 @@ namespace CovidKeeperFrontend.Model
             ColumnChartTitleProperty = ColumnChartTitleEnum.Average_Per_Week;
             ColumnChartBelowTitleProperty = "Week";
             ColumnChartSubTitleProperty = ColumnChartSubTitleEnum.Each_column_represent_one_week_in_a_specific_year;
+            EndDateForTextRepresentationProperty = DateTime.Now;
+            StartDateForTextRepresentationProperty = StartDateInDatePickerProperty;
             return default;
         }
 
@@ -488,6 +519,8 @@ namespace CovidKeeperFrontend.Model
                     avgEventsPerWeekList, workWeekAndAmountEventsDictWithRange);
                 WeekOrMonthForDateRangeTextProperty = "weeks";
                 ColumnGraphProperty = ConvertDictToListGraphContent(workWeekAndAmountEventsDictWithRange);
+                EndDateForTextRepresentationProperty = endDate;
+                StartDateForTextRepresentationProperty = startDate;
             }
         }
 
@@ -576,6 +609,8 @@ namespace CovidKeeperFrontend.Model
                 }
                 WeekOrMonthForDateRangeTextProperty = "months";
                 ColumnGraphProperty = ConvertDictToListGraphContent(monthAndAmountEventsDictWithRange);
+                EndDateForTextRepresentationProperty = endDate;
+                StartDateForTextRepresentationProperty = startDate;
             }
         }
 
@@ -673,6 +708,8 @@ namespace CovidKeeperFrontend.Model
                 }
                 WeekOrMonthForDateRangeTextProperty = "weeks";
                 ColumnGraphProperty = avgEventsPerWeekday;
+                EndDateForTextRepresentationProperty = endDate;
+                StartDateForTextRepresentationProperty = startDate;
             }
         }
 
@@ -712,17 +749,10 @@ namespace CovidKeeperFrontend.Model
                 "order by count desc; ";
             DataTable dataTableAmountEventsPerWorker = GetDataTableByQuery(amountEventsPerWorkerQuery, "History_Events");
             dataTableAmountEventsPerWorker = InitialGraphColumnsToDefault(dataTableAmountEventsPerWorker);
-            /*dataTableAmountEventsPerWorker.Columns.Add("LineSeriesGraph", typeof(SeriesCollection));
-            dataTableAmountEventsPerWorker.Columns.Add("LabelsGraph", typeof(string[]));
-            dataTableAmountEventsPerWorker.Columns.Add("TitleGraph", typeof(string));
-            foreach (DataRow row in dataTableAmountEventsPerWorker.Rows)
-            {
-                row["LineSeriesGraph"] = default;
-                row["LabelsGraph"] = default;
-                row["TitleGraph"] = default;
-            }*/
             WeekOrMonthForDateRangeTextProperty = "days";
             AmountEventsByWorkerTableProperty = dataTableAmountEventsPerWorker;
+            EndDateForTextRepresentationProperty = endDate;
+            StartDateForTextRepresentationProperty = startDate;
         }
 
         //Funtion that reutrns the dataTableAmountEventsPerWorker with default values in graph's columns

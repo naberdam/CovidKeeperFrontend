@@ -6,14 +6,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace CovidKeeperFrontend.Model
 {
     //This class is the model of HomeUserControl
     public class ManageWorkersModel : AbstractModel
-    {
-        
+    {        
         public NotifyTaskCompletion<int> UpdateHandleInAnalayzerConfigAsync { get; private set; }
         //Property that defines the workers details table
         private DataTable workerDetailsTable = default;
@@ -78,6 +78,7 @@ namespace CovidKeeperFrontend.Model
                 }
             }
         }
+        
 
         public NotifyTaskCompletion<int> RefreshData { get; private set; }
         public ManageWorkersModel()
@@ -160,21 +161,31 @@ namespace CovidKeeperFrontend.Model
         }
 
         //Function that insert worker to azure database and updating the WorkerDetailsTableProperty
-        public async Task InsertWorker(string idWorker, string fullname, string emailAddress, BitmapImage imagePath)
+        public async Task<bool> InsertWorker(string idWorker, string fullname, string emailAddress, BitmapImage imagePath)
         {
+            DataRow[] results = WorkerDetailsTableProperty.Select("Id = '" + idWorker + "'");
+            //Check if there is already worker with this id
+            if (results.Length > 0)
+            {
+                var name = results[0]["FullName"].ToString();                
+                MessageBox.Show("This id already belongs to " + name + ".\nPlease select another id.");
+                return false;
+            }
+            //There is not worker with this id
             byte[] imageToByte = ImagePathToByteArray(imagePath);
             await UploadImageToStorage(idWorker, imageToByte);
             DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
-            workerDetailsTableTemp.Rows.Add(idWorker, fullname, emailAddress, imageToByte);
+            workerDetailsTableTemp.Rows.Add(idWorker, fullname, emailAddress, imageToByte, true);
             WorkerDetailsTableProperty = workerDetailsTableTemp;
             string insertQuery = @"INSERT INTO [dbo].[Workers] VALUES (@Id, @Fullname, @Email_address);";
             Dictionary<string, string> fieldNameToValueDict = new Dictionary<string, string>
-            {
-                { "@Id", idWorker },
-                { "@FullName", fullname },
-                { "@Email_address", emailAddress }
-            };
-            await QueryDatabaseWithDict(insertQuery, fieldNameToValueDict);            
+                {
+                    { "@Id", idWorker },
+                    { "@FullName", fullname },
+                    { "@Email_address", emailAddress }
+                };
+            await QueryDatabaseWithDict(insertQuery, fieldNameToValueDict);
+            return true;
         }
 
         //Function that converts BitmapImage to byte array
@@ -201,7 +212,7 @@ namespace CovidKeeperFrontend.Model
         }
 
         //Function that updates the worker's details and updates the WorkerDetalisTable
-        public async Task<int> UpdateWorkerDetails(string idWorkerInDataTable, string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
+        public async Task<bool> UpdateWorkerDetails(string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
         {
             byte[] imageToByte = ImagePathToByteArray(imagePath);
             DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
@@ -212,24 +223,39 @@ namespace CovidKeeperFrontend.Model
             rowToChange["Email_address"] = emailAddress;
             rowToChange["Image"] = imageToByte;
             WorkerDetailsTableProperty = workerDetailsTableTemp;
-            //The id has changed
-            if (idWorkerInDataTable != idWorker)
-            {
-                await UpdateWorkerId(idWorkerInDataTable, idWorker, fullname, emailAddress);
-            }
-            //The id has not changed
-            else
-            {
-                string updateQuery = @"UPDATE [dbo].[Workers] SET FullName = @FullName, Email_address = @Email_address Where Id = @Id;";
-                Dictionary<string, string> fieldNameToValueDict = new Dictionary<string, string>
+            string updateQuery = @"UPDATE [dbo].[Workers] SET FullName = @FullName, Email_address = @Email_address Where Id = @Id;";
+            Dictionary<string, string> fieldNameToValueDict = new Dictionary<string, string>
                 {
                     { "@Id", idWorker },
                     { "@FullName", fullname },
                     { "@Email_address", emailAddress }
                 };
-                await QueryDatabaseWithDict(updateQuery, fieldNameToValueDict);                
-            }            
-            return default;
+            await QueryDatabaseWithDict(updateQuery, fieldNameToValueDict);            
+            return true;
+        }
+        //Function that updates worker's details that has a new id and updates the WorkerDetalisTable
+        public async Task<bool> UpdateWorkerDetailsWithNewId(string idWorkerInDataTable, string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
+        {
+            DataRow[] results = WorkerDetailsTableProperty.Select("Id = '" + idWorker + "'");
+            //Check if this new id is already in exists in WorkerDetailsTableProperty
+            if (results.Length > 0)
+            {
+                var name = results[0]["FullName"].ToString();
+                MessageBox.Show("This id already belongs to " + name + ".\nPlease select another id.");
+                return false;
+            }
+            //It does not exists so updates the worker's details
+            byte[] imageToByte = ImagePathToByteArray(imagePath);
+            DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
+            var rowToChange = workerDetailsTableTemp.Rows[indexOfSelectedRow];
+            await UploadImageToStorage(idWorker, imageToByte);
+            rowToChange["Id"] = idWorker;
+            rowToChange["Fullname"] = fullname;
+            rowToChange["Email_address"] = emailAddress;
+            rowToChange["Image"] = imageToByte;
+            WorkerDetailsTableProperty = workerDetailsTableTemp;
+            await UpdateWorkerId(idWorkerInDataTable, idWorker, fullname, emailAddress);            
+            return true;
         }
 
         //Function that updates worker's details in case the worker's id has been changed
