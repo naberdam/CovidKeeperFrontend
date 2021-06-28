@@ -27,10 +27,14 @@ namespace CovidKeeperFrontend.Views
     {
         //Variable that represent the last selected row by client
         DataGridRow gridRowSelected = default;
-        MainMenu mainWindowTemp = default;
+        //Variable that representing the MainWindow
+        MainMenu mainWindow = default;
+        //Variable that represents the client's choise which grpah he client wants to see
         StatisticsOptionListEnum statisticsOptionListEnum = StatisticsOptionListEnum.Nothing;
+        //Variable that representing the last detailsBtn that the client chose
         Button detailsBtn = default;
         
+        //Enum that represents the listview with the names of the graphs
         public enum StatisticsOptionListEnum
         {
             AVG_PER_WEEK = 0,
@@ -44,12 +48,14 @@ namespace CovidKeeperFrontend.Views
             InitializeComponent();            
         }
 
+        //Function that reset the values 
         public void ClearFields()
         {
             List<StatisticsOptionListEnum> buttonContentList = new List<StatisticsOptionListEnum>() { StatisticsOptionListEnum.AVG_PER_WEEK, 
                 StatisticsOptionListEnum.AVG_PER_MONTH, StatisticsOptionListEnum.AVG_PER_WEEKDAY, StatisticsOptionListEnum.TOTAL_EVENTS };
             List<MyButton> buttons = new List<MyButton>();
             int buttonId = 1;
+            //Set the names of the listview
             foreach (var content in buttonContentList)
             {
                 buttons.Add(new MyButton
@@ -78,18 +84,20 @@ namespace CovidKeeperFrontend.Views
         {
             DataGrid gd = (DataGrid)sender;
             DataRowView rowSelected = gd.SelectedItem as DataRowView;
+            //If the client choose a row in total events
             if (rowSelected != null)
             {
                 (Application.Current as App).StatisticalDataViewModel.VM_IdWorkerForLineGraphProperty = rowSelected["Id_worker"].ToString();
             }            
         }
 
+        //Function that represents the client's choose
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Button btn = (Button)sender;
             statisticsOptionListEnum = (StatisticsOptionListEnum)Enum.Parse(typeof(StatisticsOptionListEnum), btn.Content.ToString().Replace(" ", "_"));
+            //Move the GridCursor according to the client's choise
             GridCursor.Margin = new Thickness(10 + (180 * Convert.ToInt32(statisticsOptionListEnum)), 0, 0, 0);
-            GridCursor.Visibility = Visibility.Visible;
             switch (statisticsOptionListEnum)
             {
                 case StatisticsOptionListEnum.AVG_PER_WEEK:
@@ -97,21 +105,18 @@ namespace CovidKeeperFrontend.Views
                     ColumnGraph.Visibility = Visibility.Visible;
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
-                    CommentText.Visibility = Visibility.Visible;
                     break;
                 case StatisticsOptionListEnum.AVG_PER_MONTH:
                     (Application.Current as App).StatisticalDataViewModel.VM_SelectedValueOfStatisticsOptionListProperty = StatisticsOptionListEnum.AVG_PER_MONTH;
                     ColumnGraph.Visibility = Visibility.Visible;
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
-                    CommentText.Visibility = Visibility.Visible;
                     break;
                 case StatisticsOptionListEnum.AVG_PER_WEEKDAY:
                     (Application.Current as App).StatisticalDataViewModel.VM_SelectedValueOfStatisticsOptionListProperty = StatisticsOptionListEnum.AVG_PER_WEEKDAY;
                     ColumnGraph.Visibility = Visibility.Hidden;
                     PieGraph.Visibility = Visibility.Visible;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Hidden;
-                    CommentText.Visibility = Visibility.Visible;
                     break;
                 case StatisticsOptionListEnum.TOTAL_EVENTS:
                     (Application.Current as App).StatisticalDataViewModel.GraphInRangeOrNotProperty = false;
@@ -119,33 +124,35 @@ namespace CovidKeeperFrontend.Views
                     ColumnGraph.Visibility = Visibility.Hidden;
                     PieGraph.Visibility = Visibility.Hidden;
                     ScrollOfAmountEventPerWeekTable.Visibility = Visibility.Visible;
-                    /*ShowGraphInThisRange.Visibility = Visibility.Visible;
-                    ShowGraphInThisRangeText.Visibility = Visibility.Visible;*/
-                    CommentText.Visibility = Visibility.Visible;
                     gridRowSelected = default;
                     break;
                 default:
                     break;
             }
         }
-
+        //Function that responsible on disable all the windows etc. and then the DialogHost will open for selecting date range
         private void ShowGraphInThisRange_Click(object sender, RoutedEventArgs e)
         {
             this.IsEnabled = false;
             SetIsEnabled(false);
         }
+
+        //Function that get boolean variable and set it in the mainWindow field
         private void SetIsEnabled(bool isEnable)
         {
-            if (mainWindowTemp != default)
+            if (mainWindow != default)
             {
-                mainWindowTemp.IsEnabled = isEnable;
+                mainWindow.IsEnabled = isEnable;
             }
         }
+
+        //Function for setting the mainWindow field
         public void SetMainWindow(MainMenu mainWindowTemp)
         {
-            this.mainWindowTemp = mainWindowTemp;
+            this.mainWindow = mainWindowTemp;
         }
 
+        //Function that responsible on closing the DialogHost of selecting date range and enable the window
         private void CancelAddWorkerButton_Click(object sender, RoutedEventArgs e)
         {
             DialogHost.CloseDialogCommand.Execute(null, null);
@@ -153,6 +160,7 @@ namespace CovidKeeperFrontend.Views
             SetIsEnabled(true);
         }
 
+        //Function that responsible on showing graph of sum events of a worker according to the selected row
         private void DetailsButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -172,6 +180,7 @@ namespace CovidKeeperFrontend.Views
                     // get the row
                     DataGridRow gridRowSelectedNow = (DataGridRow)dep;
                     Button detailsBtnNow = (Button)sender;
+                    //The rows are the same so close the graph and change the icon to ArrowDown
                     if (gridRowSelected == gridRowSelectedNow)
                     {
                         detailsBtn.Content = new MaterialDesignThemes.Wpf.PackIcon
@@ -181,6 +190,7 @@ namespace CovidKeeperFrontend.Views
                         detailsBtn = default;
                         return;
                     }
+                    //The first row so open the graph and change the icon to ArrowUp
                     else if (gridRowSelectedNow != null && gridRowSelected == default)
                     {
                         detailsBtnNow.Content = new MaterialDesignThemes.Wpf.PackIcon
@@ -189,6 +199,7 @@ namespace CovidKeeperFrontend.Views
                         gridRowSelected = gridRowSelectedNow;
                         gridRowSelected.DetailsVisibility = Visibility.Visible;
                     }
+                    //There is already one row that still open so close the graph and open the graph of the new row and change the icons
                     else if (gridRowSelectedNow != null && gridRowSelected != default)
                     {
                         detailsBtn.Content = new MaterialDesignThemes.Wpf.PackIcon
@@ -207,9 +218,11 @@ namespace CovidKeeperFrontend.Views
             }
         }
 
+        //Function that reponsible on updating the date range
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            if (StartDatePicker.SelectedDate == default && EndDatePicker.SelectedDate == default)
+            //Check if one of the selected dates are default
+            if (StartDatePicker.SelectedDate == default || EndDatePicker.SelectedDate == default)
             {
                 MessageBox.Show("You have to insert start date and end date");
                 return;

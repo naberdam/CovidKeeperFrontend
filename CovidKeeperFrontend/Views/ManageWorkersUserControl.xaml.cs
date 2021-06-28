@@ -76,6 +76,7 @@ namespace CovidKeeperFrontend.Views
             indexOfSelectedRow = WorkerDetailsTable.Items.IndexOf(WorkerDetailsTable.CurrentItem);
             DataRowView rowSelectedNow = WorkerDetailsTable.CurrentCell.Item as DataRowView;
             string idWorker = rowSelectedNow["Id"].ToString();
+            //Calling the delete function in the view model
             await (Application.Current as App).ManageWorkersViewModel.DeleteWorker(idWorker, indexOfSelectedRow);
             ClearFields();
         }
@@ -114,13 +115,10 @@ namespace CovidKeeperFrontend.Views
             string idWorker = IdWorker.Text;
             string emailAddress = EmailAddress.Text;
             string fullName = FullName.Text;
-            if (idWorker.Equals("") || fullName.Equals("") || emailAddress.Equals("") || bitmapImage == default)
-            {
-                MessageBox.Show("You have to insert name, email and image");
-                return;
-            }
-            bool checkIfInsertionSecceed = (Application.Current as App).ManageWorkersViewModel.InsertWorker(idWorker, fullName, emailAddress, bitmapImage);
-            if (checkIfInsertionSecceed)
+            bool checkIfInsertionSucceed = (Application.Current as App).ManageWorkersViewModel.InsertWorker(idWorker, fullName, 
+                emailAddress, bitmapImage);
+            //Check if insert worker succeed or not
+            if (checkIfInsertionSucceed)
             {
                 ClearFields();
                 this.IsEnabled = true;
@@ -138,6 +136,7 @@ namespace CovidKeeperFrontend.Views
             SetIsEnabled(true);
         }
 
+        //Function to load image from client's computer
         private void LoadButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
@@ -154,6 +153,7 @@ namespace CovidKeeperFrontend.Views
                 bitmapImage = new BitmapImage(new Uri(openFileDialog.FileName));
                 ImageWorker.Source = bitmapImage;
                 imageIsGood = true;
+                //Check if all values are set properly for IsEnabled of AddButton
                 if (fullNameIsGood && emailAddressIsGood && idWorkerIsGood)
                 {
                     AddButton.IsEnabled = true;
@@ -166,6 +166,7 @@ namespace CovidKeeperFrontend.Views
         }
         private void PlusButton_Click(object sender, RoutedEventArgs e)
         {
+            //Disable all windows and user controls besides of the DialogHost of adding worker
             this.IsEnabled = false;
             SetIsEnabled(false);
         }
@@ -285,6 +286,7 @@ namespace CovidKeeperFrontend.Views
             }
         }
 
+        //Function for changing the dataTable from search to represent all workers
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
             (Application.Current as App).ManageWorkersViewModel.GetWorkersDetailsAfterRefresh();
@@ -341,6 +343,7 @@ namespace CovidKeeperFrontend.Views
             }
         }
 
+        //Function that save the update 
         private void SaveUpdateButton_Click(object sender, RoutedEventArgs e)
         {
             string idWorker = IdWorkerUpdate.Text;
