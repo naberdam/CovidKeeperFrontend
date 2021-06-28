@@ -32,7 +32,7 @@
                                     <TextBox.Text>
                                         <Binding Path="IdWorkerRuleProperty" ValidatesOnDataErrors="True" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
-                                                <DetalisRules:IdRules MinimumDigits="5"/>
+                                                <DetalisRules:IdRules MinimumDigits="1" MaximumDigits="50"/>
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </TextBox.Text>
@@ -44,7 +44,7 @@
                                     <TextBox.Text>
                                         <Binding Path="FullNameRuleProperty" ValidatesOnDataErrors="True" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
-                                                <DetalisRules:FullNameRules MinimumCharactersForEachWord="2"/>
+                                                <DetalisRules:FullNameRules MinimumCharactersForEachWord="2" MaximumCharacters="150"/>
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </TextBox.Text>
@@ -56,7 +56,7 @@
                                     <TextBox.Text>
                                         <Binding Path="EmailAddressRuleProperty" ValidatesOnDataErrors="True" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
-                                                <DetalisRules:EmailAddressRules/>
+                                                <DetalisRules:EmailAddressRules MaximumCharacters="100"/>
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </TextBox.Text>
@@ -125,7 +125,7 @@
                                     <TextBox.Text>
                                         <Binding Path="IdWorkerUpdateRuleProperty" ValidatesOnDataErrors="True" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
-                                                <DetalisRules:IdRules MinimumDigits="5"/>
+                                                <DetalisRules:IdRules MinimumDigits="1" MaximumDigits="50"/>
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </TextBox.Text>
@@ -137,7 +137,7 @@
                                     <TextBox.Text>
                                         <Binding Path="FullNameUpdateRuleProperty" ValidatesOnDataErrors="True" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
-                                                <DetalisRules:FullNameRules MinimumCharactersForEachWord="2"/>
+                                                <DetalisRules:FullNameRules MinimumCharactersForEachWord="2" MaximumCharacters="150"/>
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </TextBox.Text>
@@ -149,7 +149,7 @@
                                     <TextBox.Text>
                                         <Binding Path="EmailAddressUpdateRuleProperty" ValidatesOnDataErrors="True" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
-                                                <DetalisRules:EmailAddressRules/>
+                                                <DetalisRules:EmailAddressRules MaximumCharacters="100"/>
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </TextBox.Text>

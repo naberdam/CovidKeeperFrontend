@@ -12,6 +12,7 @@ namespace CovidKeeperFrontend.Views.UserDetailsRules
     public class FullNameRules : ValidationRule
     {
         public int MinimumCharactersForEachWord { get; set; }
+        public int MaximumCharacters { get; set; }
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
             string fullName = value as string;
@@ -29,14 +30,19 @@ namespace CovidKeeperFrontend.Views.UserDetailsRules
             if (!fullName.Contains(' '))
             {
                 return new ValidationResult(false, $"Full name must have at least two words");
-            }           
+            }
+            //Check if this string has the maximum length
+            if (fullName.Length > MaximumCharacters)
+            {
+                return new ValidationResult(false, $"At most {MaximumCharacters} characters");
+            }
             //Check if each word in this string has the minimum length
             string[] fullNameArray = fullName.Split();
             foreach (string word in fullNameArray)
             {
                 if (word.Length < MinimumCharactersForEachWord)
                 {
-                    return new ValidationResult(false, $"At least {MinimumCharactersForEachWord} characters for each word");
+                    return new ValidationResult(false, $"At least {MinimumCharactersForEachWord} characters in each word");
                 }
             }
             /*if (fullNameArray[0].Length < MinimumCharactersForEachWord || fullNameArray[1].Length < MinimumCharactersForEachWord)

@@ -11,6 +11,7 @@ namespace CovidKeeperFrontend.Views.UserDetailsRules
 {
     public class IdRules : ValidationRule
     {
+        public int MaximumDigits { get; set; }
         public int MinimumDigits { get; set; }
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
@@ -28,9 +29,13 @@ namespace CovidKeeperFrontend.Views.UserDetailsRules
             //Check if this string has the minimum length
             if (id.Length < MinimumDigits)
             {
-                return new ValidationResult(false, $"Id at least {MinimumDigits} digits");
+                return new ValidationResult(false, $"At least {MinimumDigits} digits");
             }
-
+            //Check if this string has the maximum length
+            if (id.Length > MaximumDigits)
+            {
+                return new ValidationResult(false, $"At most {MaximumDigits} digits");
+            }
             return new ValidationResult(true, null);
         }
     }

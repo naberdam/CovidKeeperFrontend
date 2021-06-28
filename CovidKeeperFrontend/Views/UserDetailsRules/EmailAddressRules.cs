@@ -7,6 +7,7 @@ namespace CovidKeeperFrontend.Views.UserDetailsRules
 {
     public class EmailAddressRules : ValidationRule
     {
+        public int MaximumCharacters { get; set; }
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
             string emailAddress = value as string;
@@ -30,6 +31,11 @@ namespace CovidKeeperFrontend.Views.UserDetailsRules
             if (!Regex.IsMatch(emailAddress, "^([a-zA-Z._0-9]+)@([a-zA-Z_0-9]+)\\.([a-zA-Z._0-9]+)$"))
             {
                 return new ValidationResult(false, $"Invalid email address");
+            }
+            //Check if this string has the maximum length
+            if (emailAddress.Length > MaximumCharacters)
+            {
+                return new ValidationResult(false, $"At most {MaximumCharacters} characters");
             }
             return new ValidationResult(true, null);
         }
