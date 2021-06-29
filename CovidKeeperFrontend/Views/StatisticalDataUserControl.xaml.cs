@@ -70,6 +70,7 @@ namespace CovidKeeperFrontend.Views
             {
                 gridRowSelected.DetailsVisibility = Visibility.Collapsed;
             }
+            GridCursor.Margin = new Thickness(10, 0, 0, 0);
             AmountEventPerWeekTable.SelectedIndex = -1;
             ColumnGraph.Visibility = Visibility.Visible;
             PieGraph.Visibility = Visibility.Hidden;
