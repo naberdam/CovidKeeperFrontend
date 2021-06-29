@@ -64,7 +64,14 @@ namespace CovidKeeperFrontend.Model
                     //This is SearchWorkerDetailsTableProperty and not WorkersDetailsTableProperty
                     SearchOrWorkersTableProperty = true;
                     //Update the CountWorkersInWorkersDetailsTableProperty with the number of rows of this dataTable
-                    CountWorkersInSearchWorkersDetailsTableProperty = value.Rows.Count.ToString();                    
+                    if (value == default)
+                    {
+                        CountWorkersInSearchWorkersDetailsTableProperty = "0";
+                    }
+                    else
+                    {
+                        CountWorkersInSearchWorkersDetailsTableProperty = value.Rows.Count.ToString();
+                    }                  
                     NotifyPropertyChanged("WorkerDetailsTableProperty");
                 }
             }
@@ -382,7 +389,8 @@ namespace CovidKeeperFrontend.Model
         //Function that refresh WorkerDetailsTableProperty and returns it to the ManageWorkersUserControl
         public void GetWorkersDetailsAfterRefresh()
         {
-            SearchOrWorkersTableProperty = false;
+            SearchWorkerDetailsTableProperty = default;
+            SearchOrWorkersTableProperty = false;            
             NotifyPropertyChanged("WorkerDetailsTableProperty");
             NotifyPropertyChanged("CountWorkersInWorkersDetailsTableProperty");
             CountWorkersInSearchWorkersDetailsTableProperty = default;

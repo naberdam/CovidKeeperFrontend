@@ -70,6 +70,14 @@ namespace CovidKeeperFrontend.Model
         //Function that check if the given datatables are the same
         public static bool AreTablesTheSame(DataTable tbl1, DataTable tbl2)
         {
+            if (tbl1 == default && tbl2 == default)
+            {
+                return true;
+            }
+            if (tbl1 == default || tbl2 == default)
+            {
+                return false;
+            }
             //If the amount of the rows or columns in each datatable are equal
             if (tbl1.Rows.Count != tbl2.Rows.Count || tbl1.Columns.Count != tbl2.Columns.Count)
                 return false;

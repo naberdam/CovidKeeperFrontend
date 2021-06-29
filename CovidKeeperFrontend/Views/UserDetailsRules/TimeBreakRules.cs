@@ -28,11 +28,6 @@ namespace CovidKeeperFrontend.Views.UserDetailsRules
             {
                 return new ValidationResult(false, $"Minutes can't start with 0");
             }
-            /*int timeBreak = Int32.Parse(timeBreakString);
-            if (timeBreak < 0)
-            {
-                return new ValidationResult(false, $"Only a positive number is allowed");
-            }*/
             return new ValidationResult(true, null);
         }
     }
