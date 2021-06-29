@@ -444,7 +444,8 @@ namespace CovidKeeperFrontend.Model
             {
                 if (StartDateInDatePickerProperty.Equals(default))
                 {
-                    string minDateQuery = "select min(Time_of_event) from [dbo].[History_Events]";
+                    string minDateQuery = "select min(" + GlobalVariables.TIME_OF_EVENT_FIELD + ") " +
+                    "from [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "]";
                     object[] minDate = QuerySelectOfOneRow(minDateQuery);
                     //If we have events, so we want to define the StartDateInDatePickerProperty to be the minimum date
                     if (minDate != null)
@@ -476,10 +477,11 @@ namespace CovidKeeperFrontend.Model
         //Function that gets the average of the events per week and updates the ColumnGraphProperty for representing the graph to the client
         public void GetAvgEventsPerWeek()
         {
-            string avgEventsPerWeekQuery = "Select DISTINCT DATEPART(WEEK, Time_of_event) AS WW, DATEPART(year, Time_of_event) AS Year, " +
-                "COUNT(CONVERT(date, Time_of_event)) / 5.0 AS Avg " +
-                "from[dbo].[History_Events] " +
-                "group by DATEPART(WEEK, Time_of_event), DATEPART(year, Time_of_event); ";
+            string avgEventsPerWeekQuery = "Select DISTINCT DATEPART(WEEK, " + GlobalVariables.TIME_OF_EVENT_FIELD + ") AS WW, " +
+                "DATEPART(year, " + GlobalVariables.TIME_OF_EVENT_FIELD + ") AS Year, " +
+                "COUNT(CONVERT(date, " + GlobalVariables.TIME_OF_EVENT_FIELD + ")) / 5.0 AS Avg " +
+                "from[" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "] " +
+                "group by DATEPART(WEEK, " + GlobalVariables.TIME_OF_EVENT_FIELD + "), DATEPART(year, " + GlobalVariables.TIME_OF_EVENT_FIELD + "); ";
             List<object[]> avgEventsPerWeekList = QuerySelectOfMultiRows(avgEventsPerWeekQuery);
 
             if (avgEventsPerWeekList != null)
@@ -499,10 +501,11 @@ namespace CovidKeeperFrontend.Model
         //and updates the ColumnGraphProperty for representing the graph to the client
         public void GetAvgEventsPerWeekWithRange(DateTime startDate, DateTime endDate)
         {
-            string avgEventsPerWeekQuery = "Select DISTINCT DATEPART(WEEK, Time_of_event) AS WW, DATEPART(year, Time_of_event) AS Year, " +
-                "COUNT(CONVERT(date, Time_of_event)) / 5.0 AS Avg " +
-                "from[dbo].[History_Events] " +
-                "group by DATEPART(WEEK, Time_of_event), DATEPART(year, Time_of_event); ";
+            string avgEventsPerWeekQuery = "Select DISTINCT DATEPART(WEEK, " + GlobalVariables.TIME_OF_EVENT_FIELD + ") AS WW, " +
+                "DATEPART(year, " + GlobalVariables.TIME_OF_EVENT_FIELD + ") AS Year, " +
+                "COUNT(CONVERT(date, " + GlobalVariables.TIME_OF_EVENT_FIELD + ")) / 5.0 AS Avg " +
+                "from[" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "] " +
+                "group by DATEPART(WEEK, " + GlobalVariables.TIME_OF_EVENT_FIELD + "), DATEPART(year, " + GlobalVariables.TIME_OF_EVENT_FIELD + "); ";
             List<object[]> avgEventsPerWeekList = QuerySelectOfMultiRows(avgEventsPerWeekQuery);
 
             if (avgEventsPerWeekList != null)
@@ -558,10 +561,11 @@ namespace CovidKeeperFrontend.Model
         //Function that gets the average events per month and updating the ColumnGraphProperty property
         public void GetAvgEventsPerMonth()
         {
-            string avgEventsPerMonthQuery = "Select DISTINCT DATEPART(month, Time_of_event) AS Month, DATEPART(year, Time_of_event) AS Year, " +
-                "COUNT(CONVERT(date, Time_of_event)) / 20.0 AS Avg " +
-                "from[dbo].[History_Events] " +
-                "group by DATEPART(month, Time_of_event), DATEPART(year, Time_of_event); ";
+            string avgEventsPerMonthQuery = "Select DISTINCT DATEPART(month, " + GlobalVariables.TIME_OF_EVENT_FIELD + ") AS Month, " +
+                "DATEPART(year, " + GlobalVariables.TIME_OF_EVENT_FIELD + ") AS Year, " +
+                "COUNT(CONVERT(date, " + GlobalVariables.TIME_OF_EVENT_FIELD + ")) / 20.0 AS Avg " +
+                "from[" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "] " +
+                "group by DATEPART(month, " + GlobalVariables.TIME_OF_EVENT_FIELD + "), DATEPART(year, " + GlobalVariables.TIME_OF_EVENT_FIELD + "); ";
             List<object[]> avgEventsPerMonthList = QuerySelectOfMultiRows(avgEventsPerMonthQuery);
 
             if (avgEventsPerMonthList != null)
@@ -580,10 +584,11 @@ namespace CovidKeeperFrontend.Model
         //Function that gets the average events per month with range and updating the ColumnGraphProperty property
         public void GetAvgEventsPerMonthWithRange(DateTime startDate, DateTime endDate)
         {
-            string avgEventsPerMonthQuery = "Select DISTINCT DATEPART(month, Time_of_event) AS Month, DATEPART(year, Time_of_event) AS Year, " +
-                "COUNT(CONVERT(date, Time_of_event)) / 20.0 AS Avg " +
-                "from[dbo].[History_Events] " +
-                "group by DATEPART(month, Time_of_event), DATEPART(year, Time_of_event); ";
+            string avgEventsPerMonthQuery = "Select DISTINCT DATEPART(month, " + GlobalVariables.TIME_OF_EVENT_FIELD + ") AS Month, " +
+                "DATEPART(year, " + GlobalVariables.TIME_OF_EVENT_FIELD + ") AS Year, " +
+                "COUNT(CONVERT(date, " + GlobalVariables.TIME_OF_EVENT_FIELD + ")) / 20.0 AS Avg " +
+                "from[" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "] " +
+                "group by DATEPART(month, " + GlobalVariables.TIME_OF_EVENT_FIELD + "), DATEPART(year, " + GlobalVariables.TIME_OF_EVENT_FIELD + "); ";
             List<object[]> avgEventsPerMonthList = QuerySelectOfMultiRows(avgEventsPerMonthQuery);
 
             if (avgEventsPerMonthList != null)
@@ -670,10 +675,10 @@ namespace CovidKeeperFrontend.Model
         //Function that gets the average events per week day and updating the ColumnGraphProperty
         public void GetAvgEventsPerWeekday()
         {
-            string avgEventsPerWeekdayQuery = "Select DISTINCT DATEPART(weekday, Time_of_event) AS Weekday, " +
-                "COUNT(CONVERT(date, Time_of_event)) / 5.0 AS Avg " +
-                "from[dbo].[History_Events] " +
-                "group by DATEPART(weekday, Time_of_event); ";
+            string avgEventsPerWeekdayQuery = "Select DISTINCT DATEPART(weekday, " + GlobalVariables.TIME_OF_EVENT_FIELD + ") AS Weekday, " +
+                "COUNT(CONVERT(date, " + GlobalVariables.TIME_OF_EVENT_FIELD + ")) / 5.0 AS Avg " +
+                "from[" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "] " +
+                "group by DATEPART(weekday, " + GlobalVariables.TIME_OF_EVENT_FIELD + "); ";
             List<object[]> avgEventsPerWeekdayList = QuerySelectOfMultiRows(avgEventsPerWeekdayQuery);
             //Check if avgEventsPerWeekdayList is not null
             if (avgEventsPerWeekdayList != null)
@@ -691,11 +696,11 @@ namespace CovidKeeperFrontend.Model
         //Function that gets the average events per week day with range from startDate to endDate and updating the ColumnGraphProperty
         public void GetAvgEventsPerWeekdayWithRange(DateTime startDate, DateTime endDate)
         {
-            string avgEventsPerWeekdayQuery = "Select DISTINCT DATEPART(weekday, Time_of_event) AS Weekday, " +
-                "COUNT(CONVERT(date, Time_of_event)) / 5.0 AS Avg " +
-                "from [dbo].[History_Events] " +
-                "where (Time_of_event > '" + startDate.ToString("MM/dd/yyyy") + "' and Time_of_event < '" + endDate.ToString("MM/dd/yyyy") + "') " +
-                "group by DATEPART(weekday, Time_of_event); ";
+            string avgEventsPerWeekdayQuery = "Select DISTINCT DATEPART(weekday, " + GlobalVariables.TIME_OF_EVENT_FIELD + ") AS Weekday, " +
+                "COUNT(CONVERT(date, " + GlobalVariables.TIME_OF_EVENT_FIELD + ")) / 5.0 AS Avg " +
+                "from [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "] " +
+                "where (" + GlobalVariables.TIME_OF_EVENT_FIELD + " > '" + startDate.ToString("MM/dd/yyyy") + "' and " + GlobalVariables.TIME_OF_EVENT_FIELD + " < '" + endDate.ToString("MM/dd/yyyy") + "') " +
+                "group by DATEPART(weekday, " + GlobalVariables.TIME_OF_EVENT_FIELD + "); ";
             List<object[]> avgEventsPerWeekdayList = QuerySelectOfMultiRows(avgEventsPerWeekdayQuery);
 
             if (avgEventsPerWeekdayList != null)
@@ -716,38 +721,29 @@ namespace CovidKeeperFrontend.Model
         //Function that gets the amount events for each worker and updating the AmountEventsByWorkerTableProperty
         public void GetAmountEventsByWorker()
         {
-            string amountEventsPerWorkerQuery = "Select DISTINCT Id_worker, FullName, " +
-                "COUNT(Id_worker) AS Count " +
-                "from[dbo].[History_Events] " +
-                "INNER JOIN [dbo].[Workers] ON [dbo].[History_Events].Id_worker=[dbo].[Workers].Id " +
-                "group by Id_worker, FullName " +
+            string amountEventsPerWorkerQuery = "Select DISTINCT " + GlobalVariables.ID_WORKER_FIELD + ", " + GlobalVariables.FULL_NAME_FIELD + ", " +
+                "COUNT(" + GlobalVariables.ID_WORKER_FIELD + ") AS Count " +
+                "from[" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "] " +
+                "INNER JOIN [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.WORKERS_TABLE_NAME + "] " +
+                "ON [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "]." + GlobalVariables.ID_WORKER_FIELD + "=[" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.WORKERS_TABLE_NAME + "]." + GlobalVariables.ID_FIELD + " " +
+                "group by " + GlobalVariables.ID_WORKER_FIELD + ", " + GlobalVariables.FULL_NAME_FIELD + " " +
                 "order by count desc; ";
-            DataTable dataTableAmountEventsPerWorker = GetDataTableByQuery(amountEventsPerWorkerQuery, "History_Events");
+            DataTable dataTableAmountEventsPerWorker = GetDataTableByQuery(amountEventsPerWorkerQuery, "" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "");
             dataTableAmountEventsPerWorker = InitialGraphColumnsToDefault(dataTableAmountEventsPerWorker);
-            /*dataTableAmountEventsPerWorker.Columns.Add("LineSeriesGraph", typeof(SeriesCollection));
-            dataTableAmountEventsPerWorker.Columns.Add("LabelsGraph", typeof(string[]));
-            dataTableAmountEventsPerWorker.Columns.Add("TitleGraph", typeof(string));
-            //Initialize the new columns to be default value
-            foreach (DataRow row in dataTableAmountEventsPerWorker.Rows)
-            {
-                row["LineSeriesGraph"] = default;
-                row["LabelsGraph"] = default;
-                row["TitleGraph"] = default;
-            }*/
             AmountEventsByWorkerTableProperty = dataTableAmountEventsPerWorker;
         }
 
         //Function that gets the amount events for each worker with range from startDate to endDate and updating the AmountEventsByWorkerTableProperty
         public void GetAmountEventsByWorkerWithRange(DateTime startDate, DateTime endDate)
         {
-            string amountEventsPerWorkerQuery = "Select DISTINCT Id_worker, FullName, " +
-                "COUNT(Id_worker) AS Count " +
-                "from[dbo].[History_Events] " +
-                "INNER JOIN [dbo].[Workers] ON [dbo].[History_Events].Id_worker=[dbo].[Workers].Id " +
-                "where (Time_of_event > '" + startDate.ToString("MM/dd/yyyy") + "' and Time_of_event < '" + endDate.ToString("MM/dd/yyyy") + "') " +
-                "group by Id_worker, FullName " +
+            string amountEventsPerWorkerQuery = "Select DISTINCT " + GlobalVariables.ID_WORKER_FIELD + ", " + GlobalVariables.FULL_NAME_FIELD + ", " +
+                "COUNT(" + GlobalVariables.ID_WORKER_FIELD + ") AS Count " +
+                "from[" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "] " +
+                "INNER JOIN [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.WORKERS_TABLE_NAME + "] ON [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "]." + GlobalVariables.ID_WORKER_FIELD + "=[" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.WORKERS_TABLE_NAME + "]." + GlobalVariables.ID_FIELD + " " +
+                "where (" + GlobalVariables.TIME_OF_EVENT_FIELD + " > '" + startDate.ToString("MM/dd/yyyy") + "' and " + GlobalVariables.TIME_OF_EVENT_FIELD + " < '" + endDate.ToString("MM/dd/yyyy") + "') " +
+                "group by " + GlobalVariables.ID_WORKER_FIELD + ", " + GlobalVariables.FULL_NAME_FIELD + " " +
                 "order by count desc; ";
-            DataTable dataTableAmountEventsPerWorker = GetDataTableByQuery(amountEventsPerWorkerQuery, "History_Events");
+            DataTable dataTableAmountEventsPerWorker = GetDataTableByQuery(amountEventsPerWorkerQuery, GlobalVariables.HISTORY_EVENTS_TABLE_NAME);
             dataTableAmountEventsPerWorker = InitialGraphColumnsToDefault(dataTableAmountEventsPerWorker);
             WeekOrMonthForDateRangeTextProperty = "days";
             AmountEventsByWorkerTableProperty = dataTableAmountEventsPerWorker;
@@ -774,10 +770,12 @@ namespace CovidKeeperFrontend.Model
         //Function that gets the average events per week with range from startDate to endDate for each worker and updating the AmountEventsByWorkerTableProperty
         public void GetAvgEventsPerWeekPerWorker(string idWorker)
         {
-            string avgEventsPerWeekPerWorkerQuery = "Select DISTINCT DATEPART(WEEK, Time_of_event) AS WW, DATEPART(year, Time_of_event) AS Year, " +
-                "COUNT(CONVERT(date, Time_of_event)) AS Avg " +
-                "from[dbo].[History_Events] where Id_worker = " + idWorker +
-                " group by DATEPART(WEEK, Time_of_event), DATEPART(year, Time_of_event); ";
+            string avgEventsPerWeekPerWorkerQuery = "Select DISTINCT DATEPART(WEEK, " + GlobalVariables.TIME_OF_EVENT_FIELD + ") AS WW, " +
+                "DATEPART(year, " + GlobalVariables.TIME_OF_EVENT_FIELD + ") AS Year, " +
+                "COUNT(CONVERT(date, " + GlobalVariables.TIME_OF_EVENT_FIELD + ")) AS Avg " +
+                "from [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "] " +
+                "where " + GlobalVariables.ID_WORKER_FIELD + " = '" + idWorker + "'" +
+                " group by DATEPART(WEEK, " + GlobalVariables.TIME_OF_EVENT_FIELD + "), DATEPART(year, " + GlobalVariables.TIME_OF_EVENT_FIELD + "); ";
             List<object[]> avgEventsPerWeekPerWorkerList = QuerySelectOfMultiRows(avgEventsPerWeekPerWorkerQuery);
 
             if (avgEventsPerWeekPerWorkerList != null)
@@ -789,9 +787,9 @@ namespace CovidKeeperFrontend.Model
                     this.workWeekAndAmountEventsDict[weekStr] = Convert.ToDouble(item[2]);
                 }
                 DataTable tempAmountEventsByWorkerTableProperty = AmountEventsByWorkerTableProperty;
-                DataRow[] foundRows = tempAmountEventsByWorkerTableProperty.Select("Id_worker = " + idWorker);
+                DataRow[] foundRows = tempAmountEventsByWorkerTableProperty.Select(GlobalVariables.ID_WORKER_FIELD + " = '" + idWorker + "'");
                 //Set the graph that the client wanted to see
-                foundRows[0]["LineSeriesGraph"] = GetLineSeriesGraph("Total Events Per Week Of " + foundRows[0]["FullName"].ToString());
+                foundRows[0]["LineSeriesGraph"] = GetLineSeriesGraph("Total Events Per Week Of " + foundRows[0][GlobalVariables.FULL_NAME_FIELD].ToString());
                 foundRows[0]["LabelsGraph"] = (new List<string>(this.workWeekAndAmountEventsDict.Keys)).ToArray();
                 foundRows[0]["TitleGraph"] = WeekOrMonth.Week;
                 AmountEventsByWorkerTableProperty = tempAmountEventsByWorkerTableProperty;
@@ -799,11 +797,12 @@ namespace CovidKeeperFrontend.Model
         }
         public void GetAvgEventsPerWeekPerWorkerWithRange(string idWorker, DateTime startDate, DateTime endDate)
         {
-            string avgEventsPerWeekPerWorkerQuery = "Select DISTINCT DATEPART(WEEK, Time_of_event) AS WW, DATEPART(year, Time_of_event) AS Year, " +
-                "COUNT(CONVERT(date, Time_of_event)) AS Avg " +
-                "from[dbo].[History_Events] " +
-                "where Id_worker = " + idWorker + " and (Time_of_event > '" + startDate.ToString("MM/dd/yyyy") + "' and Time_of_event < '" + endDate.ToString("MM/dd/yyyy") + "') " +
-                " group by DATEPART(WEEK, Time_of_event), DATEPART(year, Time_of_event); ";
+            string avgEventsPerWeekPerWorkerQuery = "Select DISTINCT DATEPART(WEEK, " + GlobalVariables.TIME_OF_EVENT_FIELD + ") AS WW, DATEPART(year, Time_of_event) AS Year, " +
+                "COUNT(CONVERT(date, " + GlobalVariables.TIME_OF_EVENT_FIELD + ")) AS Avg " +
+                "from[" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "] " +
+                "where " + GlobalVariables.ID_WORKER_FIELD + " = '" + idWorker + "' " +
+                "and (" + GlobalVariables.TIME_OF_EVENT_FIELD + " > '" + startDate.ToString("MM/dd/yyyy") + "' and " + GlobalVariables.TIME_OF_EVENT_FIELD + " < '" + endDate.ToString("MM/dd/yyyy") + "') " +
+                " group by DATEPART(WEEK, " + GlobalVariables.TIME_OF_EVENT_FIELD + "), DATEPART(year, " + GlobalVariables.TIME_OF_EVENT_FIELD + "); ";
             List<object[]> avgEventsPerWeekPerWorkerList = QuerySelectOfMultiRows(avgEventsPerWeekPerWorkerQuery);
 
             if (avgEventsPerWeekPerWorkerList != null)
@@ -815,9 +814,9 @@ namespace CovidKeeperFrontend.Model
                     this.workWeekAndAmountEventsDict[weekStr] = Convert.ToDouble(item[2]);
                 }
                 DataTable tempAmountEventsByWorkerTableProperty = AmountEventsByWorkerTableProperty;
-                DataRow[] foundRows = tempAmountEventsByWorkerTableProperty.Select("Id_worker = " + idWorker);
+                DataRow[] foundRows = tempAmountEventsByWorkerTableProperty.Select("" + GlobalVariables.ID_WORKER_FIELD + " = '" + idWorker + "'");
                 //Set the graph that the client wanted to see
-                foundRows[0]["LineSeriesGraph"] = GetLineSeriesGraph("Total Events Per Week Of " + foundRows[0]["FullName"].ToString());
+                foundRows[0]["LineSeriesGraph"] = GetLineSeriesGraph("Total Events Per Week Of " + foundRows[0][GlobalVariables.FULL_NAME_FIELD].ToString());
                 foundRows[0]["LabelsGraph"] = (new List<string>(this.workWeekAndAmountEventsDict.Keys)).ToArray();
                 foundRows[0]["TitleGraph"] = WeekOrMonth.Week;
                 AmountEventsByWorkerTableProperty = tempAmountEventsByWorkerTableProperty;

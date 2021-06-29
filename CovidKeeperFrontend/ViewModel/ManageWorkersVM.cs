@@ -115,23 +115,20 @@ namespace CovidKeeperFrontend.ViewModel
         }
         public NotifyTaskCompletion<bool> InsertWorkerAsync { get; private set; }
         //Function that responsible on insert worker
-        public bool InsertWorker(string idWorker, string fullname, string emailAddress, BitmapImage imagePath)
+        public void InsertWorker(string idWorker, string fullname, string emailAddress, BitmapImage imagePath)
         {
             InsertWorkerAsync = new NotifyTaskCompletion<bool>(this.model.InsertWorker(idWorker, fullname, emailAddress, imagePath));
-            return InsertWorkerAsync.Result;
         }
         public NotifyTaskCompletion<bool> UpdateWorkerDetailsAsync { get; private set; }
         //Function that responsible on updating worker details
-        public bool UpdateWorkerDetails(string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
+        public void UpdateWorkerDetails(string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
         {
             UpdateWorkerDetailsAsync = new NotifyTaskCompletion<bool>(this.model.UpdateWorkerDetails(idWorker, fullname, emailAddress, imagePath, indexOfSelectedRow));
-            return UpdateWorkerDetailsAsync.Result;
         }
         //Function that responsible on updating worker details while there is new id
-        public bool UpdateWorkerDetailsWithNewId(string idWorkerInDataTable, string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
+        public void UpdateWorkerDetailsWithNewId(string idWorkerInDataTable, string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
         {
             UpdateWorkerDetailsAsync = new NotifyTaskCompletion<bool>(this.model.UpdateWorkerDetailsWithNewId(idWorkerInDataTable, idWorker, fullname, emailAddress, imagePath, indexOfSelectedRow));
-            return UpdateWorkerDetailsAsync.Result;
         }
         //Function that responsible on deleting worker
         public async Task DeleteWorker(string idWorker, int indexOfSelectedRow)

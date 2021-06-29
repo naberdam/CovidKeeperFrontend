@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CovidKeeperFrontend.HelperClasses;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
@@ -25,7 +26,6 @@ namespace CovidKeeperFrontend.Model
                 if (workerDetailsTable != value)
                 {
                     workerDetailsTable = value;
-                    //CountWorkersInWorkersDetailsTableProperty = value.Rows.Count.ToString();
                     //Update the CountWorkersInWorkersDetailsTableProperty with the number of rows of this dataTable
                     CountWorkersInWorkersDetailsTableProperty = value.Rows.Count.ToString();
                     //Update the flag of UpdateHandleInAnalayzerConfig
@@ -100,11 +100,11 @@ namespace CovidKeeperFrontend.Model
             WorkerDetailsTableProperty.CaseSensitive = false;
             DataRow[] results = WorkerDetailsTableProperty.Select(query);
             WorkerDetailsTableProperty.CaseSensitive = true;
-            DataTable dataTable = new DataTable("Workers");
-            dataTable.Columns.Add("Id", typeof(String));
-            dataTable.Columns.Add("FullName", typeof(String));
-            dataTable.Columns.Add("Email_address", typeof(String));
-            dataTable.Columns.Add("Image", typeof(byte[]));
+            DataTable dataTable = new DataTable(GlobalVariables.WORKERS_TABLE_NAME);
+            dataTable.Columns.Add(GlobalVariables.ID_FIELD, typeof(String));
+            dataTable.Columns.Add(GlobalVariables.FULL_NAME_FIELD, typeof(String));
+            dataTable.Columns.Add(GlobalVariables.EMAIL_ADDRESS_FIELD, typeof(String));
+            dataTable.Columns.Add(GlobalVariables.IMAGE_FIELD, typeof(byte[]));
             foreach (DataRow row in results)
             {
                 dataTable.ImportRow(row);
@@ -115,19 +115,19 @@ namespace CovidKeeperFrontend.Model
         //Function that reponsible for searching worker by the given id
         public void SearchById(string idWorker)
         {
-            SearchWorkerDetailsTableProperty = SearchTableByQuery("Id like '%" + idWorker + "%'");
+            SearchWorkerDetailsTableProperty = SearchTableByQuery(GlobalVariables.ID_FIELD + " like '%" + idWorker + "%'");
         }
 
         //Function that reponsible for searching worker by the given fullName
         public void SearchByFullName(string fullName)
         {
-            SearchWorkerDetailsTableProperty = SearchTableByQuery("FullName like '%" + fullName + "%'");
+            SearchWorkerDetailsTableProperty = SearchTableByQuery(GlobalVariables.FULL_NAME_FIELD + " like '%" + fullName + "%'");
         }
 
         //Function that reponsible for searching worker by the given email address
         public void SearchByEmail(string emailAddress)
         {
-            SearchWorkerDetailsTableProperty = SearchTableByQuery("Email_address like '%" + emailAddress + "%'");
+            SearchWorkerDetailsTableProperty = SearchTableByQuery(GlobalVariables.EMAIL_ADDRESS_FIELD + " like '%" + emailAddress + "%'");
         }
 
         //Function that gets the the workers details table
@@ -135,14 +135,16 @@ namespace CovidKeeperFrontend.Model
         {
             await Task.Run(() =>
             {
-                DataTable dataTableImages = GetDataTableByQuery("Select * From [dbo].[Workers]", "Workers");
-                dataTableImages.Columns.Add("Image", typeof(byte[]));
-                dataTableImages.Columns.Add("Image_checkbox", typeof(bool));
+                DataTable dataTableImages = GetDataTableByQuery("Select * " +
+                    "From [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.WORKERS_TABLE_NAME + "]", 
+                    "" + GlobalVariables.WORKERS_TABLE_NAME + "");
+                dataTableImages.Columns.Add(GlobalVariables.IMAGE_FIELD, typeof(byte[]));
+                dataTableImages.Columns.Add(GlobalVariables.IMAGE_BOX_FIELD, typeof(bool));
                 foreach (DataRow row in dataTableImages.Rows)
                 {
                     string idWorker = row[0].ToString();
-                    row["Image"] = GetImageWorker(idWorker);
-                    row["Image_checkbox"] = true;
+                    row[GlobalVariables.IMAGE_FIELD] = GetImageWorker(idWorker);
+                    row[GlobalVariables.IMAGE_BOX_FIELD] = true;
                 }
                 WorkerDetailsTableProperty = dataTableImages;
             });            
@@ -151,10 +153,11 @@ namespace CovidKeeperFrontend.Model
         //Function that updates to 1 the Analayzer's flag in the azure database
         private async Task<int> UpdateHandleInAnalayzerConfig()
         {
-            string updateQuery = @"UPDATE [dbo].[Analayzer_config] SET Handle = @Handle";
+            string updateQuery = @"UPDATE [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.ANALAYZER_CONFIG_TABLE_NAME + "] " +
+                "SET " + GlobalVariables.HANDLE_ANALAYZER_FIELD + " = @" + GlobalVariables.HANDLE_ANALAYZER_FIELD + "";
             Dictionary<string, string> fieldNameToValueDict = new Dictionary<string, string>
             {
-                { "@Handle", "1" }
+                { "@" + GlobalVariables.HANDLE_ANALAYZER_FIELD + "", "1" }
             };
             await QueryDatabaseWithDict(updateQuery, fieldNameToValueDict);
             return default;
@@ -163,29 +166,21 @@ namespace CovidKeeperFrontend.Model
         //Function that insert worker to azure database and updating the WorkerDetailsTableProperty
         public async Task<bool> InsertWorker(string idWorker, string fullname, string emailAddress, BitmapImage imagePath)
         {
-            DataRow[] results = WorkerDetailsTableProperty.Select("Id = '" + idWorker + "'");
-            //Check if there is already worker with this id
-            if (results.Length > 0)
-            {
-                var name = results[0]["FullName"].ToString();                
-                MessageBox.Show("This id already belongs to " + name + ".\nPlease select another id.");
-                return false;
-            }
-            //There is not worker with this id
             byte[] imageToByte = ImagePathToByteArray(imagePath);
             await UploadImageToStorage(idWorker, imageToByte);
             DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
             workerDetailsTableTemp.Rows.Add(idWorker, fullname, emailAddress, imageToByte, true);
             WorkerDetailsTableProperty = workerDetailsTableTemp;
-            string insertQuery = @"INSERT INTO [dbo].[Workers] VALUES (@Id, @Fullname, @Email_address);";
+            string insertQuery = @"INSERT INTO [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.WORKERS_TABLE_NAME + "] " +
+                "VALUES (@" + GlobalVariables.ID_FIELD + ", @" + GlobalVariables.FULL_NAME_FIELD + ", @" + GlobalVariables.EMAIL_ADDRESS_FIELD + ");";
             Dictionary<string, string> fieldNameToValueDict = new Dictionary<string, string>
                 {
-                    { "@Id", idWorker },
-                    { "@FullName", fullname },
-                    { "@Email_address", emailAddress }
+                    { "@" + GlobalVariables.ID_FIELD + "", idWorker },
+                    { "@" + GlobalVariables.FULL_NAME_FIELD + "", fullname },
+                    { "@" + GlobalVariables.EMAIL_ADDRESS_FIELD + "", emailAddress }
                 };
             await QueryDatabaseWithDict(insertQuery, fieldNameToValueDict);
-            return true;
+            return default;
         }
 
         //Function that converts BitmapImage to byte array
@@ -218,17 +213,20 @@ namespace CovidKeeperFrontend.Model
             DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
             var rowToChange = workerDetailsTableTemp.Rows[indexOfSelectedRow];
             await UploadImageToStorage(idWorker, imageToByte);
-            rowToChange["Id"] = idWorker;
-            rowToChange["Fullname"] = fullname;
-            rowToChange["Email_address"] = emailAddress;
-            rowToChange["Image"] = imageToByte;
+            rowToChange[GlobalVariables.ID_FIELD] = idWorker;
+            rowToChange[GlobalVariables.FULL_NAME_FIELD] = fullname;
+            rowToChange[GlobalVariables.EMAIL_ADDRESS_FIELD] = emailAddress;
+            rowToChange[GlobalVariables.IMAGE_FIELD] = imageToByte;
             WorkerDetailsTableProperty = workerDetailsTableTemp;
-            string updateQuery = @"UPDATE [dbo].[Workers] SET FullName = @FullName, Email_address = @Email_address Where Id = @Id;";
+            string updateQuery = @"UPDATE [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.WORKERS_TABLE_NAME + "] " +
+                "SET " + GlobalVariables.FULL_NAME_FIELD + " = @" + GlobalVariables.FULL_NAME_FIELD + ", " +
+                "" + GlobalVariables.EMAIL_ADDRESS_FIELD + " = @" + GlobalVariables.EMAIL_ADDRESS_FIELD + " " +
+                "Where " + GlobalVariables.ID_FIELD + " = @" + GlobalVariables.ID_FIELD + ";";
             Dictionary<string, string> fieldNameToValueDict = new Dictionary<string, string>
                 {
-                    { "@Id", idWorker },
-                    { "@FullName", fullname },
-                    { "@Email_address", emailAddress }
+                    { "@" + GlobalVariables.ID_FIELD + "", idWorker },
+                    { "@" + GlobalVariables.FULL_NAME_FIELD + "", fullname },
+                    { "@" + GlobalVariables.EMAIL_ADDRESS_FIELD + "", emailAddress }
                 };
             await QueryDatabaseWithDict(updateQuery, fieldNameToValueDict);            
             return true;
@@ -236,37 +234,33 @@ namespace CovidKeeperFrontend.Model
         //Function that updates worker's details that has a new id and updates the WorkerDetalisTable
         public async Task<bool> UpdateWorkerDetailsWithNewId(string idWorkerInDataTable, string idWorker, string fullname, string emailAddress, BitmapImage imagePath, int indexOfSelectedRow)
         {
-            DataRow[] results = WorkerDetailsTableProperty.Select("Id = '" + idWorker + "'");
-            //Check if this new id is already in exists in WorkerDetailsTableProperty
-            if (results.Length > 0)
-            {
-                var name = results[0]["FullName"].ToString();
-                MessageBox.Show("This id already belongs to " + name + ".\nPlease select another id.");
-                return false;
-            }
             //It does not exists so updates the worker's details
             byte[] imageToByte = ImagePathToByteArray(imagePath);
             DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
             var rowToChange = workerDetailsTableTemp.Rows[indexOfSelectedRow];
             await UploadImageToStorage(idWorker, imageToByte);
-            rowToChange["Id"] = idWorker;
-            rowToChange["Fullname"] = fullname;
-            rowToChange["Email_address"] = emailAddress;
-            rowToChange["Image"] = imageToByte;
+            rowToChange[GlobalVariables.ID_FIELD] = idWorker;
+            rowToChange[GlobalVariables.FULL_NAME_FIELD] = fullname;
+            rowToChange[GlobalVariables.EMAIL_ADDRESS_FIELD] = emailAddress;
+            rowToChange[GlobalVariables.IMAGE_FIELD] = imageToByte;
             WorkerDetailsTableProperty = workerDetailsTableTemp;
             await UpdateWorkerId(idWorkerInDataTable, idWorker, fullname, emailAddress);            
-            return true;
+            return default;
         }
 
         //Function that updates worker's details in case the worker's id has been changed
         private async Task UpdateWorkerIdToNewId(string newIdWorker, string idWorkerToUpdate, string fullname, string emailAddress)
         {
-            string updateQuery = @"UPDATE [dbo].[Workers] SET Id = @Id, FullName = @FullName, Email_address = @Email_address Where Id = " + idWorkerToUpdate;
+            string updateQuery = @"UPDATE [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.WORKERS_TABLE_NAME + "] " +
+                "SET " + GlobalVariables.ID_FIELD + " = @" + GlobalVariables.ID_FIELD + ", " +
+                "" + GlobalVariables.FULL_NAME_FIELD + " = @" + GlobalVariables.FULL_NAME_FIELD + ", " +
+                "" + GlobalVariables.EMAIL_ADDRESS_FIELD + " = @" + GlobalVariables.EMAIL_ADDRESS_FIELD + " " +
+                "Where " + GlobalVariables.ID_FIELD + " = '" + idWorkerToUpdate + "'";
             Dictionary<string, string> fieldNameToValueDict = new Dictionary<string, string>
             {
-                { "@Id", newIdWorker },
-                { "@FullName", fullname },
-                { "@Email_address", emailAddress }
+                { "@" + GlobalVariables.ID_FIELD + "", newIdWorker },
+                { "@" + GlobalVariables.FULL_NAME_FIELD + "", fullname },
+                { "@" + GlobalVariables.EMAIL_ADDRESS_FIELD + "", emailAddress }
             };
             await QueryDatabaseWithDict(updateQuery, fieldNameToValueDict);
         }
@@ -275,10 +269,13 @@ namespace CovidKeeperFrontend.Model
         //so we need to delete and save all the worker's events, updating worker's id and then insert the events with the new id
         private async Task UpdateWorkerId(string idWorkerInDataTable, string idWorker, string fullname, string emailAddress)
         {
-            List<object[]> eventsByIdList = QuerySelectOfMultiRows("select * from [dbo].[History_Events] where Id_worker = '" + idWorkerInDataTable + "'");
+            List<object[]> eventsByIdList = QuerySelectOfMultiRows("select * " +
+                "from [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "] " +
+                "where " + GlobalVariables.ID_WORKER_FIELD + " = '" + idWorkerInDataTable + "'");
             if (eventsByIdList != null)
             {
-                string deleteQuery = @"DELETE FROM [dbo].[History_Events] WHERE Id_worker = '" + idWorkerInDataTable + "';";
+                string deleteQuery = @"DELETE FROM [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "] " +
+                    "WHERE " + GlobalVariables.ID_WORKER_FIELD + " = '" + idWorkerInDataTable + "';";
                 await QueryDatabaseWithDict(deleteQuery);
             }
             await UpdateWorkerIdToNewId(idWorker, idWorkerInDataTable, fullname, emailAddress);
@@ -292,7 +289,8 @@ namespace CovidKeeperFrontend.Model
         //Function that deletes worker and updating the WorkerDetailsTableProperty
         public async Task DeleteWorker(string idWorker, int indexOfSelectedRow=-1)
         {
-            string deleteQuery = @"DELETE FROM [dbo].[Workers] WHERE Id = " + idWorker + ";";
+            string deleteQuery = @"DELETE FROM [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.WORKERS_TABLE_NAME + "] " +
+                "WHERE " + GlobalVariables.ID_FIELD + " = '" + idWorker + "';";
             await QueryDatabaseWithDict(deleteQuery);
             await DeleteImageFromStorage(idWorker);
             DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;

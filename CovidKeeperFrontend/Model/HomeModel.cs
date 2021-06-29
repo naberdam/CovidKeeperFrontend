@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CovidKeeperFrontend.HelperClasses;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -89,7 +90,9 @@ namespace CovidKeeperFrontend.Model
             string countAllWorkers = await CountWorkers();
             await Task.Run(() =>
             {
-                string countQuery = "SELECT COUNT( DISTINCT[Id_worker]) as num_bad_workers FROM[dbo].[History_Events] WHERE DATEDIFF(day, Time_of_event, GETDATE())<= 0;";
+                string countQuery = "SELECT COUNT( DISTINCT[" + GlobalVariables.ID_WORKER_FIELD + "]) as num_bad_workers " +
+                "FROM[" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "] " +
+                "WHERE DATEDIFF(day, " + GlobalVariables.TIME_OF_EVENT_FIELD + ", GETDATE())<= 0;";
                 object[] counter = QuerySelectOfOneRow(countQuery);
                 if (counter != null)
                 {
@@ -105,7 +108,8 @@ namespace CovidKeeperFrontend.Model
         {
             await Task.Run(() =>
             {
-                string handleQuery = "SELECT Handle from [dbo].[Starter]";
+                string handleQuery = "SELECT " + GlobalVariables.HANDLE_STARTER_FIELD + " " +
+                "from [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.STARTER_TABLE_NAME + "]";
                 object[] handle = QuerySelectOfOneRow(handleQuery);
                 if (handle != null)
                 {
@@ -119,7 +123,9 @@ namespace CovidKeeperFrontend.Model
         {
             await Task.Run(() =>
             {
-                string countQuery = "SELECT COUNT(Id_worker) FROM [dbo].[History_Events] where (DATEDIFF(d, Time_of_event, GETDATE()) = 0);";
+                string countQuery = "SELECT COUNT(" + GlobalVariables.ID_WORKER_FIELD + ") " +
+                "FROM [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "] " +
+                "where (DATEDIFF(d, " + GlobalVariables.TIME_OF_EVENT_FIELD + ", GETDATE()) = 0);";
                 object[] counter = QuerySelectOfOneRow(countQuery);
                 if (counter != null)
                 {
@@ -132,7 +138,8 @@ namespace CovidKeeperFrontend.Model
         {
             return await Task.Run(() =>
             {
-                string countQuery = "SELECT Count(Id) FROM [dbo].[Workers];";
+                string countQuery = "SELECT Count(" + GlobalVariables.ID_FIELD + ") " +
+                "FROM [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.WORKERS_TABLE_NAME + "];";
                 object[] counter = QuerySelectOfOneRow(countQuery);
                 if (counter != null)
                 {
@@ -148,12 +155,12 @@ namespace CovidKeeperFrontend.Model
             await Task.Run(() =>
             {
                 string todayPerYesterdayQuery = "select " +
-                "(SELECT COUNT( DISTINCT[Id_worker]) as num_bad_workers " +
-                "FROM[dbo].[History_Events] " +
-                "WHERE DATEDIFF(day, Time_of_event, GETDATE())<= 0) as countToday, " +
-                "(SELECT COUNT(DISTINCT[Id_worker]) as num_bad_workers " +
-                "FROM[dbo].[History_Events] " +
-                "WHERE DATEDIFF(day, Time_of_event, GETDATE()-1)<= 0) as countYesterday; ";
+                "(SELECT COUNT( DISTINCT[" + GlobalVariables.ID_WORKER_FIELD + "]) as num_bad_workers " +
+                "FROM[" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "] " +
+                "WHERE DATEDIFF(day, " + GlobalVariables.TIME_OF_EVENT_FIELD + ", GETDATE())<= 0) as countToday, " +
+                "(SELECT COUNT(DISTINCT[" + GlobalVariables.ID_WORKER_FIELD + "]) as num_bad_workers " +
+                "FROM[" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "] " +
+                "WHERE DATEDIFF(day, " + GlobalVariables.TIME_OF_EVENT_FIELD + ", GETDATE()-1)<= 0) as countYesterday; ";
                 object[] todayPerYesterday = QuerySelectOfOneRow(todayPerYesterdayQuery);
                 if (todayPerYesterday != null)
                 {
@@ -194,10 +201,12 @@ namespace CovidKeeperFrontend.Model
         //Function that updates the flag in Starter table
         private async Task UpdateHandleInStarter(string valueInTable, string valueToUpdate)
         {
-            string updateQuery = @"UPDATE [dbo].[Starter] SET Handle = @Handle where Handle = " + valueInTable;
+            string updateQuery = @"UPDATE [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.STARTER_TABLE_NAME + "] " +
+                "SET " + GlobalVariables.HANDLE_STARTER_FIELD + " = @" + GlobalVariables.HANDLE_STARTER_FIELD + " " +
+                "where " + GlobalVariables.HANDLE_STARTER_FIELD + " = " + valueInTable;
             Dictionary<string, string> fieldNameToValueDict = new Dictionary<string, string> 
             { 
-                { "@Handle", valueToUpdate } 
+                { "@" + GlobalVariables.HANDLE_STARTER_FIELD + "", valueToUpdate } 
             };
             await QueryDatabaseWithDict(updateQuery, fieldNameToValueDict);
         }

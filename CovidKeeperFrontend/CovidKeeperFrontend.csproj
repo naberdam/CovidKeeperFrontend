@@ -153,6 +153,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="HelperClasses\GlobalVariables.cs" />
     <Compile Include="HelperClasses\GraphContent.cs" />
     <Compile Include="HelperClasses\NotifyTaskCompletion.cs" />
     <Compile Include="Model\AbstractModel.cs" />

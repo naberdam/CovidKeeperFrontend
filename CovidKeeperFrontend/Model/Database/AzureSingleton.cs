@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.Storage;
+﻿using CovidKeeperFrontend.HelperClasses;
+using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Newtonsoft.Json;
 using System;
@@ -18,7 +19,7 @@ namespace CovidKeeperFrontend.Model.Database
         private readonly SqlConnection sqlConnection;
         private static readonly Lazy<AzureSingleton> lazy = new Lazy<AzureSingleton>(() => new AzureSingleton());
         private readonly CloudStorageAccount cloudStorageAccount;
-        private const string configFileName = "CovidKeeperFrontend\\Files\\configAzure.json";
+        private const string CONFIG_FILE_NAME = "configAzure.json";
         private const string databaseKey = "Database";
         private const string storageKey = "Storage";
         private const string endOfFile = ".jpg";
@@ -29,7 +30,7 @@ namespace CovidKeeperFrontend.Model.Database
         {
             string path = AppDomain.CurrentDomain.BaseDirectory;
             path = path.Substring(0, path.Length - 4);
-            path += configFileName;
+            path += GlobalVariables.FILES_FOLDER_PATH + AzureSingleton.CONFIG_FILE_NAME;
             Dictionary<string, string> configDict = new Dictionary<string, string>();
             using (StreamReader r = new StreamReader(path))
             {
@@ -44,12 +45,12 @@ namespace CovidKeeperFrontend.Model.Database
             //After we succeed to read from the file we want to check if the databaseKey is exists there
             if (!configDict.ContainsKey(databaseKey))
             {
-                throw new Exception("The key " + databaseKey + " is not exists in " + configFileName + " file");
+                throw new Exception("The key " + databaseKey + " is not exists in " + path + " file");
             }
             //After we succeed to read from the file we want to check if the storageKey is exists there
             if (!configDict.ContainsKey(storageKey))
             {
-                throw new Exception("The key " + storageKey + " is not exists in " + configFileName + " file");
+                throw new Exception("The key " + storageKey + " is not exists in " + path + " file");
             }
             string connectionString = configDict[databaseKey];
             sqlConnection = new SqlConnection(connectionString);
@@ -201,10 +202,12 @@ namespace CovidKeeperFrontend.Model.Database
         {
             using (var command = sqlConnection.CreateCommand())
             {
-                string updateQuery = @"UPDATE [dbo].[Manager_Config] SET Minutes_between_mails = @Minutes_between_mails, Handle = @Handle";
+                string updateQuery = @"UPDATE [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.MANAGER_CONFIG_TABLE_NAME + "] " +
+                    "SET " + GlobalVariables.MINUTES_BETWEEN_MAILS_FIELD + " = @" + GlobalVariables.MINUTES_BETWEEN_MAILS_FIELD + ", " +
+                    "" + GlobalVariables.HANDLE_MANAGER_FIELD + " = @" + GlobalVariables.HANDLE_MANAGER_FIELD + "";
                 command.CommandText = updateQuery;
-                command.Parameters.AddWithValue("@Minutes_between_mails", minutesBreakToChange);
-                command.Parameters.AddWithValue("@Handle", 1);
+                command.Parameters.AddWithValue("@" + GlobalVariables.MINUTES_BETWEEN_MAILS_FIELD + "", minutesBreakToChange);
+                command.Parameters.AddWithValue("@" + GlobalVariables.HANDLE_MANAGER_FIELD + "", 1);
                 await command.ExecuteNonQueryAsync();
             }
         }
@@ -212,16 +215,17 @@ namespace CovidKeeperFrontend.Model.Database
         //Function that insert events by id according to the given id in case that the client wanted to edit the worker's id
         public async Task InsertEventsListById(List<object[]> eventsList, string idWorker)
         {
-            string insertStmt = "INSERT INTO [dbo].[History_Events] VALUES(@Id_worker, @Time_of_event)";
+            string insertStmt = "INSERT INTO [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "] " +
+                "VALUES(@" + GlobalVariables.ID_WORKER_FIELD + ", @" + GlobalVariables.TIME_OF_EVENT_FIELD + ")";
             using (var cmd = sqlConnection.CreateCommand())
             {
                 cmd.CommandText = insertStmt;
-                cmd.Parameters.Add("@Id_worker", SqlDbType.VarChar).Value = idWorker;
-                cmd.Parameters.Add("@Time_of_event", SqlDbType.DateTime);
+                cmd.Parameters.Add("@" + GlobalVariables.ID_WORKER_FIELD + "", SqlDbType.VarChar).Value = idWorker;
+                cmd.Parameters.Add("@" + GlobalVariables.TIME_OF_EVENT_FIELD + "", SqlDbType.DateTime);
                 //Iterate over all Time_of_event's and execute the INSERT statement for each of them
                 foreach (var item in eventsList)
                 {
-                    cmd.Parameters["@Time_of_event"].Value = Convert.ToDateTime(item[1]);
+                    cmd.Parameters["@" + GlobalVariables.TIME_OF_EVENT_FIELD + ""].Value = Convert.ToDateTime(item[1]);
                     await cmd.ExecuteNonQueryAsync();
                 }
             }

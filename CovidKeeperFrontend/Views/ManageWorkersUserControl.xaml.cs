@@ -1,4 +1,5 @@
-﻿using MaterialDesignThemes.Wpf;
+﻿using CovidKeeperFrontend.HelperClasses;
+using MaterialDesignThemes.Wpf;
 using Microsoft.Win32;
 using System;
 using System.CodeDom.Compiler;
@@ -75,7 +76,7 @@ namespace CovidKeeperFrontend.Views
             //Get the index of the selected row
             indexOfSelectedRow = WorkerDetailsTable.Items.IndexOf(WorkerDetailsTable.CurrentItem);
             DataRowView rowSelectedNow = WorkerDetailsTable.CurrentCell.Item as DataRowView;
-            string idWorker = rowSelectedNow["Id"].ToString();
+            string idWorker = rowSelectedNow[GlobalVariables.ID_FIELD].ToString();
             //Calling the delete function in the view model
             await (Application.Current as App).ManageWorkersViewModel.DeleteWorker(idWorker, indexOfSelectedRow);
             ClearFields();
@@ -84,7 +85,7 @@ namespace CovidKeeperFrontend.Views
         //Function that convert the image from the table to BitmapImage
         private void SetImageFromTableToBitmapImage(DataRowView row)
         {
-            byte[] imageArray = (byte[])row["Image"];
+            byte[] imageArray = (byte[])row[GlobalVariables.IMAGE_FIELD];
             if (imageArray.Length == 0)
             {
                 bitmapImage = default;
@@ -111,21 +112,39 @@ namespace CovidKeeperFrontend.Views
             return image;
         }
         private void AddButton_Click(object sender, RoutedEventArgs e)
-        {
+        {            
             string idWorker = IdWorker.Text;
             string emailAddress = EmailAddress.Text;
             string fullName = FullName.Text;
-            bool checkIfInsertionSucceed = (Application.Current as App).ManageWorkersViewModel.InsertWorker(idWorker, fullName, 
+            if (CheckIfIdExistsInDataGrid(idWorker, fullName))
+            {                
+                return;
+            }
+            (Application.Current as App).ManageWorkersViewModel.InsertWorker(idWorker, fullName, 
                 emailAddress, bitmapImage);
-            //Check if insert worker succeed or not
-            if (checkIfInsertionSucceed)
+            ClearFields();
+            this.IsEnabled = true;
+            SetIsEnabled(true);
+            //Close DialoHost
+            DialogHost.CloseDialogCommand.Execute(null, null);
+        }
+
+        private bool CheckIfIdExistsInDataGrid(string idWorker, string fullName)
+        {
+            var itemSource = WorkerDetailsTable.Items;
+            if (itemSource == null)
             {
-                ClearFields();
-                this.IsEnabled = true;
-                SetIsEnabled(true);
-                //Close DialoHost
-                DialogHost.CloseDialogCommand.Execute(null, null);
-            }            
+                return false;
+            }
+            foreach (DataRowView rowView in itemSource)
+            {
+                if (rowView[GlobalVariables.ID_FIELD].ToString() == idWorker && rowView != rowViewSelected)
+                {
+                    MessageBox.Show("This id already belongs to " + fullName + ".\nPlease select another id.");
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void CancelAddWorkerButton_Click(object sender, RoutedEventArgs e)
@@ -164,8 +183,25 @@ namespace CovidKeeperFrontend.Views
                 }
             }
         }
+
+        private void CheckTextIfNotEmpty(ref TextBox textToCheck)
+        {
+            if (textToCheck.Text != "")
+            {
+                textToCheck.Text = "";
+            }
+        }
         private void PlusButton_Click(object sender, RoutedEventArgs e)
         {
+            indexOfSelectedRow = WorkerDetailsTable.Items.IndexOf(WorkerDetailsTable.CurrentItem);
+            rowViewSelected = WorkerDetailsTable.CurrentCell.Item as DataRowView;
+            CheckTextIfNotEmpty(ref IdWorker);
+            CheckTextIfNotEmpty(ref FullName);
+            CheckTextIfNotEmpty(ref EmailAddress);
+            if (ImageWorker.Source != default)
+            {
+                ImageWorker.Source = default;
+            }
             //Disable all windows and user controls besides of the DialogHost of adding worker
             this.IsEnabled = false;
             SetIsEnabled(false);
@@ -350,24 +386,26 @@ namespace CovidKeeperFrontend.Views
             string emailAddress = EmailAddressUpdate.Text;
             string fullName = FullNameUpdate.Text;
             SetImageFromTableToBitmapImage(rowViewSelected);
-            bool checkIfUpdateSucceed;
+            if (CheckIfIdExistsInDataGrid(idWorker, fullName))
+            {
+                return;
+            }
             //Call update function from view model
             if (idWorker != idWorkerInDataTable)
             {
-                checkIfUpdateSucceed = (Application.Current as App).ManageWorkersViewModel.UpdateWorkerDetailsWithNewId(idWorkerInDataTable, idWorker, fullName, emailAddress, bitmapImage, indexOfSelectedRow);
+                (Application.Current as App).ManageWorkersViewModel.UpdateWorkerDetailsWithNewId(idWorkerInDataTable, idWorker, 
+                    fullName, emailAddress, bitmapImage, indexOfSelectedRow);
             }
             else
             {
-                checkIfUpdateSucceed = (Application.Current as App).ManageWorkersViewModel.UpdateWorkerDetails(idWorker, fullName, emailAddress, bitmapImage, indexOfSelectedRow);
+                (Application.Current as App).ManageWorkersViewModel.UpdateWorkerDetails(idWorker, fullName, 
+                    emailAddress, bitmapImage, indexOfSelectedRow);
             }
-            if (checkIfUpdateSucceed)
-            {
-                ClearFields();
-                this.IsEnabled = true;
-                SetIsEnabled(true);
-                //Close DialogHost
-                DialogHost.CloseDialogCommand.Execute(null, null);
-            }            
+            ClearFields();
+            this.IsEnabled = true;
+            SetIsEnabled(true);
+            //Close DialogHost
+            DialogHost.CloseDialogCommand.Execute(null, null);
         }
 
         private void CancelSaveUpdateButton_Click(object sender, RoutedEventArgs e)
@@ -396,11 +434,15 @@ namespace CovidKeeperFrontend.Views
             emailAddressIsGood = false;
             SetImageFromTableToBitmapImage(rowViewSelected);
             imageIsGood = true;
-            IdWorkerUpdate.Text = rowViewSelected["Id"].ToString();
-            FullNameUpdate.Text = rowViewSelected["Fullname"].ToString();
-            EmailAddressUpdate.Text = rowViewSelected["Email_address"].ToString();            
+            IdWorkerUpdate.Text = default;
+            FullNameUpdate.Text = default;
+            EmailAddressUpdate.Text = default;
+            ImageWorkerUpdate.Source = default;
+            IdWorkerUpdate.Text = rowViewSelected[GlobalVariables.ID_FIELD].ToString();
+            FullNameUpdate.Text = rowViewSelected[GlobalVariables.FULL_NAME_FIELD].ToString();
+            EmailAddressUpdate.Text = rowViewSelected[GlobalVariables.EMAIL_ADDRESS_FIELD].ToString();            
             ImageWorkerUpdate.Source = bitmapImage;
-            idWorkerInDataTable = rowViewSelected["Id"].ToString();
+            idWorkerInDataTable = IdWorkerUpdate.Text;
         }
 
         //Function that handling the text changing in EmailAddress

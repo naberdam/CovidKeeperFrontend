@@ -87,7 +87,7 @@ namespace CovidKeeperFrontend.Views
             //If the client choose a row in total events
             if (rowSelected != null)
             {
-                (Application.Current as App).StatisticalDataViewModel.VM_IdWorkerForLineGraphProperty = rowSelected["Id_worker"].ToString();
+                (Application.Current as App).StatisticalDataViewModel.VM_IdWorkerForLineGraphProperty = rowSelected[GlobalVariables.ID_WORKER_FIELD].ToString();
             }            
         }
 

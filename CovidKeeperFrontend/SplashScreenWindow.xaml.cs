@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CovidKeeperFrontend.HelperClasses;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,7 +25,7 @@ namespace CovidKeeperFrontend
             InitializeComponent();
             string path = AppDomain.CurrentDomain.BaseDirectory;
             path = path.Substring(0, path.Length - 4);
-            var image = new BitmapImage(new Uri(path + "CovidKeeperFrontend\\Files\\load_screen_image.jpeg"));
+            var image = new BitmapImage(new Uri(path + GlobalVariables.FILES_FOLDER_PATH + "load_screen_image.jpeg"));
             ImageLoadScreen.ImageSource = image;
         }
 
