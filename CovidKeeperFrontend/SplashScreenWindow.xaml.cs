@@ -20,12 +20,13 @@ namespace CovidKeeperFrontend
     /// </summary>
     public partial class SplashScreenWindow : Window
     {
+        private const string LOAD_SCREEN_IMAGE_NAME = "load_screen_image.jpeg";
         public SplashScreenWindow()
         {
             InitializeComponent();
             string path = AppDomain.CurrentDomain.BaseDirectory;
             path = path.Substring(0, path.Length - 4);
-            var image = new BitmapImage(new Uri(path + GlobalVariables.FILES_FOLDER_PATH + "load_screen_image.jpeg"));
+            var image = new BitmapImage(new Uri(path + GlobalVariables.FILES_FOLDER_PATH + LOAD_SCREEN_IMAGE_NAME));
             ImageLoadScreen.ImageSource = image;
         }
 

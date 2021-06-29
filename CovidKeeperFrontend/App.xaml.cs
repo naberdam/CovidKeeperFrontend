@@ -17,7 +17,6 @@ namespace CovidKeeperFrontend
     /// </summary>
     public partial class App : Application
     {
-        /*public WpfDatabase WpfDatabaseObject = new WpfDatabase();*/
         public HomeModel Home = new HomeModel();
         public MainMenuModel MainMenu = new MainMenuModel();
         public ManageWorkersModel ManageWorkers = new ManageWorkersModel();
@@ -38,32 +37,32 @@ namespace CovidKeeperFrontend
         {
             base.OnStartup(e);
 
-            //initialize the splash screen and set it as the application main window
+            //Initialize the splash screen and set it as the application main window
             var splashScreen = new SplashScreenWindow();
             this.MainWindow = splashScreen;
             splashScreen.Show();
 
-            //in order to ensure the UI stays responsive, we need to
-            //do the work on a different thread
+            //In order to ensure the UI stays responsive, we need to
+            //Do the work on a different thread
             Task.Factory.StartNew(() =>
             {
-                //we need to do the work in batches so that we can report progress
-                for (int i = 1; i <= 100; i++)
+                //We need to do the work in batches so that we can report progress
+                for (int i = 1; i <= 150; i++)
                 {
-                    //simulate a part of work being done
+                    //Simulate a part of work being done
                     System.Threading.Thread.Sleep(30);
 
-                    //because we're not on the UI thread, we need to use the Dispatcher
-                    //associated with the splash screen to update the progress bar
+                    //Because we're not on the UI thread, we need to use the Dispatcher
+                    //Associated with the splash screen to update the progress bar
                     splashScreen.Dispatcher.Invoke(() => splashScreen.Progress = i);
                 }
 
-                //once we're done we need to use the Dispatcher
-                //to create and show the main window
+                //Once we're done we need to use the Dispatcher
+                //To create and show the main window
                 this.Dispatcher.Invoke(() =>
                 {
-                    //initialize the main window, set it as the application main window
-                    //and close the splash screen
+                    //Initialize the main window, set it as the application main window
+                    //And close the splash screen
                     var mainWindow = new MainMenu();
                     this.MainWindow = mainWindow;
                     
