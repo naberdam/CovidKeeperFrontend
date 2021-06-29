@@ -343,6 +343,7 @@ namespace CovidKeeperFrontend.Model
             }
         }
 
+        //Function that deletes rows from table
         private DataTable DeleteRowFromTable(DataTable dataTableToDelete, int indexOfSelectedRow = -1)
         {            
             if (indexOfSelectedRow != -1)
