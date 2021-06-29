@@ -351,25 +351,7 @@ namespace CovidKeeperFrontend.Model
             EndDateForTextRepresentationProperty = DateTime.Now;
             StartDateForTextRepresentationProperty = StartDateInDatePickerProperty;
             return default;
-        }
-
-        //Function that check if the given datatables are the same
-        public static bool AreTablesTheSame(DataTable tbl1, DataTable tbl2)
-        {
-            //If the amount of the rows or columns in each datatable are equal
-            if (tbl1.Rows.Count != tbl2.Rows.Count || tbl1.Columns.Count != tbl2.Columns.Count)
-                return false;
-            //make loop over the datatable to check if they are equal
-            for (int i = 0; i < tbl1.Rows.Count; i++)
-            {
-                for (int c = 0; c < tbl1.Columns.Count; c++)
-                {
-                    if (!Equals(tbl1.Rows[i][c], tbl2.Rows[i][c]))
-                        return false;
-                }
-            }
-            return true;
-        }
+        }        
 
         //Function that initializes the dictionary of work week as keys and amount events as values
         private void InitialWorkWeekAndAmountEventsDict()

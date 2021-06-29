@@ -20,10 +20,17 @@ namespace CovidKeeperFrontend.Model
         private DataTable workerDetailsTable = default;
         public DataTable WorkerDetailsTableProperty
         {
-            get { return workerDetailsTable; }
+            get 
+            {
+                if (workerDetailsTable == default)
+                {
+                    return default;
+                }
+                return workerDetailsTable.Copy(); 
+            }
             set
             {
-                if (workerDetailsTable != value)
+                if (workerDetailsTable == default || !AreTablesTheSame(workerDetailsTable, value))
                 {
                     workerDetailsTable = value;
                     //Update the CountWorkersInWorkersDetailsTableProperty with the number of rows of this dataTable
@@ -41,16 +48,23 @@ namespace CovidKeeperFrontend.Model
         private DataTable searchWorkerDetailsTable = default;
         public DataTable SearchWorkerDetailsTableProperty
         {
-            get { return searchWorkerDetailsTable; }
+            get
+            {
+                if (searchWorkerDetailsTable == default)
+                {
+                    return default;
+                }
+                return searchWorkerDetailsTable.Copy();
+            }
             set
             {
-                if (searchWorkerDetailsTable != value)
+                if (searchWorkerDetailsTable == default || !AreTablesTheSame(searchWorkerDetailsTable, value))
                 {
                     searchWorkerDetailsTable = value;
-                    //Update the CountWorkersInWorkersDetailsTableProperty with the number of rows of this dataTable
-                    CountWorkersInWorkersDetailsTableProperty = value.Rows.Count.ToString();
                     //This is SearchWorkerDetailsTableProperty and not WorkersDetailsTableProperty
                     SearchOrWorkersTableProperty = true;
+                    //Update the CountWorkersInWorkersDetailsTableProperty with the number of rows of this dataTable
+                    CountWorkersInSearchWorkersDetailsTableProperty = value.Rows.Count.ToString();                    
                     NotifyPropertyChanged("WorkerDetailsTableProperty");
                 }
             }
@@ -78,7 +92,22 @@ namespace CovidKeeperFrontend.Model
                 }
             }
         }
-        
+
+        //Property that defines the count workers in SearchWorkersDetailsTable
+        private string countWorkersInSearchWorkersDetailsTable;
+        public string CountWorkersInSearchWorkersDetailsTableProperty
+        {
+            get { return countWorkersInSearchWorkersDetailsTable; }
+            set
+            {
+                if (countWorkersInSearchWorkersDetailsTable != value)
+                {
+                    countWorkersInSearchWorkersDetailsTable = value;
+                    NotifyPropertyChanged("CountWorkersInWorkersDetailsTableProperty");
+                }
+            }
+        }
+
 
         public NotifyTaskCompletion<int> RefreshData { get; private set; }
         public ManageWorkersModel()
@@ -296,13 +325,33 @@ namespace CovidKeeperFrontend.Model
                 "WHERE " + GlobalVariables.ID_FIELD + " = '" + idWorker + "';";
             await QueryDatabaseWithDict(deleteQuery);
             await DeleteImageFromStorage(idWorker);
-            DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
+            //If we are in search mode
+            if (SearchOrWorkersTableProperty)
+            {
+                DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
+                DataRow[] results = workerDetailsTableTemp.Select(GlobalVariables.ID_FIELD + " = '" + idWorker + "'");
+                var index = workerDetailsTableTemp.Rows.IndexOf(results[0]);
+                WorkerDetailsTableProperty = DeleteRowFromTable(workerDetailsTableTemp, index); ;
+                DataTable searchWorkerDetailsTableTemp = SearchWorkerDetailsTableProperty;
+                SearchWorkerDetailsTableProperty = DeleteRowFromTable(searchWorkerDetailsTableTemp, indexOfSelectedRow);                
+            }
+            //Not in search mode
+            else
+            {
+                DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
+                WorkerDetailsTableProperty = DeleteRowFromTable(workerDetailsTableTemp, indexOfSelectedRow);
+            }
+        }
+
+        private DataTable DeleteRowFromTable(DataTable dataTableToDelete, int indexOfSelectedRow = -1)
+        {            
             if (indexOfSelectedRow != -1)
             {
-                workerDetailsTableTemp.Rows[indexOfSelectedRow].Delete();
-                workerDetailsTableTemp.AcceptChanges();
-                WorkerDetailsTableProperty = workerDetailsTableTemp;
-            }            
+                dataTableToDelete.Rows[indexOfSelectedRow].Delete();
+                dataTableToDelete.AcceptChanges();
+                return dataTableToDelete;
+            }
+            return dataTableToDelete;
         }
 
         //Function that refresh WorkerDetailsTableProperty and returns it to the ManageWorkersUserControl
@@ -310,6 +359,8 @@ namespace CovidKeeperFrontend.Model
         {
             SearchOrWorkersTableProperty = false;
             NotifyPropertyChanged("WorkerDetailsTableProperty");
+            NotifyPropertyChanged("CountWorkersInWorkersDetailsTableProperty");
+            CountWorkersInSearchWorkersDetailsTableProperty = default;
         }
     }
 }

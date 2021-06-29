@@ -28,7 +28,14 @@ namespace CovidKeeperFrontend.ViewModel
         //Property of binding CountWorkersInWorkersDetailsTableProperty to view
         public string VM_CountWorkersInWorkersDetailsTableProperty 
         { 
-            get { return model.CountWorkersInWorkersDetailsTableProperty; }
+            get 
+            {
+                if (model.SearchOrWorkersTableProperty)
+                {
+                    return model.CountWorkersInSearchWorkersDetailsTableProperty;
+                }
+                return model.CountWorkersInWorkersDetailsTableProperty; 
+            }
         }
         //Property of binding SearchWorkerDetailsTableProperty or WorkerDetailsTableProperty to view
         public DataTable VM_WorkerDetailsTableProperty
