@@ -38,7 +38,7 @@ namespace CovidKeeperFrontend.Model
                     //Update the flag of UpdateHandleInAnalayzerConfig
                     UpdateHandleInAnalayzerConfigAsync = new NotifyTaskCompletion<int>(UpdateHandleInAnalayzerConfig());
                     //This is WorkersDetailsTableProperty and not SearchWorkerDetailsTableProperty
-                    SearchOrWorkersTableProperty = false;
+                    //SearchOrWorkersTableProperty = false;
                     NotifyPropertyChanged("WorkerDetailsTableProperty");
                 }
             }
@@ -138,6 +138,7 @@ namespace CovidKeeperFrontend.Model
             {
                 dataTable.ImportRow(row);
             }
+            SearchOrWorkersTableProperty = true;
             return dataTable;
         }
 
@@ -266,15 +267,38 @@ namespace CovidKeeperFrontend.Model
             //It does not exists so updates the worker's details
             byte[] imageToByte = ImagePathToByteArray(imagePath);
             DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
-            var rowToChange = workerDetailsTableTemp.Rows[indexOfSelectedRow];
+            DataRow[] results = workerDetailsTableTemp.Select(GlobalVariables.ID_FIELD + " = '" + idWorkerInDataTable + "'");
+            var index = workerDetailsTableTemp.Rows.IndexOf(results[0]);
+            var rowToChange = workerDetailsTableTemp.Rows[index];
+            UpdateRowToChange(ref rowToChange, idWorker, fullname, emailAddress, imageToByte);
+            WorkerDetailsTableProperty = workerDetailsTableTemp;
+            //Search mode
+            if (SearchOrWorkersTableProperty)
+            {
+                
+                DataTable searchWorkerDetailsTableTemp = SearchWorkerDetailsTableProperty;
+                rowToChange = searchWorkerDetailsTableTemp.Rows[indexOfSelectedRow];
+                UpdateRowToChange(ref rowToChange, idWorker, fullname, emailAddress, imageToByte);
+                SearchWorkerDetailsTableProperty = searchWorkerDetailsTableTemp;
+            }
+            
             await UploadImageToStorage(idWorker, imageToByte);
+            /*rowToChange[GlobalVariables.ID_FIELD] = idWorker;
+            rowToChange[GlobalVariables.FULL_NAME_FIELD] = fullname;
+            rowToChange[GlobalVariables.EMAIL_ADDRESS_FIELD] = emailAddress;
+            rowToChange[GlobalVariables.IMAGE_FIELD] = imageToByte;*/
+            /*WorkerDetailsTableProperty = workerDetailsTableTemp;*/
+            await UpdateWorkerId(idWorkerInDataTable, idWorker, fullname, emailAddress);            
+            return default;
+        }
+
+
+        private void UpdateRowToChange(ref DataRow rowToChange, string idWorker, string fullname, string emailAddress, byte[] imageToByte)
+        {
             rowToChange[GlobalVariables.ID_FIELD] = idWorker;
             rowToChange[GlobalVariables.FULL_NAME_FIELD] = fullname;
             rowToChange[GlobalVariables.EMAIL_ADDRESS_FIELD] = emailAddress;
             rowToChange[GlobalVariables.IMAGE_FIELD] = imageToByte;
-            WorkerDetailsTableProperty = workerDetailsTableTemp;
-            await UpdateWorkerId(idWorkerInDataTable, idWorker, fullname, emailAddress);            
-            return default;
         }
 
         //Function that updates worker's details in case the worker's id has been changed
