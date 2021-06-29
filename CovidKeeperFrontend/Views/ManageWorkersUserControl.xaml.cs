@@ -158,6 +158,15 @@ namespace CovidKeeperFrontend.Views
         //Function to load image from client's computer
         private void LoadButton_Click(object sender, RoutedEventArgs e)
         {
+            SetImageInImageSource(ref AddButton, ref ImageWorker);
+        }
+        private void LoadButtonUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            SetImageInImageSource(ref SaveUpdateButton, ref ImageWorkerUpdate);
+        }
+
+        private void SetImageInImageSource(ref Button buttonToEnable, ref Image imageToUpdate)
+        {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 Multiselect = false,
@@ -170,16 +179,16 @@ namespace CovidKeeperFrontend.Views
             {
                 //Set the image that worker's image
                 bitmapImage = new BitmapImage(new Uri(openFileDialog.FileName));
-                ImageWorker.Source = bitmapImage;
+                imageToUpdate.Source = bitmapImage;
                 imageIsGood = true;
                 //Check if all values are set properly for IsEnabled of AddButton
                 if (fullNameIsGood && emailAddressIsGood && idWorkerIsGood)
                 {
-                    AddButton.IsEnabled = true;
+                    buttonToEnable.IsEnabled = true;
                 }
                 else
                 {
-                    AddButton.IsEnabled = false;
+                    buttonToEnable.IsEnabled = false;
                 }
             }
         }
@@ -385,7 +394,6 @@ namespace CovidKeeperFrontend.Views
             string idWorker = IdWorkerUpdate.Text;
             string emailAddress = EmailAddressUpdate.Text;
             string fullName = FullNameUpdate.Text;
-            SetImageFromTableToBitmapImage(rowViewSelected);
             if (CheckIfIdExistsInDataGrid(idWorker, fullName))
             {
                 return;
@@ -468,5 +476,7 @@ namespace CovidKeeperFrontend.Views
             UpdateIsEnabledAddButton((Application.Current as App).ManageWorkersViewModel.IdWorkerUpdateRuleProperty, textBox.Text,
                 ref idWorkerIsGood, fullNameIsGood, emailAddressIsGood, imageIsGood, ref SaveUpdateButton);
         }
+
+        
     }
 }

@@ -289,6 +289,9 @@ namespace CovidKeeperFrontend.Model
         //Function that deletes worker and updating the WorkerDetailsTableProperty
         public async Task DeleteWorker(string idWorker, int indexOfSelectedRow=-1)
         {
+            string deleteEventsQuery = @"DELETE FROM [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.HISTORY_EVENTS_TABLE_NAME + "] " +
+                    "WHERE " + GlobalVariables.ID_WORKER_FIELD + " = '" + idWorker + "';";
+            await QueryDatabaseWithDict(deleteEventsQuery);
             string deleteQuery = @"DELETE FROM [" + GlobalVariables.DBO_NAME + "].[" + GlobalVariables.WORKERS_TABLE_NAME + "] " +
                 "WHERE " + GlobalVariables.ID_FIELD + " = '" + idWorker + "';";
             await QueryDatabaseWithDict(deleteQuery);
@@ -296,8 +299,8 @@ namespace CovidKeeperFrontend.Model
             DataTable workerDetailsTableTemp = WorkerDetailsTableProperty;
             if (indexOfSelectedRow != -1)
             {
-                var rowToChange = workerDetailsTableTemp.Rows[indexOfSelectedRow];
-                rowToChange.Delete();
+                workerDetailsTableTemp.Rows[indexOfSelectedRow].Delete();
+                workerDetailsTableTemp.AcceptChanges();
                 WorkerDetailsTableProperty = workerDetailsTableTemp;
             }            
         }
